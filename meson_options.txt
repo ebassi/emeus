@@ -1,0 +1,10 @@
+option('enable-gtk-doc', type: 'boolean',
+       value: false,
+       description: 'Enable generating the API reference (depends on GTK-Doc)')
+option('enable-introspection', type: 'boolean',
+       value: true,
+       description: 'Enable GObject Introspection (depends on GObject)')
+option('enable-debug', type: 'combo',
+       choices: [ 'auto', 'yes', 'minimum', 'no' ],
+       value: 'auto',
+       description: 'Enable debugging level')
