@@ -18,7 +18,6 @@ typedef struct {
 
   double value;
 
-  gboolean is_dummy : 1;
   gboolean is_external : 1;
   gboolean is_pivotable : 1;
   gboolean is_restricted : 1;

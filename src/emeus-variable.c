@@ -11,7 +11,6 @@ dummy_variable_init (Variable   *v,
 {
   v->v_type = VARIABLE_TYPE_DUMMY;
   v->name = g_quark_from_string (name);
-  v->is_dummy = TRUE;
   v->is_external = FALSE;
   v->is_pivotable = FALSE;
   v->is_restricted = TRUE;
@@ -24,7 +23,6 @@ objective_variable_init (Variable   *v,
 {
   v->v_type = VARIABLE_TYPE_OBJECTIVE;
   v->name = g_quark_from_string (name);
-  v->is_dummy = FALSE;
   v->is_external = FALSE;
   v->is_pivotable = FALSE;
   v->is_restricted = FALSE;
@@ -37,7 +35,6 @@ slack_variable_init (Variable   *v,
 {
   v->v_type = VARIABLE_TYPE_SLACK;
   v->name = g_quark_from_string (name);
-  v->is_dummy = FALSE;
   v->is_external = FALSE;
   v->is_pivotable = TRUE;
   v->is_restricted = TRUE;
@@ -51,7 +48,6 @@ regular_variable_init (Variable   *v,
 {
   v->v_type = VARIABLE_TYPE_REGULAR;
   v->name = g_quark_from_string (name);
-  v->is_dummy = FALSE;
   v->is_external = TRUE;
   v->is_pivotable = FALSE;
   v->is_restricted = FALSE;
