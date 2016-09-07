@@ -38,7 +38,6 @@ install_headers(public_headers + [ 'emeus-version.h', 'emeus.h' ], subdir: 'emeu
 libemeus = shared_library('emeus-@0@'.format(emeus_api_version),
   sources: sources + private_headers,
   version: '@0@.@1@.@2@'.format(emeus_major_version, emeus_minor_version, emeus_micro_version),
-  soversion: emeus_so_version,
   install: true,
   dependencies: [ gtk_dep, mathlib_dep ],
   c_args: common_cflags + debug_cflags + gtk_version_cflags + [
