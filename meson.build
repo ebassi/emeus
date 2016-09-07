@@ -5,7 +5,8 @@ project('emeus', 'c',
           'c_std=c99',
           'warning_level=1'
         ],
-        license: 'LGPLv2.1+')
+        license: 'LGPLv2.1+',
+        meson_version: '>= 0.34.0')
 
 emeus_version = meson.project_version().split('.')
 emeus_major_version = emeus_version[0].to_int()
@@ -17,14 +18,7 @@ emeus_api_version = '@0@.0'.format(emeus_major_version)
 emeus_interface_age = 0
 emeus_binary_age = emeus_minor_version * 100 + emeus_micro_version
 
-# FIXME: Use '%' when it's available
-emeus_is_development = (emeus_minor_version - (2 * (emeus_minor_version / 2))) != 0
-
-soname_current = emeus_binary_age - emeus_interface_age
-soname_revision = emeus_interface_age
-soname_age = emeus_binary_age - emeus_interface_age
-# FIXME: Use .join()
-emeus_so_version = '@0@.@1@.@2@'.format(soname_age, soname_revision, soname_current)
+emeus_is_development = emeus_minor_version.is_odd()
 
 emeus_prefix = get_option('prefix')
 emeus_libdir = emeus_prefix + '/' + get_option('libdir')
@@ -146,11 +140,11 @@ mathlib_dep = cc.find_library('m', required: true)
 gtk_version_req_major = 3
 gtk_version_req_minor = 20
 gtk_version_req_micro = 0
-# FIXME: Use .join()
 gtk_version_required = '@0@.@1@.@2@'.format(gtk_version_req_major, gtk_version_req_minor, gtk_version_req_micro)
-gtk_version_is_development = (gtk_version_req_minor - (2 * (gtk_version_req_minor / 2))) != 0
-gtk_version_cflags = [ ]
+gtk_version_is_development = gtk_version_req_minor.is_odd()
+gtk_version_cflags = []
 if gtk_version_is_development
+  # Ensure we're using the newly added API at most
   min_required = 'GDK_VERSION_@0@_@1@'.format(gtk_version_req_major, gtk_version_req_minor - 1)
   max_allowed = 'GDK_VERSION_@0@_@1@'.format(gtk_version_req_major, gtk_version_req_minor + 1)
   gtk_version_cflags += [
