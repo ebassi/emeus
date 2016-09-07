@@ -34,4 +34,6 @@ void            expression_change_subject       (Expression *expression,
                                                  Variable   *old_subject,
                                                  Variable   *new_subject);
 
+char *          expression_to_string            (const Expression *expression);
+
 G_END_DECLS

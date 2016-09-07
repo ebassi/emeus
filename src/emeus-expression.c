@@ -71,6 +71,51 @@ expression_is_constant (Expression *expression)
   return expression->terms == NULL;
 }
 
+char *
+expression_to_string (const Expression *expression)
+{
+  GString *buf;
+  gboolean needs_plus = FALSE;
+  GHashTableIter iter;
+  gpointer key_p, value_p;
+
+  if (expression == NULL)
+    return NULL;
+
+  buf = g_string_new (NULL);
+
+  if (fabs (expression->constant - 0.0) > DBL_EPSILON || expression->terms == NULL)
+    {
+      g_string_append_printf (buf, "%g", expression->constant);
+
+      if (expression->terms == NULL)
+        return g_string_free (buf, FALSE);
+
+      needs_plus = TRUE;
+    }
+
+  g_hash_table_iter_init (&iter, expression->terms);
+  while (g_hash_table_iter_next (&iter, &key_p, &value_p))
+    {
+      Variable *v = key_p;
+      double *coeff = value_p;
+      char *var_str;
+
+      if (needs_plus)
+        g_string_append (buf, " + ");
+
+      var_str = variable_to_string (v);
+
+      g_string_append_printf (buf, "%g * %s", *coeff, var_str);
+
+      g_free (var_str);
+
+      needs_plus = TRUE;
+    }
+
+  return g_string_free (buf, FALSE);
+}
+
 static void
 expression_set_variable (Expression *expression,
                          Variable   *variable,

@@ -25,3 +25,47 @@ simplex_constraint_new (ConstraintType  c_type,
 
   return res;
 }
+
+static const char *strengths[] = {
+  [STRENGTH_REQUIRED] = "required",
+  [STRENGTH_STRONG]   = "strong",
+  [STRENGTH_MEDIUM]   = "medium",
+  [STRENGTH_WEAK]     = "weak",
+};
+
+static const char *operators[] = {
+  "<=",
+  "==",
+  ">="
+};
+
+char *
+simplex_constraint_to_string (const SimplexConstraint *constraint)
+{
+  GString *buf;
+  char *str;
+
+  if (constraint == NULL)
+    return NULL;
+
+  buf = g_string_new (NULL);
+
+  g_string_append (buf, strengths[constraint->strength]);
+  g_string_append_printf (buf, " {%g} ", constraint->weight);
+  g_string_append (buf, "(");
+
+  str = expression_to_string (constraint->expression);
+
+  if (str != NULL)
+    g_string_append (buf, str);
+
+  g_free (str);
+
+  g_string_append (buf, ") ");
+
+  g_string_append (buf, operators[constraint->op_type + 1]);
+
+  g_string_append (buf, " 0");
+
+  return g_string_free (buf, FALSE);
+}

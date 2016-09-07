@@ -131,3 +131,41 @@ variable_equal (gconstpointer v1,
 
   return FALSE;
 }
+
+char *
+variable_to_string (const Variable *variable)
+{
+  GString *buf;
+
+  if (variable == NULL)
+    return NULL;
+
+  buf = g_string_new (NULL);
+
+  switch (variable->v_type)
+    {
+    case VARIABLE_TYPE_DUMMY:
+      g_string_append (buf, "dummy:");
+      break;
+
+    case VARIABLE_TYPE_OBJECTIVE:
+      g_string_append (buf, "obj:");
+      break;
+
+    case VARIABLE_TYPE_SLACK:
+      g_string_append (buf, "slack:");
+      break;
+
+    case VARIABLE_TYPE_REGULAR:
+      g_string_append (buf, "v:");
+      break;
+    }
+
+  g_string_append (buf, "[");
+  g_string_append (buf, g_quark_to_string (variable->name));
+  g_string_append (buf, ":");
+  g_string_append_printf (buf, "%g", variable->value);
+  g_string_append (buf, "]");
+
+  return g_string_free (buf, FALSE);
+}

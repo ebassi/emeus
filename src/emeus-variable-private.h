@@ -38,4 +38,6 @@ guint           variable_hash   (gconstpointer v);
 gboolean        variable_equal  (gconstpointer v1,
                                  gconstpointer v2);
 
+char *          variable_to_string      (const Variable *variable);
+
 G_END_DECLS

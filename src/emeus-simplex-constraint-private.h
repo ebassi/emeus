@@ -26,3 +26,5 @@ SimplexConstraint *     simplex_constraint_new  (ConstraintType  c_type,
                                                  Expression     *param2,
                                                  int             strength,
                                                  double          weight);
+
+char *                  simplex_constraint_to_string    (const SimplexConstraint *constraint);
