@@ -26,18 +26,26 @@ simplex_constraint_new (ConstraintType  c_type,
   return res;
 }
 
-static const char *strengths[] = {
-  [STRENGTH_REQUIRED] = "required",
-  [STRENGTH_STRONG]   = "strong",
-  [STRENGTH_MEDIUM]   = "medium",
-  [STRENGTH_WEAK]     = "weak",
-};
-
 static const char *operators[] = {
   "<=",
   "==",
   ">="
 };
+
+static const char *
+strength_to_string (int strength)
+{
+  if (strength >= STRENGTH_REQUIRED)
+    return "required";
+
+  if (strength >= STRENGTH_STRONG)
+    return "strong";
+
+  if (strength >= STRENGTH_MEDIUM)
+    return "medium";
+
+  return "weak";
+}
 
 char *
 simplex_constraint_to_string (const SimplexConstraint *constraint)
@@ -50,7 +58,7 @@ simplex_constraint_to_string (const SimplexConstraint *constraint)
 
   buf = g_string_new (NULL);
 
-  g_string_append (buf, strengths[constraint->strength]);
+  g_string_append (buf, strength_to_string (constraint->strength));
   g_string_append_printf (buf, " {%g} ", constraint->weight);
   g_string_append (buf, "(");
 
