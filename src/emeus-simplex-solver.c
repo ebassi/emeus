@@ -26,6 +26,9 @@ simplex_solver_init (SimplexSolver *solver)
 
   /* HashTable<Variable, Expression>; does not own keys or values */
   solver->external_rows = g_hash_table_new (NULL, NULL);
+
+  /* HashSet<Variable>; does not own keys */
+  solver->infeasible_rows = g_hash_table_new (NULL, NULL);
 }
 
 void
@@ -105,4 +108,69 @@ simplex_solver_add_row (SimplexSolver *solver,
 
   if (variable_is_external (variable))
     g_hash_table_insert (solver->external_rows, variable, expression);
+}
+
+static void
+simplex_solver_remove_column (SimplexSolver *solver,
+                              Variable *variable)
+{
+  GHashTable *row_set = g_hash_table_lookup (solver->columns, variable);
+  GHashTableIter iter;
+  gpointer key_p;
+
+  if (row_set == NULL)
+    goto out;
+
+  g_hash_table_iter_init (&iter, row_set);
+  while (g_hash_table_iter_next (&iter, &key_p, NULL))
+    {
+      Expression *e = key_p;
+
+      expression_remove_variable (e, variable);
+    }
+
+  g_hash_table_remove (row_set, variable);
+
+out:
+  if (variable_is_external (variable))
+    g_hash_table_remove (solver->external_rows, variable);
+}
+
+static void
+remove_expression_columns (Term *term,
+                           gpointer data_)
+{
+  ForeachClosure *data = data_;
+
+  GHashTable *row_set = g_hash_table_lookup (data->solver->columns, term_get_variable (term));
+
+  if (row_set != NULL)
+    g_hash_table_remove (row_set, data->variable);
+}
+
+static Expression *
+simplex_solver_remove_row (SimplexSolver *solver,
+                           Variable *variable)
+{
+  Expression *e = g_hash_table_lookup (solver->rows, variable);
+  ForeachClosure data;
+
+  g_assert (e != NULL);
+
+  expression_ref (e);
+
+  data.variable = variable;
+  data.solver = solver;
+  expression_terms_foreach (e,
+                            remove_expression_columns,
+                            &data);
+
+  g_hash_table_remove (solver->infeasible_rows, variable);
+
+  if (variable_is_external (variable))
+    g_hash_table_remove (solver->external_rows, variable);
+
+  g_hash_table_remove (solver->rows, variable);
+
+  return e;
 }
