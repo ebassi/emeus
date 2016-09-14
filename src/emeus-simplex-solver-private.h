@@ -3,7 +3,10 @@
 #include "emeus-types-private.h"
 
 typedef struct {
+  /* HashTable<Variable, HashSet<Variable>> */
   GHashTable *columns;
+
+  /* HashTable<Variable, Expression> */
   GHashTable *rows;
 
   GHashTable *infeasible_rows;
@@ -23,8 +26,9 @@ typedef struct {
   int dummy_counter;
   int optimize_count;
 
-  gboolean auto_solve : 1;
-  gboolean needs_solving : 1;
+  bool auto_solve;
+  bool needs_solving;
 } SimplexSolver;
 
-SimplexSolver *         simplex_solver_new      (void);
+void simplex_solver_init (SimplexSolver *solver);
+void simplex_solver_clear (SimplexSolver *solver);

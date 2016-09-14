@@ -16,7 +16,7 @@ GtkWidget *     emeus_constraint_layout_new     (void);
 EMEUS_AVAILABLE_IN_1_0
 void            emeus_constraint_layout_pack                    (EmeusConstraintLayout   *layout,
                                                                  GtkWidget               *child,
-                                                                 EmeusConstraint         *first_constaint,
+                                                                 EmeusConstraint         *first_constraint,
                                                                  ...) G_GNUC_NULL_TERMINATED;
 EMEUS_AVAILABLE_IN_1_0
 void            emeus_constraint_layout_child_add_constraint    (EmeusConstraintLayout   *layout,
