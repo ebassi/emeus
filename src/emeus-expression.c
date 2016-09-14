@@ -149,6 +149,26 @@ expression_add_variable (Expression *expression,
   expression_add_term (expression, term);
 }
 
+void
+expression_remove_variable (Expression *expression,
+                            Variable *variable)
+{
+  GHashTableIter iter;
+  gpointer key_p;
+
+  if (expression->terms == NULL)
+    return;
+
+  g_hash_table_iter_init (&iter, expression->terms);
+  while (g_hash_table_iter_next (&iter, &key_p, NULL))
+    {
+      Term *t = key_p;
+
+      if (t->variable == variable)
+        g_hash_table_iter_remove (&iter);
+    }
+}
+
 Expression *
 expression_clone (const Expression *expression)
 {

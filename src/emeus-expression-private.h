@@ -56,6 +56,8 @@ GPtrArray *expression_get_terms_as_array (const Expression *expression);
 void expression_add_variable (Expression *expression,
                               Variable *variable,
                               double value);
+void expression_remove_variable (Expression *expression,
+                                 Variable *variable);
 
 double expression_get_value (const Expression *expression);
 
