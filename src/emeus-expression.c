@@ -3,242 +3,213 @@
 #include "emeus-expression-private.h"
 #include "emeus-variable-private.h"
 
-#include <float.h>
+#include <glib.h>
 #include <math.h>
+#include <float.h>
 
-static void     expression_set_variable         (Expression *expression,
-                                                 Variable   *variable,
-                                                 double      value);
+Term *
+term_new (Variable *variable,
+          double coefficient)
+{
+  Term *t = g_slice_new (Term);
+
+  t->variable = variable_ref (variable);
+  t->coefficient = coefficient;
+
+  return t;
+}
+
+Term *
+term_clone (const Term *term)
+{
+  Term *t = g_slice_new (Term);
+
+  t->variable = variable_clone (term->variable);
+  t->coefficient = term->coefficient;
+
+  return t;
+}
+
+void
+term_free (Term *term)
+{
+  if (term == NULL)
+    return;
+
+  variable_unref (term->variable);
+
+  g_slice_free (Term, term);
+}
+
+gboolean
+term_equal (gconstpointer v1,
+            gconstpointer v2)
+{
+  const Term *a = v1;
+  const Term *b = v2;
+
+  if (a == b)
+    return TRUE;
+
+  if (a->variable == b->variable &&
+      fabs (a->coefficient - b->coefficient) < DBL_EPSILON)
+    return TRUE;
+
+  if (g_strcmp0 (variable_get_name (a->variable), variable_get_name (b->variable)) != 0)
+    return FALSE;
+
+  if (fabs (variable_get_value (a->variable) - variable_get_value (b->variable)) > DBL_EPSILON)
+    return FALSE;
+
+  if (fabs (a->coefficient - b->coefficient) > DBL_EPSILON)
+    return FALSE;
+
+  return TRUE;
+}
 
 Expression *
 expression_new (Variable *variable,
-                double    value,
-                double    constant)
+                double value,
+                double constant)
 {
   Expression *res = g_slice_new (Expression);
 
   res->constant = constant;
+  res->terms = NULL;
 
   if (variable != NULL)
-    expression_set_variable (res, variable, constant);
+    expression_add_variable (res, variable, value);
 
   return res;
 }
 
+Expression *
+expression_new_from_variable (Variable *variable)
+{
+  return expression_new (variable, 1.0, 0.0);
+}
+
+Expression *
+expression_new_from_constant (double constant)
+{
+  return expression_new (NULL, 1.0, constant);
+}
+
+Expression *
+expression_new_empty (void)
+{
+  return expression_new (NULL, 1.0, 0.0);
+}
+
+Expression *
+expression_ref (Expression *expression)
+{
+  if (expression == NULL)
+    return NULL;
+
+  expression->ref_count += 1;
+
+  return expression;
+}
+
 void
-expression_free (Expression *expression)
+expression_unref (Expression *expression)
 {
   if (expression == NULL)
     return;
 
-  if (expression->terms != NULL)
-    g_hash_table_unref (expression->terms);
+  expression->ref_count -= 1;
 
-  g_slice_free (Expression, expression);
-}
-
-Expression *
-expression_copy (Expression *expression)
-{
-  Expression *res;
-  GHashTableIter iter;
-  gpointer key_p, value_p;
-
-  if (expression == NULL)
-    return NULL;
-
-  res = expression_new (NULL, 0.0, expression->constant);
-  if (expression->terms == NULL)
-    return res;
-
-  res->terms = g_hash_table_new_full (variable_hash, variable_equal, variable_free, g_free);
-
-  g_hash_table_iter_init (&iter, expression->terms);
-  while (g_hash_table_iter_next (&iter, &key_p, &value_p))
+  if (expression->ref_count == 0)
     {
-      Variable *variable = key_p;
-      double *value = value_p;
+      if (expression->terms != NULL)
+        g_hash_table_unref (expression->terms);
 
-      g_hash_table_insert (res->terms, variable_copy (variable), g_memdup (value, sizeof (double)));
+      g_slice_free (Expression, expression);
     }
-
-  return res;
-}
-
-gboolean
-expression_is_constant (Expression *expression)
-{
-  return expression->terms == NULL;
-}
-
-char *
-expression_to_string (const Expression *expression)
-{
-  GString *buf;
-  gboolean needs_plus = FALSE;
-  GHashTableIter iter;
-  gpointer key_p, value_p;
-
-  if (expression == NULL)
-    return NULL;
-
-  buf = g_string_new (NULL);
-
-  if (fabs (expression->constant - 0.0) > DBL_EPSILON || expression->terms == NULL)
-    {
-      g_string_append_printf (buf, "%g", expression->constant);
-
-      if (expression->terms == NULL)
-        return g_string_free (buf, FALSE);
-
-      needs_plus = TRUE;
-    }
-
-  g_hash_table_iter_init (&iter, expression->terms);
-  while (g_hash_table_iter_next (&iter, &key_p, &value_p))
-    {
-      Variable *v = key_p;
-      double *coeff = value_p;
-      char *var_str;
-
-      if (needs_plus)
-        g_string_append (buf, " + ");
-
-      var_str = variable_to_string (v);
-
-      g_string_append_printf (buf, "%g * %s", *coeff, var_str);
-
-      g_free (var_str);
-
-      needs_plus = TRUE;
-    }
-
-  return g_string_free (buf, FALSE);
 }
 
 static void
-expression_set_variable (Expression *expression,
-                         Variable   *variable,
-                         double      value)
+expression_add_term (Expression *expression,
+                     Term *term)
 {
-  double *value_p;
-
   if (expression->terms == NULL)
-    expression->terms = g_hash_table_new_full (variable_hash, variable_equal, variable_free, g_free);
+    expression->terms = g_hash_table_new_full (NULL, term_equal, (GDestroyNotify) term_free, NULL);
 
-  value_p = g_new (double, 1);
-  *value_p = value;
-
-  g_hash_table_insert (expression->terms, variable_copy (variable), value_p);
+  g_hash_table_add (expression->terms, term);
 }
 
 void
 expression_add_variable (Expression *expression,
-                         Variable   *variable,
-                         double      coefficient)
+                         Variable *variable,
+                         double value)
 {
-  double *new_coefficient;
+  Term *term = term_new (variable, value);
 
-  if (expression->terms == NULL || g_hash_table_lookup (expression->terms, variable) == NULL)
-    {
-      if (fabs (coefficient - 0.0) > DBL_EPSILON)
-        expression_set_variable (expression, variable, coefficient);
-
-      return;
-    }
-
-  new_coefficient = g_hash_table_lookup (expression->terms, variable);
-  g_assert (new_coefficient != NULL);
-
-  *new_coefficient = *new_coefficient + coefficient;
-
-  if (fabs (*new_coefficient - 0.0) < DBL_EPSILON)
-    expression_remove_variable (expression, variable);
-  else
-    expression_set_variable (expression, variable, *new_coefficient);
+  expression_add_term (expression, term);
 }
 
-gboolean
-expression_has_variable (Expression *expression,
-                         Variable   *variable)
-{
-  if (expression->terms == NULL)
-    return FALSE;
-
-  return g_hash_table_lookup (expression->terms, variable) != NULL;
-}
-
-void
-expression_remove_variable (Expression *expression,
-                            Variable   *variable)
-{
-  if (expression->terms == NULL)
-    return;
-
-  g_hash_table_remove (expression->terms, variable);
-}
-
-double
-expression_get_coefficient (Expression *expression,
-                            Variable   *variable)
-{
-  double *coeff;
-
-  if (expression->terms == NULL)
-    return 0.0;
-
-  coeff = g_hash_table_lookup (expression->terms, variable);
-  if (coeff == NULL)
-    return 0.0;
-
-  return *coeff;
-}
-
-void
-expression_multiply (Expression *expression,
-                     double      value)
+Expression *
+expression_clone (const Expression *expression)
 {
   GHashTableIter iter;
-  gpointer value_p;
+  Expression *res;
+  gpointer key_p;
 
-  expression->constant *= value;
+  if (expression == NULL)
+    return NULL;
+
+  res = g_slice_new (Expression);
+  res->constant = expression->constant;
 
   if (expression->terms == NULL)
-    return;
+    return res;
 
   g_hash_table_iter_init (&iter, expression->terms);
-  while (g_hash_table_iter_next (&iter, NULL, &value_p))
-    {
-      double *coefficient = value_p;
+  while (g_hash_table_iter_next (&iter, &key_p, NULL))
+    expression_add_term (res, term_clone (key_p));
 
-      *coefficient = *coefficient * value;
-    }
+  return res;
+}
+
+GPtrArray *
+expression_get_terms_as_array (const Expression *expression)
+{
+  GHashTableIter iter;
+  GPtrArray *res;
+  gpointer key_p;
+
+  if (expression->terms == NULL)
+    return NULL;
+
+  res = g_ptr_array_new_full (g_hash_table_size (expression->terms), (GDestroyNotify) term_free);
+
+  g_hash_table_iter_init (&iter, expression->terms);
+  while (g_hash_table_iter_next (&iter, &key_p, NULL))
+    g_ptr_array_add (res, term_clone (key_p));
+
+  return res;
 }
 
 double
-expression_new_subject (Expression *expression,
-                        Variable   *subject)
+expression_get_value (const Expression *expression)
 {
-  double value;
-  
-  if (!expression_has_variable (expression, subject))
-    return 0.0;
+  GHashTableIter iter;
+  gpointer key_p;
+  double res;
 
-  value = expression_get_coefficient (expression, subject);
-  expression_remove_variable (expression, subject);
+  res = expression->constant;
 
-  if (fabs (value - 0.0) < DBL_EPSILON)
-    return 0.0;
+  if (expression->terms == NULL)
+    return res;
 
-  expression_multiply (expression, 1.0 / value);
+  g_hash_table_iter_init (&iter, expression->terms);
+  while (g_hash_table_iter_next (&iter, &key_p, NULL))
+    {
+      const Term *t = key_p;
 
-  return 1.0 / value;
-}
+      res += term_get_value (t);
+    }
 
-void
-expression_change_subject (Expression *expression,
-                           Variable   *old_subject,
-                           Variable   *new_subject)
-{
-  expression_set_variable (expression, old_subject, expression_new_subject (expression, new_subject));
+  return res;
 }

@@ -1,39 +1,50 @@
 #pragma once
 
 #include "emeus-types-private.h"
+#include "emeus-variable-private.h"
 
 G_BEGIN_DECLS
 
-Expression *    expression_new                  (Variable   *variable,
-                                                 double      value,
-                                                 double      constant);
+static inline double
+term_get_value (const Term *term)
+{
+  if (term == NULL)
+    return 0.0;
 
-void            expression_free                 (Expression *expression);
+  return variable_get_value (term->variable) * term->coefficient;
+}
 
-Expression *    expression_copy                 (Expression *expression);
+Term *term_new (Variable *variable,
+                double    coefficient);
+Term *term_clone (const Term *term);
+void term_free (Term *term);
+gboolean term_equal (gconstpointer v1,
+                     gconstpointer v2);
 
-gboolean        expression_is_constant          (Expression *expression);
+static inline bool
+expression_is_constant (const Expression *expression)
+{
+  return expression->terms == NULL;
+}
 
-void            expression_add_variable         (Expression *expression,
-                                                 Variable   *variable,
-                                                 double      coefficient);
-void            expression_remove_variable      (Expression *expression,
-                                                 Variable   *variable);
-gboolean        expression_has_variable         (Expression *expression,
-                                                 Variable   *variable);
+Expression *expression_new (Variable *variable,
+                            double value,
+                            double constant);
+Expression *expression_new_empty (void);
+Expression *expression_new_from_variable (Variable *variable);
+Expression *expression_new_from_constant (double constant);
 
-double          expression_get_coefficient      (Expression *expression,
-                                                 Variable   *variable);
+Expression *expression_ref (Expression *expression);
+void expression_unref (Expression *expression);
 
-void            expression_multiply             (Expression *expression,
-                                                 double      value);
+Expression *expression_clone (const Expression *expression);
 
-double          expression_new_subject          (Expression *expression,
-                                                 Variable   *subject);
-void            expression_change_subject       (Expression *expression,
-                                                 Variable   *old_subject,
-                                                 Variable   *new_subject);
+GPtrArray *expression_get_terms_as_array (const Expression *expression);
 
-char *          expression_to_string            (const Expression *expression);
+void expression_add_variable (Expression *expression,
+                              Variable *variable,
+                              double value);
+
+double expression_get_value (const Expression *expression);
 
 G_END_DECLS

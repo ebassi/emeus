@@ -4,40 +4,60 @@
 
 G_BEGIN_DECLS
 
-static inline gboolean
-variable_is_dummy (Variable *variable)
+static inline bool
+variable_is_dummy (const Variable *variable)
 {
-  return variable->v_type == VARIABLE_TYPE_DUMMY;
+  return variable->type == VARIABLE_DUMMY;
+}
+
+static inline bool
+variable_is_objective (const Variable *variable)
+{
+  return variable->type == VARIABLE_OBJECTIVE;
+}
+
+static inline bool
+variable_is_slack (const Variable *variable)
+{
+  return variable->type == VARIABLE_SLACK;
+}
+
+static inline bool
+variable_is_external (const Variable *variable)
+{
+  return variable->is_external;
+}
+
+static inline bool
+variable_is_pivotable (const Variable *variable)
+{
+  return variable->is_pivotable;
 }
 
 static inline gboolean
-variable_is_objective (Variable *variable)
+variable_is_restricted (const Variable *variable)
 {
-  return variable->v_type == VARIABLE_TYPE_OBJECTIVE;
+  return variable->is_restricted;
 }
 
-static inline gboolean
-variable_is_slack (Variable *variable)
+static inline double
+variable_get_value (const Variable *variable)
 {
-  return variable->v_type == VARIABLE_TYPE_SLACK;
+  if (variable_is_dummy (variable) ||
+      variable_is_objective (variable) ||
+      variable_is_slack (variable))
+    return 0.0;
+
+  return variable->value;
 }
 
-static inline gboolean
-variable_is_regular (Variable *variable)
-{
-  return variable->v_type == VARIABLE_TYPE_REGULAR;
-}
+Variable *variable_new (VariableType type,
+                        const char *name,
+                        double value);
+Variable *variable_ref (Variable *variable);
+void      variable_unref (Variable *variable);
+Variable *variable_clone (const Variable *variable);
 
-gpointer        variable_new    (VariableType v_type,
-                                 const char  *name,
-                                 double       value);
-gpointer        variable_copy   (gpointer     variable);
-void            variable_free   (gpointer     variable);
-
-guint           variable_hash   (gconstpointer v);
-gboolean        variable_equal  (gconstpointer v1,
-                                 gconstpointer v2);
-
-char *          variable_to_string      (const Variable *variable);
+const char *variable_get_name (const Variable *variable);
 
 G_END_DECLS

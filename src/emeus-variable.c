@@ -5,167 +5,120 @@
 #include <math.h>
 #include <float.h>
 
-static inline void
-dummy_variable_init (Variable   *v,
-                     const char *name)
+static void
+dummy_variable_init (Variable *v)
 {
-  v->v_type = VARIABLE_TYPE_DUMMY;
-  v->name = g_quark_from_string (name);
   v->is_external = FALSE;
   v->is_pivotable = FALSE;
   v->is_restricted = TRUE;
-  v->value = 0.0;
 }
 
-static inline void
-objective_variable_init (Variable   *v,
-                         const char *name)
+static void
+objective_variable_init (Variable *v)
 {
-  v->v_type = VARIABLE_TYPE_OBJECTIVE;
-  v->name = g_quark_from_string (name);
   v->is_external = FALSE;
   v->is_pivotable = FALSE;
   v->is_restricted = FALSE;
-  v->value = 0.0;
 }
 
-static inline void
-slack_variable_init (Variable   *v,
-                     const char *name)
+static void
+slack_variable_init (Variable *v)
 {
-  v->v_type = VARIABLE_TYPE_SLACK;
-  v->name = g_quark_from_string (name);
   v->is_external = FALSE;
   v->is_pivotable = TRUE;
   v->is_restricted = TRUE;
-  v->value = 0.0;
 }
 
-static inline void
-regular_variable_init (Variable   *v,
-                       const char *name,
-                       double      value)
+static void
+regular_variable_init (Variable *v)
 {
-  v->v_type = VARIABLE_TYPE_REGULAR;
-  v->name = g_quark_from_string (name);
   v->is_external = TRUE;
   v->is_pivotable = FALSE;
   v->is_restricted = FALSE;
-  v->value = value;
 }
 
-gpointer
-variable_new (VariableType  v_type,
+Variable *
+variable_new (VariableType  type,
               const char   *name,
               double        value)
 {
-  gpointer res = g_slice_new (Variable);
+  Variable *res = g_slice_new (Variable);
 
-  switch (v_type)
+  res->type = type;
+  res->name = g_strdup (name);
+  res->ref_count = 1;
+
+  switch (type)
     {
-    case VARIABLE_TYPE_DUMMY:
-      dummy_variable_init (res, name);
+    case VARIABLE_DUMMY:
+      dummy_variable_init (res);
       break;
 
-    case VARIABLE_TYPE_OBJECTIVE:
-      objective_variable_init (res, name);
+    case VARIABLE_OBJECTIVE:
+      objective_variable_init (res);
       break;
 
-    case VARIABLE_TYPE_SLACK:
-      slack_variable_init (res, name);
+    case VARIABLE_SLACK:
+      slack_variable_init (res);
       break;
 
-    case VARIABLE_TYPE_REGULAR:
-      regular_variable_init (res, name, value);
+    case VARIABLE_REGULAR:
+      regular_variable_init (res);
+      res->value = value;
       break;
     }
 
   return res;
 }
 
-gpointer
-variable_copy (gpointer variable)
-{
-  if (variable == NULL)
-    return NULL;
-
-  return g_slice_dup (Variable, variable);
-}
-
-void
-variable_free (gpointer variable)
+static void
+variable_free (Variable *variable)
 {
   if (variable == NULL)
     return;
 
+  g_free (variable->name);
   g_slice_free (Variable, variable);
 }
 
-guint
-variable_hash (gconstpointer v)
+Variable *
+variable_ref (Variable *variable)
 {
-  return GPOINTER_TO_UINT (v);
-}
-
-gboolean
-variable_equal (gconstpointer v1,
-                gconstpointer v2)
-{
-  const Variable *av1 = v1;
-  const Variable *av2 = v2;
-
-  if (av1 == av2)
-    return TRUE;
-
-  if (av1->v_type == av2->v_type)
-    return TRUE;
-
-  if (av1->name == av2->name)
-    return TRUE;
-
-  if (av1->v_type == VARIABLE_TYPE_REGULAR)
-    {
-      if (fabs (av1->value - av2->value) < DBL_EPSILON)
-        return TRUE;
-    }
-
-  return FALSE;
-}
-
-char *
-variable_to_string (const Variable *variable)
-{
-  GString *buf;
-
   if (variable == NULL)
     return NULL;
 
-  buf = g_string_new (NULL);
+  variable->ref_count += 1;
 
-  switch (variable->v_type)
-    {
-    case VARIABLE_TYPE_DUMMY:
-      g_string_append (buf, "dummy:");
-      break;
+  return variable;
+}
 
-    case VARIABLE_TYPE_OBJECTIVE:
-      g_string_append (buf, "obj:");
-      break;
+void
+variable_unref (Variable *variable)
+{
+  if (variable == NULL)
+    return;
 
-    case VARIABLE_TYPE_SLACK:
-      g_string_append (buf, "slack:");
-      break;
+  variable->ref_count -= 1;
+  if (variable->ref_count == 0)
+    variable_free (variable);
+}
 
-    case VARIABLE_TYPE_REGULAR:
-      g_string_append (buf, "v:");
-      break;
-    }
+Variable *
+variable_clone (const Variable *variable)
+{
+  Variable *res = g_slice_dup (Variable, variable);
 
-  g_string_append (buf, "[");
-  g_string_append (buf, g_quark_to_string (variable->name));
-  g_string_append (buf, ":");
-  g_string_append_printf (buf, "%g", variable->value);
-  g_string_append (buf, "]");
+  if (res == NULL)
+    return NULL;
 
-  return g_string_free (buf, FALSE);
+  res->name = g_strdup (variable->name);
+  res->ref_count = 1;
+
+  return res;
+}
+
+const char *
+variable_get_name (const Variable *variable)
+{
+  return variable->name;
 }

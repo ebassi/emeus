@@ -1,39 +1,43 @@
 #pragma once
 
+#include <stdbool.h>
 #include <glib-object.h>
 
 G_BEGIN_DECLS
 
 typedef enum {
-  VARIABLE_TYPE_DUMMY,
-  VARIABLE_TYPE_OBJECTIVE,
-  VARIABLE_TYPE_SLACK,
-  VARIABLE_TYPE_REGULAR
+  VARIABLE_DUMMY     = 'd',
+  VARIABLE_OBJECTIVE = 'o',
+  VARIABLE_SLACK     = 's',
+  VARIABLE_REGULAR   = 'v'
 } VariableType;
 
 typedef struct {
-  VariableType v_type;
+  int ref_count;
 
-  GQuark name;
+  VariableType type;
+  char *name;
 
   double value;
 
-  gboolean is_external : 1;
-  gboolean is_pivotable : 1;
-  gboolean is_restricted : 1;
+  bool is_external;
+  bool is_pivotable;
+  bool is_restricted;
 } Variable;
 
 typedef struct {
+  double coefficient;
+
+  Variable *variable;
+} Term;
+
+typedef struct {
+  int ref_count;
+
   double constant;
 
   GHashTable *terms;
 } Expression;
-
-typedef enum {
-  CONSTRAINT_TYPE_EDIT,
-  CONSTRAINT_TYPE_STAY,
-  CONSTRAINT_TYPE_REGULAR
-} ConstraintType;
 
 typedef enum {
   OPERATOR_TYPE_LE = -1,
@@ -49,16 +53,17 @@ typedef enum {
 } StrengthType;
 
 typedef struct {
-  ConstraintType c_type;
+  int ref_count;
 
-  Variable *variable;
-  OperatorType op_type;
   Expression *expression;
+  OperatorType op_type;
 
-  int strength;
+  StrengthType strength;
   double weight;
 
-  gboolean is_inequality : 1;
-} SimplexConstraint;
+  bool is_edit;
+  bool is_slack;
+  bool is_inequality;
+} Constraint;
 
 G_END_DECLS

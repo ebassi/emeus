@@ -9,7 +9,6 @@ public_headers = [
 private_headers = [
   'emeus-expression-private.h',
   'emeus-macros-private.h',
-  'emeus-simplex-constraint-private.h',
   'emeus-simplex-solver-private.h',
   'emeus-types-private.h',
   'emeus-variable-private.h',
@@ -19,7 +18,6 @@ sources = [
   'emeus-constraint.c',
   'emeus-constraint-layout.c',
   'emeus-expression.c',
-  'emeus-simplex-constraint.c',
   'emeus-simplex-solver.c',
   'emeus-types.c',
   'emeus-variable.c',
