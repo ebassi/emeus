@@ -14,6 +14,18 @@ term_get_value (const Term *term)
   return variable_get_value (term->variable) * term->coefficient;
 }
 
+static inline Variable *
+term_get_variable (const Term *term)
+{
+  return term->variable;
+}
+
+static inline double
+term_get_coefficient (const Term *term)
+{
+  return term->coefficient;
+}
+
 Term *term_new (Variable *variable,
                 double    coefficient);
 Term *term_clone (const Term *term);
@@ -46,5 +58,11 @@ void expression_add_variable (Expression *expression,
                               double value);
 
 double expression_get_value (const Expression *expression);
+
+typedef void (* ExpressionForeachTermFunc) (Term *term, gpointer data);
+
+void expression_terms_foreach (Expression *expression,
+                               ExpressionForeachTermFunc func,
+                               gpointer data);
 
 G_END_DECLS

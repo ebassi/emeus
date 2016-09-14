@@ -213,3 +213,19 @@ expression_get_value (const Expression *expression)
 
   return res;
 }
+
+void
+expression_terms_foreach (Expression *expression,
+                          ExpressionForeachTermFunc func,
+                          gpointer data)
+{
+  GHashTableIter iter;
+  gpointer key_p;
+
+  if (expression->terms == NULL)
+    return;
+
+  g_hash_table_iter_init (&iter, expression->terms);
+  while (g_hash_table_iter_next (&iter, &key_p, NULL))
+    func (key_p, data);
+}
