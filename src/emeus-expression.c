@@ -169,6 +169,28 @@ expression_remove_variable (Expression *expression,
     }
 }
 
+double
+expression_get_coefficient (const Expression *expression,
+                            Variable *variable)
+{
+  GHashTableIter iter;
+  gpointer key_p;
+
+  if (expression->terms == NULL)
+    return 0.0;
+
+  g_hash_table_iter_init (&iter, expression->terms);
+  while (g_hash_table_iter_next (&iter, &key_p, NULL))
+    {
+      Term *t = key_p;
+
+      if (t->variable == variable)
+        return t->coefficient;
+    }
+
+  return 0.0;
+}
+
 Expression *
 expression_clone (const Expression *expression)
 {

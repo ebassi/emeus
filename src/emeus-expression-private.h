@@ -39,6 +39,12 @@ expression_is_constant (const Expression *expression)
   return expression->terms == NULL;
 }
 
+static inline double
+expression_get_constant (const Expression *expression)
+{
+  return expression->constant;
+}
+
 Expression *expression_new (Variable *variable,
                             double value,
                             double constant);
@@ -58,6 +64,9 @@ void expression_add_variable (Expression *expression,
                               double value);
 void expression_remove_variable (Expression *expression,
                                  Variable *variable);
+
+double expression_get_coefficient (const Expression *expression,
+                                   Variable *variable);
 
 double expression_get_value (const Expression *expression);
 

@@ -9,9 +9,11 @@ typedef struct {
   /* HashTable<Variable, Expression> */
   GHashTable *rows;
 
+  /* Sets */
   GHashTable *infeasible_rows;
   GHashTable *external_rows;
   GHashTable *external_vars;
+  GHashTable *updated_externals;
 
   GPtrArray *stay_error_vars;
 

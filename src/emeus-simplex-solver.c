@@ -29,6 +29,9 @@ simplex_solver_init (SimplexSolver *solver)
 
   /* HashSet<Variable>; does not own keys */
   solver->infeasible_rows = g_hash_table_new (NULL, NULL);
+
+  /* HashSet<Variable>; does not own keys */
+  solver->updated_externals = g_hash_table_new (NULL, NULL);
 }
 
 void
@@ -173,4 +176,52 @@ simplex_solver_remove_row (SimplexSolver *solver,
   g_hash_table_remove (solver->rows, variable);
 
   return e;
+}
+
+static void
+expression_substitute_out (SimplexSolver *solver,
+                           Expression *expression,
+                           Variable *out_variable,
+                           Expression *new_expression,
+                           Variable *subject)
+{
+  double coefficient = expression_get_coefficient (expression, out_variable);
+
+  expression_remove_variable (expression, out_variable);
+
+  expression->constant += (coefficient * new_expression->constant);
+}
+
+static void
+simplex_solver_substitute_out (SimplexSolver *solver,
+                               Variable *old_variable,
+                               Expression *expression)
+{
+  GHashTable *row_set = g_hash_table_lookup (solver->columns, old_variable);
+
+  if (row_set == NULL)
+    {
+      GHashTableIter iter;
+      gpointer key_p;
+
+      g_hash_table_iter_init (&iter, solver->rows);
+      while (g_hash_table_iter_next (&iter, &key_p, NULL))
+        {
+          Variable *variable = key_p;
+          Expression *e = g_hash_table_lookup (solver->rows, variable);
+
+          expression_substitute_out (solver, e, old_variable, expression, variable);
+
+          if (variable_is_external (variable))
+            g_hash_table_add (solver->updated_externals, variable);
+
+          if (variable_is_restricted (variable) && expression_get_constant (e) < 0)
+            g_hash_table_add (solver->infeasible_rows, variable);
+        }
+
+      if (variable_is_external (old_variable))
+        g_hash_table_insert (solver->external_rows, variable_ref (old_variable), expression);
+
+      g_hash_table_remove (solver->columns, old_variable);
+    }
 }
