@@ -7,6 +7,8 @@ public_headers = [
 ]
 
 private_headers = [
+  'emeus-constraint-private.h',
+  'emeus-constraint-layout-private.h',
   'emeus-expression-private.h',
   'emeus-macros-private.h',
   'emeus-simplex-solver-private.h',

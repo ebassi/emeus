@@ -62,4 +62,7 @@ EmeusConstraintStrength         emeus_constraint_get_strength           (EmeusCo
 EMEUS_AVAILABLE_IN_1_0
 gboolean                        emeus_constraint_is_required            (EmeusConstraint         *constraint);
 
+EMEUS_AVAILABLE_IN_1_0
+gboolean                        emeus_constraint_is_attached            (EmeusConstraint         *constraint);
+
 G_END_DECLS

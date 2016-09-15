@@ -18,7 +18,8 @@
 
 #include "config.h"
 
-#include "emeus-constraint.h"
+#include "emeus-constraint-private.h"
+#include "emeus-simplex-solver-private.h"
 
 /**
  * SECTION:emeusconstraint
@@ -55,24 +56,6 @@
  *   button2.width = button1.width × 1.0 + 0.0
  * ]|
  */
-
-struct _EmeusConstraint
-{
-  GInitiallyUnowned parent_instance;
-
-  gpointer target_object;
-  EmeusConstraintAttribute target_attribute;
-
-  EmeusConstraintRelation relation;
-
-  gpointer source_object;
-  EmeusConstraintAttribute source_attribute;
-
-  double multiplier;
-  double constant;
-
-  EmeusConstraintStrength strength;
-};
 
 enum {
   PROP_TARGET_OBJECT = 1,
@@ -432,4 +415,37 @@ emeus_constraint_is_required (EmeusConstraint *constraint)
   g_return_val_if_fail (EMEUS_IS_CONSTRAINT (constraint), FALSE);
 
   return constraint->strength == EMEUS_CONSTRAINT_STRENGTH_REQUIRED;
+}
+
+void
+emeus_constraint_attach (EmeusConstraint       *constraint,
+                         EmeusConstraintLayout *layout)
+{
+  constraint->solver = emeus_constraint_layout_get_solver (layout);
+}
+
+void
+emeus_constraint_detach (EmeusConstraint *constraint)
+{
+  if (constraint->constraint != NULL)
+    simplex_solver_remove_constraint (constraint->solver, constraint->constraint);
+
+  constraint->solver = NULL;
+}
+
+gboolean
+emeus_constraint_is_attached (EmeusConstraint *constraint)
+{
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT (constraint), FALSE);
+
+  return constraint->solver != NULL;
+}
+
+Constraint *
+emeus_constraint_get_real_constraint (EmeusConstraint *constraint)
+{
+  if (constraint->solver == NULL)
+    return NULL;
+
+  return constraint->constraint;
 }

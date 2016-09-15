@@ -83,16 +83,4 @@ typedef struct {
   SimplexSolver *solver;
 } Constraint;
 
-static inline bool
-constraint_is_inequality (const Constraint *constraint)
-{
-  return constraint->op_type != OPERATOR_TYPE_EQ;
-}
-
-static inline bool
-constraint_is_required (const Constraint *constraint)
-{
-  return constraint->strength >= STRENGTH_REQUIRED;
-}
-
 G_END_DECLS

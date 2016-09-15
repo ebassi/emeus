@@ -33,6 +33,21 @@ struct _SimplexSolver {
   bool needs_solving;
 };
 
+static inline bool
+constraint_is_inequality (const Constraint *constraint)
+{
+  return constraint->op_type != OPERATOR_TYPE_EQ;
+}
+
+static inline bool
+constraint_is_required (const Constraint *constraint)
+{
+  return constraint->strength >= STRENGTH_REQUIRED;
+}
+
+Constraint *constraint_ref (Constraint *constraint);
+void constraint_unref (Constraint *constraint);
+
 void simplex_solver_init (SimplexSolver *solver);
 void simplex_solver_clear (SimplexSolver *solver);
 
@@ -52,6 +67,9 @@ Constraint *simplex_solver_add_stay_constraint (SimplexSolver *solver,
 Constraint *simplex_solver_add_edit_constraint (SimplexSolver *solver,
                                                 Variable *variable,
                                                 StrengthType strength);
+
+void simplex_solver_remove_constraint (SimplexSolver *solver,
+                                       Constraint *constraint);
 
 void simplex_solver_suggest_value (SimplexSolver *solver,
                                    Variable *variable,

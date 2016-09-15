@@ -9,6 +9,26 @@
 #include <glib.h>
 #include <string.h>
 
+Constraint *
+constraint_ref (Constraint *constraint)
+{
+  constraint->ref_count += 1;
+
+  return constraint;
+}
+
+void
+constraint_unref (Constraint *constraint)
+{
+  constraint->ref_count -= 1;
+
+  if (constraint->ref_count == 0)
+    {
+      expression_unref (constraint->expression);
+      g_slice_free (Constraint, constraint);
+    }
+}
+
 void
 simplex_solver_init (SimplexSolver *solver)
 {
@@ -289,7 +309,7 @@ simplex_solver_add_constraint (SimplexSolver *solver,
 
   res = g_slice_new (Constraint);
   res->solver = solver;
-  res->expression = expression;
+  res->expression = expression_ref (expression);
   res->op_type = op;
   res->strength = strength;
   res->is_stay = false;
@@ -338,6 +358,13 @@ simplex_solver_add_edit_constraint (SimplexSolver *solver,
   simplex_solver_add_constraint_internal (solver, res);
 
   return res;
+}
+
+void
+simplex_solver_remove_constraint (SimplexSolver *solver,
+                                  Constraint *constraint)
+{
+  constraint_unref (constraint);
 }
 
 void

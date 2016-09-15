@@ -1,7 +1,8 @@
 #include "config.h"
 
-#include "emeus-constraint-layout.h"
+#include "emeus-constraint-layout-private.h"
 
+#include "emeus-constraint-private.h"
 #include "emeus-types-private.h"
 #include "emeus-expression-private.h"
 #include "emeus-simplex-solver-private.h"
@@ -194,6 +195,7 @@ add_child_constraint (EmeusConstraintLayout *layout,
   g_assert (data != NULL);
 
   g_hash_table_add (data->constraints, g_object_ref_sink (constraint));
+  emeus_constraint_attach (constraint, layout);
 }
 
 static void
@@ -204,8 +206,16 @@ remove_child_constraint (EmeusConstraintLayout *layout,
   LayoutChildData *data = get_layout_child_data (layout, widget);
 
   g_assert (data != NULL);
+  g_assert (emeus_constraint_is_attached (constraint));
 
+  emeus_constraint_detach (constraint);
   g_hash_table_remove (data->constraints, constraint);
+}
+
+SimplexSolver *
+emeus_constraint_layout_get_solver (EmeusConstraintLayout *layout)
+{
+  return &layout->solver;
 }
 
 void
@@ -248,6 +258,7 @@ emeus_constraint_layout_child_add_constraint (EmeusConstraintLayout *layout,
   g_return_if_fail (EMEUS_IS_CONSTRAINT (constraint));
 
   g_return_if_fail (gtk_widget_get_parent (child) == GTK_WIDGET (layout));
+  g_return_if_fail (!emeus_constraint_is_attached (constraint));
 
   add_child_constraint (layout, child, constraint);
 
@@ -264,6 +275,7 @@ emeus_constraint_layout_child_remove_constraint (EmeusConstraintLayout *layout,
   g_return_if_fail (EMEUS_IS_CONSTRAINT (constraint));
 
   g_return_if_fail (gtk_widget_get_parent (child) == GTK_WIDGET (layout));
+  g_return_if_fail (!emeus_constraint_is_attached (constraint));
 
   remove_child_constraint (layout, child, constraint);
 
