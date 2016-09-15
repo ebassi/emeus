@@ -60,12 +60,14 @@ bool expression_has_variable (const Expression *expression,
                               Variable *variable);
 
 void expression_add_expression (Expression *a,
-                                Expression *b);
+                                Expression *b,
+                                double n,
+                                Variable *subject);
 
-Expression *expression_plus_variable (Expression *expression,
-                                      Variable *variable);
-Expression *expression_times_constant (Expression *expression,
-                                       double constant);
+Expression *expression_plus (Expression *expression,
+                             double constant);
+Expression *expression_times (Expression *expression,
+                              double multiplier);
 
 void expression_set_coefficient (Expression *expression,
                                  Variable *variable,

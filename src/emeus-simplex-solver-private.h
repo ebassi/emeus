@@ -61,8 +61,12 @@ void simplex_solver_resolve (SimplexSolver *solver);
 
 /* Internal */
 void simplex_solver_add_variable (SimplexSolver *solver,
-                                  Variable *variable);
+                                  Variable *variable,
+                                  Variable *subject);
 void simplex_solver_remove_variable (SimplexSolver *solver,
+                                     Variable *variable,
+                                     Variable *subject);
+void simplex_solver_update_variable (SimplexSolver *solver,
                                      Variable *variable);
 
 G_END_DECLS

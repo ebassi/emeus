@@ -45,34 +45,11 @@ simplex_solver_clear (SimplexSolver *solver)
   g_clear_pointer (&solver->external_rows, g_hash_table_unref);
 }
 
-void
-simplex_solver_add_variable (SimplexSolver *solver,
-                             Variable *variable)
-{
-}
-
-void
-simplex_solver_remove_variable (SimplexSolver *solver,
-                                Variable *variable)
-{
-}
-
 static GHashTable *
 simplex_solver_get_column_set (SimplexSolver *solver,
                                Variable *param_var)
 {
-  GHashTable *res;
-
-  res = g_hash_table_lookup (solver->columns, param_var);
-  if (res == NULL)
-    {
-      res = g_hash_table_new_full (NULL, NULL,
-                                   (GDestroyNotify) variable_unref,
-                                   NULL);
-      g_hash_table_insert (solver->columns, variable_ref (param_var), res);
-    }
-
-  return res;
+  return g_hash_table_lookup (solver->columns, param_var);
 }
 
 static gboolean
@@ -89,8 +66,20 @@ simplex_solver_insert_column_variable (SimplexSolver *solver,
 {
   GHashTable *row_set;
 
+  if (simplex_solver_has_column_set (solver, param_var))
+    return;
+
   row_set = simplex_solver_get_column_set (solver, param_var);
-  g_hash_table_add (row_set, variable_ref (row_var));
+  if (row_set == NULL)
+    {
+      row_set = g_hash_table_new_full (NULL, NULL,
+                                       (GDestroyNotify) variable_unref,
+                                       NULL);
+      g_hash_table_insert (solver->columns, variable_ref (param_var), row_set);
+    }
+
+  if (row_var != NULL)
+    g_hash_table_add (row_set, variable_ref (row_var));
 }
 
 typedef struct {
@@ -239,6 +228,32 @@ simplex_solver_substitute_out (SimplexSolver *solver,
 
       g_hash_table_remove (solver->columns, old_variable);
     }
+}
+
+void
+simplex_solver_add_variable (SimplexSolver *solver,
+                             Variable *variable,
+                             Variable *subject)
+{
+  if (subject != NULL)
+    simplex_solver_insert_column_variable (solver, variable, subject);
+}
+
+void
+simplex_solver_remove_variable (SimplexSolver *solver,
+                                Variable *variable,
+                                Variable *subject)
+{
+  GHashTable *row_set = g_hash_table_lookup (solver->columns, variable);
+
+  if (row_set != NULL && subject != NULL)
+    g_hash_table_remove (row_set, subject);
+}
+
+void
+simplex_solver_update_variable (SimplexSolver *solver,
+                                Variable *variable)
+{
 }
 
 Variable *

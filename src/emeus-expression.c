@@ -99,14 +99,13 @@ expression_add_term (Expression *expression,
     expression->terms = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) term_free);
 
   g_hash_table_insert (expression->terms, term->variable, term);
-
-  simplex_solver_add_variable (expression->solver, term->variable);
 }
 
-void
-expression_add_variable (Expression *expression,
-                         Variable *variable,
-                         double coefficient)
+static void
+expression_add_variable_with_subject (Expression *expression,
+                                      Variable *variable,
+                                      double coefficient,
+                                      Variable *subject)
 {
   if (expression->terms != NULL)
     {
@@ -116,7 +115,7 @@ expression_add_variable (Expression *expression,
         {
           if (coefficient == 0.0)
             {
-              simplex_solver_remove_variable (expression->solver, t->variable);
+              simplex_solver_remove_variable (expression->solver, t->variable, subject);
               g_hash_table_remove (expression->terms, t);
             }
           else
@@ -127,17 +126,54 @@ expression_add_variable (Expression *expression,
     }
 
   expression_add_term (expression, term_new (variable, coefficient));
+  simplex_solver_add_variable (expression->solver, variable, subject);
+}
+
+static void
+expression_remove_variable_with_subject (Expression *expression,
+                                         Variable *variable,
+                                         Variable *subject)
+{
+  if (expression->terms == NULL)
+    return;
+
+  simplex_solver_remove_variable (expression->solver, variable, subject);
+  g_hash_table_remove (expression->terms, variable);
+}
+
+void
+expression_add_expression (Expression *a,
+                           Expression *b,
+                           double n,
+                           Variable *subject)
+{
+  GHashTableIter iter;
+  gpointer value_p;
+
+  a->constant += (n * b->constant);
+
+  g_hash_table_iter_init (&iter, b->terms);
+  while (g_hash_table_iter_next (&iter, NULL, &value_p))
+    {
+      Term *t = value_p;
+
+      expression_add_variable_with_subject (a, t->variable, n * t->coefficient, subject);
+    }
+}
+
+void
+expression_add_variable (Expression *expression,
+                         Variable *variable,
+                         double coefficient)
+{
+  expression_add_variable_with_subject (expression, variable, coefficient, NULL);
 }
 
 void
 expression_remove_variable (Expression *expression,
                             Variable *variable)
 {
-  if (expression->terms == NULL)
-    return;
-
-  simplex_solver_remove_variable (expression->solver, variable);
-  g_hash_table_remove (expression->terms, variable);
+  expression_remove_variable_with_subject (expression, variable, NULL);
 }
 
 void
@@ -152,7 +188,12 @@ expression_set_coefficient (Expression *expression,
       Term *t = g_hash_table_lookup (expression->terms, variable);
 
       if (t != NULL)
-        t->coefficient = coefficient;
+        {
+          t->coefficient = coefficient;
+
+          if (variable_is_external (t->variable))
+            simplex_solver_update_variable (expression->solver, t->variable);
+        }
       else
         expression_add_variable (expression, variable, coefficient);
     }
@@ -211,4 +252,38 @@ expression_terms_foreach (Expression *expression,
   g_hash_table_iter_init (&iter, expression->terms);
   while (g_hash_table_iter_next (&iter, NULL, &value_p))
     func (value_p, data);
+}
+
+Expression *
+expression_plus (Expression *expression,
+                 double constant)
+{
+  Expression *e = expression_new (expression->solver, constant);
+
+  expression_add_expression (expression, e, 1.0, NULL);
+
+  return expression;
+}
+
+Expression *
+expression_times (Expression *expression,
+                  double multiplier)
+{
+  GHashTableIter iter;
+  gpointer value_p;
+
+  expression->constant *= multiplier;
+
+  if (expression->terms == NULL)
+    return expression;
+
+  g_hash_table_iter_init (&iter, expression->terms);
+  while (g_hash_table_iter_next (&iter, NULL, &value_p))
+    {
+      Term *t = value_p;
+
+      t->coefficient *= multiplier;
+    }
+
+  return expression;
 }
