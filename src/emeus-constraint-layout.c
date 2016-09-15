@@ -49,11 +49,76 @@ emeus_constraint_layout_dispose (GObject *gobject)
 }
 
 static void
+emeus_constraint_layout_get_preferred_size (GtkWidget      *widget,
+                                            GtkOrientation  orientation,
+                                            int            *minimum_p,
+                                            int            *natural_p)
+{
+}
+
+static void
+emeus_constraint_layout_get_preferred_width (GtkWidget *widget,
+                                             int       *minimum_p,
+                                             int       *natural_p)
+{
+  emeus_constraint_layout_get_preferred_size (widget,
+                                              GTK_ORIENTATION_HORIZONTAL,
+                                              minimum_p, natural_p);
+}
+
+static void
+emeus_constraint_layout_get_preferred_height (GtkWidget *widget,
+                                              int       *minimum_p,
+                                              int       *natural_p)
+{
+  emeus_constraint_layout_get_preferred_size (widget,
+                                              GTK_ORIENTATION_VERTICAL,
+                                              minimum_p, natural_p);
+}
+
+static void
+emeus_constraint_layout_size_allocate (GtkWidget     *widget,
+                                       GtkAllocation *allocation)
+{
+  gtk_widget_set_allocation (widget, allocation);
+}
+
+static void
+emeus_constraint_layout_add (GtkContainer *container,
+                             GtkWidget    *widget)
+{
+}
+
+static void
+emeus_constraint_layout_remove (GtkContainer *container,
+                                GtkWidget    *widget)
+{
+}
+
+static void
+emeus_constraint_layout_forall (GtkContainer *container,
+                                gboolean      internals,
+                                GtkCallback   callback,
+                                gpointer      data)
+{
+}
+
+static void
 emeus_constraint_layout_class_init (EmeusConstraintLayoutClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+  GtkContainerClass *container_class = GTK_CONTAINER_CLASS (klass);
 
   gobject_class->dispose = emeus_constraint_layout_dispose;
+
+  widget_class->get_preferred_width = emeus_constraint_layout_get_preferred_width;
+  widget_class->get_preferred_height = emeus_constraint_layout_get_preferred_height;
+  widget_class->size_allocate = emeus_constraint_layout_size_allocate;
+
+  container_class->add = emeus_constraint_layout_add;
+  container_class->remove = emeus_constraint_layout_remove;
+  container_class->forall = emeus_constraint_layout_forall;
 }
 
 static void
