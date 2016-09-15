@@ -26,13 +26,6 @@ term_get_coefficient (const Term *term)
   return term->coefficient;
 }
 
-Term *term_new (Variable *variable,
-                double    coefficient);
-Term *term_clone (const Term *term);
-void term_free (Term *term);
-gboolean term_equal (gconstpointer v1,
-                     gconstpointer v2);
-
 static inline bool
 expression_is_constant (const Expression *expression)
 {
@@ -45,25 +38,38 @@ expression_get_constant (const Expression *expression)
   return expression->constant;
 }
 
-Expression *expression_new (Variable *variable,
-                            double value,
+Expression *expression_new (SimplexSolver *solver,
                             double constant);
-Expression *expression_new_empty (void);
+
 Expression *expression_new_from_variable (Variable *variable);
-Expression *expression_new_from_constant (double constant);
 
 Expression *expression_ref (Expression *expression);
 void expression_unref (Expression *expression);
 
-Expression *expression_clone (const Expression *expression);
-
-GPtrArray *expression_get_terms_as_array (const Expression *expression);
+void expression_set_constant (Expression *expression,
+                              double constant);
 
 void expression_add_variable (Expression *expression,
                               Variable *variable,
                               double value);
+
 void expression_remove_variable (Expression *expression,
                                  Variable *variable);
+
+bool expression_has_variable (const Expression *expression,
+                              Variable *variable);
+
+void expression_add_expression (Expression *a,
+                                Expression *b);
+
+Expression *expression_plus_variable (Expression *expression,
+                                      Variable *variable);
+Expression *expression_times_constant (Expression *expression,
+                                       double constant);
+
+void expression_set_coefficient (Expression *expression,
+                                 Variable *variable,
+                                 double coefficient);
 
 double expression_get_coefficient (const Expression *expression,
                                    Variable *variable);

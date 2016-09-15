@@ -5,6 +5,8 @@
 
 G_BEGIN_DECLS
 
+typedef struct _SimplexSolver   SimplexSolver;
+
 typedef enum {
   VARIABLE_DUMMY     = 'd',
   VARIABLE_OBJECTIVE = 'o',
@@ -16,13 +18,14 @@ typedef struct {
   int ref_count;
 
   VariableType type;
-  char *name;
 
   double value;
 
   bool is_external;
   bool is_pivotable;
   bool is_restricted;
+
+  SimplexSolver *solver;
 } Variable;
 
 typedef struct {
@@ -36,7 +39,10 @@ typedef struct {
 
   double constant;
 
+  /* HashTable<Variable,Term> */
   GHashTable *terms;
+
+  SimplexSolver *solver;
 } Expression;
 
 typedef enum {
@@ -55,15 +61,38 @@ typedef enum {
 typedef struct {
   int ref_count;
 
+  /* While the Constraint's normal form is expressed in terms of a linear
+   * equation between two terms, e.g.:
+   *
+   *   x = y * coefficient + constant
+   *
+   * we use a single expression and compare with zero:
+   *
+   *   x - (y * coefficient + constant) = 0
+   *
+   * as this simplifies tableau we set up for the simplex solver
+   */
   Expression *expression;
   OperatorType op_type;
 
   StrengthType strength;
-  double weight;
 
   bool is_edit;
-  bool is_slack;
-  bool is_inequality;
+  bool is_stay;
+
+  SimplexSolver *solver;
 } Constraint;
+
+static inline bool
+constraint_is_inequality (const Constraint *constraint)
+{
+  return constraint->op_type != OPERATOR_TYPE_EQ;
+}
+
+static inline bool
+constraint_is_required (const Constraint *constraint)
+{
+  return constraint->strength >= STRENGTH_REQUIRED;
+}
 
 G_END_DECLS

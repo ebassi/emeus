@@ -32,6 +32,9 @@ simplex_solver_init (SimplexSolver *solver)
 
   /* HashSet<Variable>; does not own keys */
   solver->updated_externals = g_hash_table_new (NULL, NULL);
+
+  solver->needs_solving = false;
+  solver->auto_solve = false;
 }
 
 void
@@ -40,6 +43,18 @@ simplex_solver_clear (SimplexSolver *solver)
   g_clear_pointer (&solver->columns, g_hash_table_unref);
   g_clear_pointer (&solver->rows, g_hash_table_unref);
   g_clear_pointer (&solver->external_rows, g_hash_table_unref);
+}
+
+void
+simplex_solver_add_variable (SimplexSolver *solver,
+                             Variable *variable)
+{
+}
+
+void
+simplex_solver_remove_variable (SimplexSolver *solver,
+                                Variable *variable)
+{
 }
 
 static GHashTable *
@@ -224,4 +239,100 @@ simplex_solver_substitute_out (SimplexSolver *solver,
 
       g_hash_table_remove (solver->columns, old_variable);
     }
+}
+
+Variable *
+simplex_solver_create_variable (SimplexSolver *solver)
+{
+  return variable_new (solver, VARIABLE_REGULAR);
+}
+
+Expression *
+simplex_solver_create_expression (SimplexSolver *solver,
+                                  double constant)
+{
+  return expression_new (solver, constant);
+}
+
+static void
+simplex_solver_add_constraint_internal (SimplexSolver *solver,
+                                        Constraint *constraint)
+{
+  solver->needs_solving = true;
+
+  if (solver->auto_solve)
+    simplex_solver_resolve (solver);
+}
+
+Constraint *
+simplex_solver_add_constraint (SimplexSolver *solver,
+                               Expression *expression,
+                               OperatorType op,
+                               StrengthType strength)
+{
+  Constraint *res;
+
+  res = g_slice_new (Constraint);
+  res->solver = solver;
+  res->expression = expression;
+  res->op_type = op;
+  res->strength = strength;
+  res->is_stay = false;
+  res->is_edit = false;
+
+  simplex_solver_add_constraint_internal (solver, res);
+
+  return res;
+}
+
+Constraint *
+simplex_solver_add_stay_constraint (SimplexSolver *solver,
+                                    Variable *variable,
+                                    StrengthType strength)
+{
+  Constraint *res;
+
+  res = g_slice_new (Constraint);
+  res->solver = solver;
+  res->expression = expression_new_from_variable (variable);
+  res->op_type = OPERATOR_TYPE_EQ;
+  res->strength = strength;
+  res->is_stay = true;
+  res->is_edit = false;
+
+  simplex_solver_add_constraint_internal (solver, res);
+
+  return res;
+}
+
+Constraint *
+simplex_solver_add_edit_constraint (SimplexSolver *solver,
+                                    Variable *variable,
+                                    StrengthType strength)
+{
+  Constraint *res;
+
+  res = g_slice_new (Constraint);
+  res->solver = solver;
+  res->expression = expression_new_from_variable (variable);
+  res->op_type = OPERATOR_TYPE_EQ;
+  res->strength = strength;
+  res->is_stay = false;
+  res->is_edit = true;
+
+  simplex_solver_add_constraint_internal (solver, res);
+
+  return res;
+}
+
+void
+simplex_solver_suggest_value (SimplexSolver *solver,
+                              Variable *variable,
+                              double value)
+{
+}
+
+void
+simplex_solver_resolve (SimplexSolver *solver)
+{
 }

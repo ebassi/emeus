@@ -38,14 +38,13 @@ regular_variable_init (Variable *v)
 }
 
 Variable *
-variable_new (VariableType  type,
-              const char   *name,
-              double        value)
+variable_new (SimplexSolver *solver,
+              VariableType   type)
 {
   Variable *res = g_slice_new (Variable);
 
+  res->solver = solver;
   res->type = type;
-  res->name = g_strdup (name);
   res->ref_count = 1;
 
   switch (type)
@@ -64,7 +63,6 @@ variable_new (VariableType  type,
 
     case VARIABLE_REGULAR:
       regular_variable_init (res);
-      res->value = value;
       break;
     }
 
@@ -74,19 +72,12 @@ variable_new (VariableType  type,
 static void
 variable_free (Variable *variable)
 {
-  if (variable == NULL)
-    return;
-
-  g_free (variable->name);
   g_slice_free (Variable, variable);
 }
 
 Variable *
 variable_ref (Variable *variable)
 {
-  if (variable == NULL)
-    return NULL;
-
   variable->ref_count += 1;
 
   return variable;
@@ -95,30 +86,7 @@ variable_ref (Variable *variable)
 void
 variable_unref (Variable *variable)
 {
-  if (variable == NULL)
-    return;
-
   variable->ref_count -= 1;
   if (variable->ref_count == 0)
     variable_free (variable);
-}
-
-Variable *
-variable_clone (const Variable *variable)
-{
-  Variable *res = g_slice_dup (Variable, variable);
-
-  if (res == NULL)
-    return NULL;
-
-  res->name = g_strdup (variable->name);
-  res->ref_count = 1;
-
-  return res;
-}
-
-const char *
-variable_get_name (const Variable *variable)
-{
-  return variable->name;
 }

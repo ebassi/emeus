@@ -51,13 +51,9 @@ variable_get_value (const Variable *variable)
   return variable->value;
 }
 
-Variable *variable_new (VariableType type,
-                        const char *name,
-                        double value);
+Variable *variable_new (SimplexSolver *solver,
+                        VariableType type);
 Variable *variable_ref (Variable *variable);
 void      variable_unref (Variable *variable);
-Variable *variable_clone (const Variable *variable);
-
-const char *variable_get_name (const Variable *variable);
 
 G_END_DECLS
