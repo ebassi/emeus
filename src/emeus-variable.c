@@ -90,3 +90,10 @@ variable_unref (Variable *variable)
   if (variable->ref_count == 0)
     variable_free (variable);
 }
+
+void
+variable_set_value (Variable *variable,
+                    double value)
+{
+  variable->value = value;
+}

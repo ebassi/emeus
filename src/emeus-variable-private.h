@@ -54,6 +54,9 @@ variable_get_value (const Variable *variable)
 Variable *variable_new (SimplexSolver *solver,
                         VariableType type);
 Variable *variable_ref (Variable *variable);
-void      variable_unref (Variable *variable);
+void variable_unref (Variable *variable);
+
+void variable_set_value (Variable *variable,
+                         double value);
 
 G_END_DECLS
