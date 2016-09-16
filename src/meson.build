@@ -13,6 +13,7 @@ private_headers = [
   'emeus-macros-private.h',
   'emeus-simplex-solver-private.h',
   'emeus-types-private.h',
+  'emeus-utils-private.h',
   'emeus-variable-private.h',
 ]
 
@@ -22,6 +23,7 @@ sources = [
   'emeus-expression.c',
   'emeus-simplex-solver.c',
   'emeus-types.c',
+  'emeus-utils.c',
   'emeus-variable.c',
 ]
 
