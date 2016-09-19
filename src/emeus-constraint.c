@@ -16,21 +16,8 @@
  * License along with this library. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
-
-#include "emeus-constraint-private.h"
-
-#include "emeus-expression-private.h"
-#include "emeus-simplex-solver-private.h"
-#include "emeus-variable-private.h"
-#include "emeus-utils-private.h"
-
-#include <math.h>
-#include <float.h>
-#include <gtk/gtk.h>
-
 /**
- * SECTION:emeusconstraint
+ * SECTION:emeus-constraint
  * @Title: EmeusConstraint
  * @Short_desc: The representation of a single constraint
  *
@@ -64,6 +51,19 @@
  *   button2.width = button1.width × 1.0 + 0.0
  * ]|
  */
+
+#include "config.h"
+
+#include "emeus-constraint-private.h"
+
+#include "emeus-expression-private.h"
+#include "emeus-simplex-solver-private.h"
+#include "emeus-variable-private.h"
+#include "emeus-utils-private.h"
+
+#include <math.h>
+#include <float.h>
+#include <gtk/gtk.h>
 
 enum {
   PROP_TARGET_OBJECT = 1,

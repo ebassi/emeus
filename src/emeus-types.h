@@ -1,4 +1,4 @@
-/* emeus-types.h
+/* emeus-types.h: Shared public types
  *
  * Copyright 2016  Endless
  *
@@ -24,6 +24,23 @@
 
 G_BEGIN_DECLS
 
+/**
+ * EmeusConstraintStrength:
+ * @EMEUS_CONSTRAINT_STRENGTH_WEAK: Weak constraint
+ * @EMEUS_CONSTRAINT_STRENGTH_MEDIUM: Medium constraint
+ * @EMEUS_CONSTRAINT_STRENGTH_STRONG: Strong constraint
+ * @EMEUS_CONSTRAINT_STRENGTH_REQUIRED: Requires constraint
+ *
+ * The possible strengths for a constraint.
+ *
+ * The order is:
+ *
+ * |[<!-- language="plain" -->
+ *   weak < medium < strong < required
+ * ]|
+ *
+ * Since: 1.0
+ */
 typedef enum {
   EMEUS_CONSTRAINT_STRENGTH_WEAK,
   EMEUS_CONSTRAINT_STRENGTH_MEDIUM,
@@ -36,6 +53,16 @@ typedef enum {
 EMEUS_AVAILABLE_IN_1_0
 GType emeus_constraint_strength_get_type (void) G_GNUC_CONST;
 
+/**
+ * EmeusConstraintRelation:
+ * @EMEUS_CONSTRAINT_RELATION_LE: Less than, or equal
+ * @EMEUS_CONSTRAINT_RELATION_EQ: Equal
+ * @EMEUS_CONSTRAINT_RELATION_GE: Greater than, or equal
+ *
+ * The relation between the two terms of the constraint.
+ *
+ * Since: 1.0
+ */
 typedef enum
 {
   EMEUS_CONSTRAINT_RELATION_LE,
@@ -48,6 +75,29 @@ typedef enum
 EMEUS_AVAILABLE_IN_1_0
 GType emeus_constraint_relation_get_type (void) G_GNUC_CONST;
 
+/**
+ * EmeusConstraintAttribute:
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_INVALID: Used for constants
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_LEFT: The left edge of a widget
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT: The right edge of a widget
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_TOP: The top edge of a widget
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_BOTTOM: The bottom edge of a widget
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_START: The leading edge of a widget, depending
+ *   on the text direction (left for LTR languages, right for RTL ones)
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_END: The trailing edge of a widget, depending
+ *   on the text direction (right for LTR languages, left for RTL ones)
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH: The width of a widget
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT: The height of a widget
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X: The center of a widget, on the horizontal
+ *   axis
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y: The center of a widget, on the vertical
+ *   axis
+ * @EMEUS_CONSTRAINT_ATTRIBUTE_BASELINE: The baseline of a widget
+ *
+ * The attributes that can be used to build a constraint.
+ *
+ * Since: 1.0
+ */
 typedef enum
 {
   EMEUS_CONSTRAINT_ATTRIBUTE_INVALID,

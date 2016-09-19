@@ -1,3 +1,30 @@
+/* emeus-constraint-layout.c: The constraint layout manager
+ *
+ * Copyright 2016  Endless
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * SECTION:emeus-constraint-layout
+ * @Title: EmeusConstraintLayout
+ * @Short_desc: A widget container using layout constraints
+ *
+ * #EmeusConstraintLayout is a #GtkContainter that uses constraints
+ * associated to each of its children to decide their layout.
+ */
+
 #include "config.h"
 
 #include "emeus-constraint-layout-private.h"
@@ -343,6 +370,21 @@ emeus_constraint_layout_has_child_data (EmeusConstraintLayout *layout,
   return get_layout_child_data (layout, widget) != NULL;
 }
 
+/**
+ * emeus_constraint_layout_pack:
+ * @layout: a #EmeusConstraintLayout
+ * @child: a #GtkWidget
+ * @first_constraint: (nullable): a #EmeusConstraint
+ * @...: a %NULL-terminated list of #EmeusConstraint instances
+ *
+ * Adds @child to the @layout, and applies a list of constraints to it.
+ *
+ * This convenience function is the equivalent of calling
+ * gtk_container_add() and emeus_constraint_layout_child_add_constraint()
+ * for each constraint instance.
+ *
+ * Since: 1.0
+ */
 void
 emeus_constraint_layout_pack (EmeusConstraintLayout *layout,
                               GtkWidget             *child,
@@ -373,6 +415,20 @@ emeus_constraint_layout_pack (EmeusConstraintLayout *layout,
   va_end (args);
 }
 
+/**
+ * emeus_constraint_layout_child_add_constraint:
+ * @layout: a #EmeusConstraintLayout
+ * @child: a #GtkWidget
+ * @constraint: a #EmeusConstraint
+ *
+ * Adds the given @constraint to the list of constraints applied to
+ * the @child of the @layout.
+ *
+ * The #EmeusConstraintLayout will own the @constraint until the
+ * @child is removed, or until the @constraint is removed.
+ *
+ * Since: 1.0
+ */
 void
 emeus_constraint_layout_child_add_constraint (EmeusConstraintLayout *layout,
                                               GtkWidget             *child,
@@ -390,6 +446,17 @@ emeus_constraint_layout_child_add_constraint (EmeusConstraintLayout *layout,
   gtk_widget_queue_resize (child);
 }
 
+/**
+ * emeus_constraint_layout_child_remove_constraint:
+ * @layout: a #EmeusConstraintLayout
+ * @child: a #GtkWidget
+ * @constraint: a #EmeusConstraint
+ *
+ * Removes the given @constraint from the list of constraints applied
+ * to the @child of the @layout.
+ *
+ * Since: 1.0
+ */
 void
 emeus_constraint_layout_child_remove_constraint (EmeusConstraintLayout *layout,
                                                  GtkWidget             *child,
@@ -407,6 +474,16 @@ emeus_constraint_layout_child_remove_constraint (EmeusConstraintLayout *layout,
   gtk_widget_queue_resize (child);
 }
 
+/**
+ * emeus_constraint_layout_child_clear_constraints:
+ * @layout: a #EmeusConstraintLayout
+ * @child: a #GtkWidget
+ *
+ * Clears all the constraints associated with the child @widget of
+ * the @layout.
+ *
+ * Since: 1.0
+ */
 void
 emeus_constraint_layout_child_clear_constraints (EmeusConstraintLayout *layout,
                                                  GtkWidget             *child)
