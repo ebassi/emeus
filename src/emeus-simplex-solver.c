@@ -301,15 +301,29 @@ simplex_solver_add_constraint_internal (SimplexSolver *solver,
 
 Constraint *
 simplex_solver_add_constraint (SimplexSolver *solver,
-                               Expression *expression,
+                               Variable *variable,
                                OperatorType op,
+                               Expression *expression,
                                StrengthType strength)
 {
   Constraint *res;
+  Expression *expr;
+
+  /* Turn:
+   *
+   *   attr OP expression
+   *
+   * into:
+   *
+   *   attr - expression OP 0
+   */
+  expr = expression_new_from_variable (variable);
+  expression_add_expression (expr, expression, -1.0, NULL);
+  expression_unref (expression);
 
   res = g_slice_new (Constraint);
   res->solver = solver;
-  res->expression = expression_ref (expression);
+  res->expression = expr;
   res->op_type = op;
   res->strength = strength;
   res->is_stay = false;
@@ -321,15 +335,27 @@ simplex_solver_add_constraint (SimplexSolver *solver,
 }
 
 Constraint *
-simplex_solver_add_stay_constraint (SimplexSolver *solver,
-                                    Variable *variable,
-                                    StrengthType strength)
+simplex_solver_add_stay_variable (SimplexSolver *solver,
+                                  Variable *variable,
+                                  StrengthType strength)
 {
   Constraint *res;
+  Expression *expr;
+
+  /* Turn stay constraint from:
+   *
+   *   attr == value
+   *
+   * into:
+   *
+   *   attr - value == 0
+   */
+  expr = expression_new_from_variable (variable);
+  expression_plus (expr, variable_get_value (variable) * -1.0);
 
   res = g_slice_new (Constraint);
   res->solver = solver;
-  res->expression = expression_new_from_variable (variable);
+  res->expression = expr;
   res->op_type = OPERATOR_TYPE_EQ;
   res->strength = strength;
   res->is_stay = true;
@@ -341,9 +367,9 @@ simplex_solver_add_stay_constraint (SimplexSolver *solver,
 }
 
 Constraint *
-simplex_solver_add_edit_constraint (SimplexSolver *solver,
-                                    Variable *variable,
-                                    StrengthType strength)
+simplex_solver_add_edit_variable (SimplexSolver *solver,
+                                  Variable *variable,
+                                  StrengthType strength)
 {
   Constraint *res;
 

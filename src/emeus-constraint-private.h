@@ -23,14 +23,17 @@ struct _EmeusConstraint
 
   EmeusConstraintStrength strength;
 
+  char *description;
   SimplexSolver *solver;
   Constraint *constraint;
 };
 
-void            emeus_constraint_attach                 (EmeusConstraint       *constraint,
+gboolean        emeus_constraint_attach                 (EmeusConstraint       *constraint,
                                                          EmeusConstraintLayout *layout);
 void            emeus_constraint_detach                 (EmeusConstraint       *constraint);
 
 Constraint *    emeus_constraint_get_real_constraint    (EmeusConstraint       *constraint);
+
+const char *    emeus_constraint_to_string              (EmeusConstraint       *constraint);
 
 G_END_DECLS

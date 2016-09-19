@@ -56,17 +56,18 @@ Expression *simplex_solver_create_expression (SimplexSolver *solver,
                                               double constant);
 
 Constraint *simplex_solver_add_constraint (SimplexSolver *solver,
-                                           Expression *expression,
+                                           Variable *variable,
                                            OperatorType op,
+                                           Expression *expression,
                                            StrengthType strength);
 
-Constraint *simplex_solver_add_stay_constraint (SimplexSolver *solver,
-                                                Variable *variable,
-                                                StrengthType strength);
+Constraint *simplex_solver_add_stay_variable (SimplexSolver *solver,
+                                              Variable *variable,
+                                              StrengthType strength);
 
-Constraint *simplex_solver_add_edit_constraint (SimplexSolver *solver,
-                                                Variable *variable,
-                                                StrengthType strength);
+Constraint *simplex_solver_add_edit_variable (SimplexSolver *solver,
+                                              Variable *variable,
+                                              StrengthType strength);
 
 void simplex_solver_remove_constraint (SimplexSolver *solver,
                                        Constraint *constraint);
