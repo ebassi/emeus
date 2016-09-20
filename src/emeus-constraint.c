@@ -273,17 +273,20 @@ emeus_constraint_init (EmeusConstraint *self)
 
 /**
  * emeus_constraint_new: (constructor)
- * @target_object: (type Gtk.Widget): ..
- * @target_attribute: ...
- * @relation: ...
- * @source_object: (type Gtk.Widget): ..
- * @source_attribute: ...
- * @multiplier: ...
- * @constant: ...
+ * @target_object: (type Gtk.Widget): the target widget for the constraint
+ * @target_attribute: the attribute to set on the target widget
+ * @relation: the relation between the target and source attributes
+ * @source_object: (type Gtk.Widget) (nullable): the source widget, or
+ *   %NULL for the parent layout
+ * @source_attribute: the attribute to get from the source widget
+ * @multiplier: the multiplication coefficient to apply to the source
+ *   attribute
+ * @constant: the constant to add to the source attribute
  *
- * ...
+ * Creates a new constraint using a value from the source widget's attribute
+ * and applying it to the target widget's attribute.
  *
- * Returns: (transfer full): ...
+ * Returns: (transfer full): the newly created constraint
  *
  * Since: 1.0
  */
@@ -297,8 +300,8 @@ emeus_constraint_new (gpointer                 target_object,
                       double                   constant,
                       EmeusConstraintStrength  strength)
 {
-  g_return_val_if_fail (target_object != NULL, NULL);
-  g_return_val_if_fail (source_object != NULL, NULL);
+  g_return_val_if_fail (GTK_IS_WIDGET (target_object), NULL);
+  g_return_val_if_fail (source_object == NULL || GTK_IS_WIDGET (source_object), NULL);
 
   return g_object_new (EMEUS_TYPE_CONSTRAINT,
                        "target-object", target_object,
@@ -314,10 +317,10 @@ emeus_constraint_new (gpointer                 target_object,
 
 /**
  * emeus_constraint_new_constant: (constructor)
- * @target_object: (type Gtk.Widget): ..
- * @target_attribute: ...
- * @relation: ...
- * @constant: ...
+ * @target_object: (type Gtk.Widget): the target widget for the constraint
+ * @target_attribute: the attribute to set on the target widget
+ * @relation: the relation between the target and the constant
+ * @constant: the constant value of the constraint
  *
  * Creates a new constant constraint.
  *
@@ -327,7 +330,7 @@ emeus_constraint_new (gpointer                 target_object,
  *  - #EmeusConstraint:source_attribute set to %EMEUS_CONSTRAINT_ATTRIBUTE_INVALID
  *  - #EmeusConstraint:multiplier set to 1.0
  *
- * Returns: (transfer full): ...
+ * Returns: (transfer full): the newly created constraint
  *
  * Since: 1.0
  */
@@ -390,7 +393,7 @@ emeus_constraint_get_relation (EmeusConstraint *constraint)
  *
  * ...
  *
- * Returns: (transfer none) (type Gtk.Widget): ...
+ * Returns: (transfer none) (nullable) (type Gtk.Widget): ...
  */
 gpointer
 emeus_constraint_get_source_object (EmeusConstraint *constraint)

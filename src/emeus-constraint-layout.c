@@ -62,6 +62,8 @@ struct _EmeusConstraintLayout
   GSequence *children;
 
   SimplexSolver solver;
+
+  GHashTable *bound_attributes;
 };
 
 G_DEFINE_TYPE (EmeusConstraintLayout, emeus_constraint_layout, GTK_TYPE_CONTAINER)
@@ -86,6 +88,7 @@ emeus_constraint_layout_dispose (GObject *gobject)
   EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (gobject);
 
   g_clear_pointer (&self->children, g_sequence_free);
+  g_clear_pointer (&self->bound_attributes, g_hash_table_unref);
 
   simplex_solver_clear (&self->solver);
 
@@ -113,6 +116,21 @@ get_layout_child_data (EmeusConstraintLayout *layout,
     }
 
   return NULL;
+}
+
+static Variable *
+get_layout_attribute (EmeusConstraintLayout *layout,
+                      const char            *attr_name)
+{
+  Variable *res = g_hash_table_lookup (layout->bound_attributes, attr_name);
+
+  if (res == NULL)
+    {
+      res = simplex_solver_create_variable (&layout->solver);
+      g_hash_table_insert (layout->bound_attributes, g_strdup (attr_name), res);
+    }
+
+  return res;
 }
 
 static Variable *
@@ -269,6 +287,10 @@ emeus_constraint_layout_init (EmeusConstraintLayout *self)
   simplex_solver_init (&self->solver);
 
   self->children = g_sequence_new (layout_child_data_free);
+
+  self->bound_attributes = g_hash_table_new_full (g_str_hash, g_str_equal,
+                                                  g_free,
+                                                  (GDestroyNotify) variable_unref);
 }
 
 GtkWidget *
@@ -322,9 +344,16 @@ add_child_constraint (EmeusConstraintLayout *layout,
   /* Alternatively, if it's not a constant value, we find the variable
    * associated with it
    */
-  attr2 = get_child_attribute (layout,
-                               constraint->source_object,
-                               get_attribute_name (constraint->source_attribute));
+  if (constraint->source_object != NULL)
+    {
+      attr2 = get_child_attribute (layout,
+                                   constraint->source_object,
+                                   get_attribute_name (constraint->source_attribute));
+    }
+  else
+    {
+      attr2 = get_layout_attribute (layout, get_attribute_name (constraint->source_attribute));
+    }
 
   /* Turn attr2 into an expression in the form:
    *
