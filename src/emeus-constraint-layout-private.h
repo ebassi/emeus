@@ -44,6 +44,9 @@ struct _EmeusConstraintLayoutChild
    * widget, using the public API objects.
    */
   GHashTable *constraints;
+
+  double intrinsic_width;
+  double intrinsic_height;
 };
 
 struct _EmeusConstraintLayout

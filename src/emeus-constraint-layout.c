@@ -36,6 +36,8 @@
 #include "emeus-utils-private.h"
 #include "emeus-variable-private.h"
 
+#include <math.h>
+
 G_DEFINE_TYPE (EmeusConstraintLayout, emeus_constraint_layout, GTK_TYPE_CONTAINER)
 
 G_DEFINE_TYPE (EmeusConstraintLayoutChild, emeus_constraint_layout_child, GTK_TYPE_BIN)
@@ -575,4 +577,144 @@ emeus_constraint_layout_child_clear_constraints (EmeusConstraintLayoutChild *chi
   g_hash_table_remove_all (child->bound_attributes);
 
   gtk_widget_queue_resize (GTK_WIDGET (child));
+}
+
+int
+emeus_constraint_layout_child_get_top (EmeusConstraintLayoutChild *child)
+{
+  Variable *res;
+
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child), 0);
+
+  res = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_TOP));
+
+  return floor (variable_get_value (res));
+}
+
+int
+emeus_constraint_layout_child_get_right (EmeusConstraintLayoutChild *child)
+{
+  Variable *res;
+
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child), 0);
+
+  res = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT));
+
+  return ceil (variable_get_value (res));
+}
+
+int
+emeus_constraint_layout_child_get_bottom (EmeusConstraintLayoutChild *child)
+{
+  Variable *res;
+
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child), 0);
+
+  res = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_BOTTOM));
+
+  return ceil (variable_get_value (res));
+}
+
+int
+emeus_constraint_layout_child_get_left (EmeusConstraintLayoutChild *child)
+{
+  Variable *res;
+
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child), 0);
+
+  res = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT));
+
+  return floor (variable_get_value (res));
+}
+
+int
+emeus_constraint_layout_child_get_width (EmeusConstraintLayoutChild *child)
+{
+  Variable *res;
+
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child), 0);
+
+  res = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH));
+
+  return ceil (variable_get_value (res));
+}
+
+int
+emeus_constraint_layout_child_get_height (EmeusConstraintLayoutChild *child)
+{
+  Variable *res;
+
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child), 0);
+
+  res = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT));
+
+  return ceil (variable_get_value (res));
+}
+
+int
+emeus_constraint_layout_child_get_center_x (EmeusConstraintLayoutChild *child)
+{
+  Variable *res;
+
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child), 0);
+
+  res = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X));
+
+  return ceil (variable_get_value (res));
+}
+
+int
+emeus_constraint_layout_child_get_center_y (EmeusConstraintLayoutChild *child)
+{
+  Variable *res;
+
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child), 0);
+
+  res = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y));
+
+  return ceil (variable_get_value (res));
+}
+
+void
+emeus_constraint_layout_child_set_intrinsic_width (EmeusConstraintLayoutChild *child,
+                                                   int                         width)
+{
+  Variable *attr;
+
+  g_return_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child));
+
+  attr = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH));
+
+  if (child->intrinsic_width < 0)
+    simplex_solver_add_edit_variable (child->solver, attr, STRENGTH_REQUIRED);
+
+  child->intrinsic_width = width;
+
+  simplex_solver_suggest_value (child->solver, attr, child->intrinsic_width);
+  simplex_solver_resolve (child->solver);
+
+  if (gtk_widget_get_visible (GTK_WIDGET (child)))
+    gtk_widget_queue_resize (GTK_WIDGET (child));
+}
+
+void
+emeus_constraint_layout_child_set_intrinsic_height (EmeusConstraintLayoutChild *child,
+                                                    int                         height)
+{
+  Variable *attr;
+
+  g_return_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child));
+
+  attr = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT));
+
+  if (child->intrinsic_width < 0)
+    simplex_solver_add_edit_variable (child->solver, attr, STRENGTH_REQUIRED);
+
+  child->intrinsic_height = height;
+
+  simplex_solver_suggest_value (child->solver, attr, child->intrinsic_height);
+  simplex_solver_resolve (child->solver);
+
+  if (gtk_widget_get_visible (GTK_WIDGET (child)))
+    gtk_widget_queue_resize (GTK_WIDGET (child));
 }
