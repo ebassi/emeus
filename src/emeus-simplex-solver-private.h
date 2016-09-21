@@ -22,35 +22,6 @@
 
 G_BEGIN_DECLS
 
-struct _SimplexSolver {
-  /* HashTable<Variable, HashSet<Variable>> */
-  GHashTable *columns;
-
-  /* HashTable<Variable, Expression> */
-  GHashTable *rows;
-
-  /* Sets */
-  GHashTable *infeasible_rows;
-  GHashTable *external_rows;
-  GHashTable *external_vars;
-  GHashTable *updated_externals;
-
-  GPtrArray *stay_error_vars;
-
-  GHashTable *error_vars;
-  GHashTable *marker_vars;
-
-  GHashTable *edit_var_map;
-
-  int slack_counter;
-  int artificial_counter;
-  int dummy_counter;
-  int optimize_count;
-
-  bool auto_solve;
-  bool needs_solving;
-};
-
 static inline bool
 constraint_is_inequality (const Constraint *constraint)
 {

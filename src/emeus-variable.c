@@ -20,6 +20,8 @@
 
 #include "emeus-variable-private.h"
 
+#include "emeus-simplex-solver-private.h"
+
 #include <math.h>
 #include <float.h>
 
@@ -90,6 +92,11 @@ variable_new (SimplexSolver *solver,
 static void
 variable_free (Variable *variable)
 {
+  if (variable == NULL)
+    return;
+
+  simplex_solver_remove_variable (variable->solver, variable, NULL);
+
   g_slice_free (Variable, variable);
 }
 
