@@ -87,6 +87,9 @@ Expression *expression_plus (Expression *expression,
 Expression *expression_times (Expression *expression,
                               double multiplier);
 
+Expression *expression_plus_variable (Expression *expression,
+                                      Variable *variable);
+
 void expression_set_coefficient (Expression *expression,
                                  Variable *variable,
                                  double coefficient);
