@@ -683,6 +683,9 @@ emeus_constraint_layout_child_set_intrinsic_width (EmeusConstraintLayoutChild *c
 
   g_return_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child));
 
+  if (child->intrinsic_width == width)
+    return;
+
   attr = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH));
 
   if (child->intrinsic_width < 0)
@@ -690,7 +693,9 @@ emeus_constraint_layout_child_set_intrinsic_width (EmeusConstraintLayoutChild *c
 
   child->intrinsic_width = width;
 
-  simplex_solver_suggest_value (child->solver, attr, child->intrinsic_width);
+  if (width > 0)
+    simplex_solver_suggest_value (child->solver, attr, width);
+
   simplex_solver_resolve (child->solver);
 
   if (gtk_widget_get_visible (GTK_WIDGET (child)))
@@ -705,14 +710,19 @@ emeus_constraint_layout_child_set_intrinsic_height (EmeusConstraintLayoutChild *
 
   g_return_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child));
 
+  if (child->intrinsic_height == height)
+    return;
+
   attr = get_child_attribute (child, get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT));
 
-  if (child->intrinsic_width < 0)
-    simplex_solver_add_edit_variable (child->solver, attr, STRENGTH_REQUIRED);
+  if (child->intrinsic_height < 0)
+    simplex_solver_add_edit_variable (child->solver, attr, STRENGTH_REQUIRED - 1);
 
   child->intrinsic_height = height;
 
-  simplex_solver_suggest_value (child->solver, attr, child->intrinsic_height);
+  if (height > 0)
+    simplex_solver_suggest_value (child->solver, attr, height);
+
   simplex_solver_resolve (child->solver);
 
   if (gtk_widget_get_visible (GTK_WIDGET (child)))
