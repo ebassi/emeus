@@ -23,6 +23,40 @@
 
 G_BEGIN_DECLS
 
+struct _EmeusConstraintLayoutChild
+{
+  GtkBin parent_instance;
+
+  /* Position in the layout's GSequence */
+  GSequenceIter *iter;
+
+  /* Back pointer to the solver in the layout */
+  SimplexSolver *solver;
+
+  /* HashTable<static string, Variable>; a hash table of variables,
+   * one for each attribute; we use these to query and suggest the
+   * values for the solver. The string is static and does not need
+   * to be freed.
+   */
+  GHashTable *bound_attributes;
+
+  /* HashSet<EmeusConstraint>; the set of constraints on the
+   * widget, using the public API objects.
+   */
+  GHashTable *constraints;
+};
+
+struct _EmeusConstraintLayout
+{
+  GtkContainer parent_instance;
+
+  GSequence *children;
+
+  SimplexSolver solver;
+
+  GHashTable *bound_attributes;
+};
+
 SimplexSolver * emeus_constraint_layout_get_solver      (EmeusConstraintLayout *layout);
 
 gboolean        emeus_constraint_layout_has_child_data  (EmeusConstraintLayout *layout,

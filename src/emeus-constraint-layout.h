@@ -29,23 +29,50 @@ EMEUS_AVAILABLE_IN_1_0
 G_DECLARE_FINAL_TYPE (EmeusConstraintLayout, emeus_constraint_layout, EMEUS, CONSTRAINT_LAYOUT, GtkContainer)
 
 EMEUS_AVAILABLE_IN_1_0
-GtkWidget *     emeus_constraint_layout_new                     (void);
+GtkWidget *     emeus_constraint_layout_new     (void);
+EMEUS_AVAILABLE_IN_1_0
+void            emeus_constraint_layout_pack    (EmeusConstraintLayout *layout,
+                                                 GtkWidget             *child,
+                                                 EmeusConstraint       *first_constraint,
+                                                 ...);
+
+#define EMEUS_TYPE_CONSTRAINT_LAYOUT_CHILD (emeus_constraint_layout_child_get_type())
 
 EMEUS_AVAILABLE_IN_1_0
-void            emeus_constraint_layout_pack                    (EmeusConstraintLayout *layout,
-                                                                 GtkWidget             *child,
-                                                                 EmeusConstraint       *first_constraint,
-                                                                 ...) G_GNUC_NULL_TERMINATED;
+G_DECLARE_FINAL_TYPE (EmeusConstraintLayoutChild, emeus_constraint_layout_child, EMEUS, CONSTRAINT_LAYOUT_CHILD, GtkBin)
+
 EMEUS_AVAILABLE_IN_1_0
-void            emeus_constraint_layout_child_add_constraint    (EmeusConstraintLayout *layout,
-                                                                 GtkWidget             *child,
-                                                                 EmeusConstraint       *constraint);
+GtkWidget *     emeus_constraint_layout_child_new                       (void);
+
 EMEUS_AVAILABLE_IN_1_0
-void            emeus_constraint_layout_child_remove_constraint (EmeusConstraintLayout *layout,
-                                                                 GtkWidget             *child,
-                                                                 EmeusConstraint       *constraint);
+int             emeus_constraint_layout_child_get_top                   (EmeusConstraintLayoutChild *child);
 EMEUS_AVAILABLE_IN_1_0
-void            emeus_constraint_layout_child_clear_constraints (EmeusConstraintLayout *layout,
-                                                                 GtkWidget             *child);
+int             emeus_constraint_layout_child_get_right                 (EmeusConstraintLayoutChild *child);
+EMEUS_AVAILABLE_IN_1_0
+int             emeus_constraint_layout_child_get_bottom                (EmeusConstraintLayoutChild *child);
+EMEUS_AVAILABLE_IN_1_0
+int             emeus_constraint_layout_child_get_left                  (EmeusConstraintLayoutChild *child);
+EMEUS_AVAILABLE_IN_1_0
+int             emeus_constraint_layout_child_get_width                 (EmeusConstraintLayoutChild *child);
+EMEUS_AVAILABLE_IN_1_0
+int             emeus_constraint_layout_child_get_height                (EmeusConstraintLayoutChild *child);
+EMEUS_AVAILABLE_IN_1_0
+int             emeus_constraint_layout_child_get_center_x              (EmeusConstraintLayoutChild *child);
+EMEUS_AVAILABLE_IN_1_0
+int             emeus_constraint_layout_child_get_center_y              (EmeusConstraintLayoutChild *child);
+EMEUS_AVAILABLE_IN_1_0
+void            emeus_constraint_layout_child_set_intrinsic_width       (EmeusConstraintLayoutChild *child,
+                                                                         int                         width);
+EMEUS_AVAILABLE_IN_1_0
+void            emeus_constraint_layout_child_set_intrinsic_height      (EmeusConstraintLayoutChild *child,
+                                                                         int                         height);
+EMEUS_AVAILABLE_IN_1_0
+void            emeus_constraint_layout_child_add_constraint            (EmeusConstraintLayoutChild *child,
+                                                                         EmeusConstraint            *constraint);
+EMEUS_AVAILABLE_IN_1_0
+void            emeus_constraint_layout_child_remove_constraint         (EmeusConstraintLayoutChild *child,
+                                                                         EmeusConstraint            *constraint);
+EMEUS_AVAILABLE_IN_1_0
+void            emeus_constraint_layout_child_clear_constraints         (EmeusConstraintLayoutChild *child);
 
 G_END_DECLS
