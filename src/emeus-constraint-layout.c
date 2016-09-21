@@ -507,6 +507,36 @@ emeus_constraint_layout_child_get_preferred_size (EmeusConstraintLayoutChild *se
                                                   int                        *minimum_p,
                                                   int                        *natural_p)
 {
+  GtkWidget *child = gtk_bin_get_child (GTK_BIN (self));
+  int child_min = 0;
+  int child_nat = 0;
+  int size = 0;
+  Variable *attr = NULL;
+
+  switch (orientation)
+    {
+    case GTK_ORIENTATION_HORIZONTAL:
+      attr = get_child_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
+      if (gtk_widget_get_visible (child))
+        gtk_widget_get_preferred_width (child, &child_min, &child_nat);
+      break;
+
+    case GTK_ORIENTATION_VERTICAL:
+      attr = get_child_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
+      if (gtk_widget_get_visible (child))
+        gtk_widget_get_preferred_height (child, &child_min, &child_nat);
+      break;
+    }
+
+  g_assert (attr != NULL);
+
+  size = ceil (variable_get_value (attr));
+
+  if (minimum_p != NULL)
+    *minimum_p = MAX (child_min, size);
+
+  if (natural_p != NULL)
+    *natural_p = MIN (child_nat, size);
 }
 
 static void
@@ -535,12 +565,24 @@ static void
 emeus_constraint_layout_child_size_allocate (GtkWidget     *widget,
                                              GtkAllocation *allocation)
 {
+  EmeusConstraintLayoutChild *self = EMEUS_CONSTRAINT_LAYOUT_CHILD (widget);
   GtkWidget *child = gtk_bin_get_child (GTK_BIN (widget));
+  GtkAllocation child_alloc;
+  int baseline;
 
   gtk_widget_set_allocation (widget, allocation);
 
   if (!gtk_widget_get_visible (child))
     return;
+
+  child_alloc.x = 0;
+  child_alloc.y = 0;
+  child_alloc.width = allocation->width;
+  child_alloc.height = allocation->height;
+
+  baseline = variable_get_value (get_child_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_BASELINE));
+
+  gtk_widget_size_allocate_with_baseline (child, &child_alloc, baseline > 0 ? baseline : -1);
 }
 
 static void
@@ -548,12 +590,15 @@ emeus_constraint_layout_child_class_init (EmeusConstraintLayoutChildClass *klass
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+  GtkContainerClass *container_class = GTK_CONTAINER_CLASS (klass);
 
   gobject_class->dispose = emeus_constraint_layout_child_dispose;
 
   widget_class->get_preferred_width = emeus_constraint_layout_child_get_preferred_width;
   widget_class->get_preferred_height = emeus_constraint_layout_child_get_preferred_height;
   widget_class->size_allocate = emeus_constraint_layout_child_size_allocate;
+
+  gtk_container_class_handle_border_width (container_class);
 }
 
 static void
