@@ -284,6 +284,8 @@ emeus_constraint_layout_class_init (EmeusConstraintLayoutClass *klass)
 static void
 emeus_constraint_layout_init (EmeusConstraintLayout *self)
 {
+  Variable *var;
+
   simplex_solver_init (&self->solver);
 
   self->children = g_sequence_new (layout_child_data_free);
@@ -291,6 +293,21 @@ emeus_constraint_layout_init (EmeusConstraintLayout *self)
   self->bound_attributes = g_hash_table_new_full (g_str_hash, g_str_equal,
                                                   g_free,
                                                   (GDestroyNotify) variable_unref);
+
+  /* Add two required stay constraints for the top left corner */
+  var = simplex_solver_create_variable (&self->solver);
+  variable_set_value (var, 0.0);
+  g_hash_table_insert (self->bound_attributes,
+                       g_strdup (get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_TOP)),
+                       var);
+  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_REQUIRED);
+
+  var = simplex_solver_create_variable (&self->solver);
+  variable_set_value (var, 0.0);
+  g_hash_table_insert (self->bound_attributes,
+                       g_strdup (get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT)),
+                       var);
+  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_REQUIRED);
 }
 
 GtkWidget *
