@@ -58,6 +58,12 @@ Constraint *simplex_solver_add_edit_variable (SimplexSolver *solver,
                                               Variable *variable,
                                               StrengthType strength);
 
+bool simplex_solver_has_edit_variable (SimplexSolver *solver,
+                                       Variable *variable);
+
+bool simplex_solver_has_stay_variable (SimplexSolver *solver,
+                                       Variable *variable);
+
 void simplex_solver_remove_constraint (SimplexSolver *solver,
                                        Constraint *constraint);
 

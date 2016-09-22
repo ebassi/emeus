@@ -384,6 +384,13 @@ simplex_solver_add_stay_variable (SimplexSolver *solver,
   return res;
 }
 
+bool
+simplex_solver_has_stay_variable (SimplexSolver *solver,
+                                  Variable *variable)
+{
+  return false;
+}
+
 Constraint *
 simplex_solver_add_edit_variable (SimplexSolver *solver,
                                   Variable *variable,
@@ -402,6 +409,13 @@ simplex_solver_add_edit_variable (SimplexSolver *solver,
   simplex_solver_add_constraint_internal (solver, res);
 
   return res;
+}
+
+bool
+simplex_solver_has_edit_variable (SimplexSolver *solver,
+                                  Variable *variable)
+{
+  return false;
 }
 
 void
