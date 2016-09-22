@@ -384,8 +384,14 @@ add_child_constraint (EmeusConstraintLayout      *layout,
    */
   if (constraint->source_object != NULL)
     {
-      attr2 = get_child_attribute (constraint->source_object,
-                                   constraint->source_attribute);
+      EmeusConstraintLayoutChild *source_child;
+
+      if (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (constraint->source_object))
+        source_child = constraint->source_object;
+      else
+        source_child = (EmeusConstraintLayoutChild *) gtk_widget_get_parent (constraint->source_object);
+
+      attr2 = get_child_attribute (source_child, constraint->source_attribute);
     }
   else
     {
@@ -437,7 +443,23 @@ gboolean
 emeus_constraint_layout_has_child_data (EmeusConstraintLayout *layout,
                                         GtkWidget             *widget)
 {
-  return gtk_widget_get_parent (widget) == GTK_WIDGET (layout);
+  GSequenceIter *iter;
+
+  if (gtk_widget_get_parent (widget) == GTK_WIDGET (layout))
+    return TRUE;
+
+  iter = g_sequence_get_begin_iter (layout->children);
+  while (!g_sequence_iter_is_end (iter))
+    {
+      GtkWidget *child = g_sequence_get (iter);
+
+      iter = g_sequence_iter_next (iter);
+
+      if (gtk_widget_get_parent (widget) == child)
+        return TRUE;
+    }
+
+  return FALSE;
 }
 
 /**
