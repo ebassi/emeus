@@ -81,6 +81,8 @@ simplex_solver_clear (SimplexSolver *solver)
   g_clear_pointer (&solver->columns, g_hash_table_unref);
   g_clear_pointer (&solver->rows, g_hash_table_unref);
   g_clear_pointer (&solver->external_rows, g_hash_table_unref);
+  g_clear_pointer (&solver->infeasible_rows, g_hash_table_unref);
+  g_clear_pointer (&solver->updated_externals, g_hash_table_unref);
 }
 
 static GHashTable *
