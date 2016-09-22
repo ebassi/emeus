@@ -47,6 +47,14 @@ struct _EmeusConstraintLayoutChild
 
   double intrinsic_width;
   double intrinsic_height;
+
+  /* Internal constraints, created to satisfy specific bound
+   * attributes; may be unset.
+   */
+  Constraint *right_constraint;
+  Constraint *bottom_constraint;
+  Constraint *center_x_constraint;
+  Constraint *center_y_constraint;
 };
 
 struct _EmeusConstraintLayout
