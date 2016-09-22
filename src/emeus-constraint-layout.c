@@ -179,11 +179,41 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
 }
 
 static void
-emeus_constraint_layout_get_preferred_size (GtkWidget      *widget,
-                                            GtkOrientation  orientation,
-                                            int            *minimum_p,
-                                            int            *natural_p)
+emeus_constraint_layout_get_preferred_size (EmeusConstraintLayout *self,
+                                            GtkOrientation         orientation,
+                                            int                   *minimum_p,
+                                            int                   *natural_p)
 {
+  Variable *size = NULL;
+
+  if (g_sequence_is_empty (self->children))
+    {
+      if (minimum_p != NULL)
+        *minimum_p = 0;
+
+      if (natural_p != NULL)
+        *natural_p = 0;
+
+      return;
+    }
+
+  switch (orientation)
+    {
+    case GTK_ORIENTATION_HORIZONTAL:
+      size = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
+      break;
+
+    case GTK_ORIENTATION_VERTICAL:
+      size = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
+      break;
+    }
+
+  g_assert (size != NULL);
+
+  if (minimum_p != NULL)
+    *minimum_p = variable_get_value (size);
+  if (natural_p != NULL)
+    *natural_p = variable_get_value (size);
 }
 
 static void
@@ -191,7 +221,7 @@ emeus_constraint_layout_get_preferred_width (GtkWidget *widget,
                                              int       *minimum_p,
                                              int       *natural_p)
 {
-  emeus_constraint_layout_get_preferred_size (widget,
+  emeus_constraint_layout_get_preferred_size (EMEUS_CONSTRAINT_LAYOUT (widget),
                                               GTK_ORIENTATION_HORIZONTAL,
                                               minimum_p, natural_p);
 }
@@ -201,7 +231,7 @@ emeus_constraint_layout_get_preferred_height (GtkWidget *widget,
                                               int       *minimum_p,
                                               int       *natural_p)
 {
-  emeus_constraint_layout_get_preferred_size (widget,
+  emeus_constraint_layout_get_preferred_size (EMEUS_CONSTRAINT_LAYOUT (widget),
                                               GTK_ORIENTATION_VERTICAL,
                                               minimum_p, natural_p);
 }
@@ -324,6 +354,15 @@ emeus_constraint_layout_init (EmeusConstraintLayout *self)
   simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_REQUIRED);
 }
 
+/**
+ * emeus_constraint_layout_new:
+ *
+ * Creates a new constraint-based layout manager.
+ *
+ * Returns: (transfer full): the newly created layout widget
+ *
+ * Since: 1.0
+ */
 GtkWidget *
 emeus_constraint_layout_new (void)
 {
