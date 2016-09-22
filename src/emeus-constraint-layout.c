@@ -240,7 +240,49 @@ static void
 emeus_constraint_layout_size_allocate (GtkWidget     *widget,
                                        GtkAllocation *allocation)
 {
+  EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (widget);
+  EmeusConstraintLayoutChild *child;
+  Variable *layout_width, *layout_height;
+  GSequenceIter *iter;
+
   gtk_widget_set_allocation (widget, allocation);
+
+  if (g_sequence_is_empty (self->children))
+    return;
+
+  layout_width = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
+  layout_height = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
+
+  if (!simplex_solver_has_edit_variable (&self->solver, layout_width))
+    simplex_solver_add_edit_variable (&self->solver, layout_width, STRENGTH_REQUIRED);
+  if (!simplex_solver_has_edit_variable (&self->solver, layout_height))
+    simplex_solver_add_edit_variable (&self->solver, layout_height, STRENGTH_REQUIRED);
+
+  simplex_solver_suggest_value (&self->solver, layout_width, allocation->width);
+  simplex_solver_suggest_value (&self->solver, layout_height, allocation->height);
+  simplex_solver_resolve (&self->solver);
+
+  iter = g_sequence_get_begin_iter (self->children);
+  while (!g_sequence_iter_is_end (iter))
+    {
+      Variable *top, *left, *width, *height;
+      GtkAllocation child_alloc;
+
+      child = g_sequence_get (iter);
+      iter = g_sequence_iter_next (iter);
+
+      top = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_TOP);
+      left = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_LEFT);
+      width = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
+      height = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
+
+      child_alloc.x = floor (variable_get_value (top));
+      child_alloc.y = floor (variable_get_value (left));
+      child_alloc.width = ceil (variable_get_value (width));
+      child_alloc.height = ceil (variable_get_value (height));
+
+      gtk_widget_size_allocate (GTK_WIDGET (child), &child_alloc);
+    }
 }
 
 static void
@@ -632,30 +674,6 @@ emeus_constraint_layout_child_get_preferred_height (GtkWidget *widget,
 }
 
 static void
-emeus_constraint_layout_child_size_allocate (GtkWidget     *widget,
-                                             GtkAllocation *allocation)
-{
-  EmeusConstraintLayoutChild *self = EMEUS_CONSTRAINT_LAYOUT_CHILD (widget);
-  GtkWidget *child = gtk_bin_get_child (GTK_BIN (widget));
-  GtkAllocation child_alloc;
-  int baseline;
-
-  gtk_widget_set_allocation (widget, allocation);
-
-  if (!gtk_widget_get_visible (child))
-    return;
-
-  child_alloc.x = 0;
-  child_alloc.y = 0;
-  child_alloc.width = allocation->width;
-  child_alloc.height = allocation->height;
-
-  baseline = variable_get_value (get_child_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_BASELINE));
-
-  gtk_widget_size_allocate_with_baseline (child, &child_alloc, baseline > 0 ? baseline : -1);
-}
-
-static void
 emeus_constraint_layout_child_class_init (EmeusConstraintLayoutChildClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
@@ -666,7 +684,6 @@ emeus_constraint_layout_child_class_init (EmeusConstraintLayoutChildClass *klass
 
   widget_class->get_preferred_width = emeus_constraint_layout_child_get_preferred_width;
   widget_class->get_preferred_height = emeus_constraint_layout_child_get_preferred_height;
-  widget_class->size_allocate = emeus_constraint_layout_child_size_allocate;
 
   gtk_container_class_handle_border_width (container_class);
 }
