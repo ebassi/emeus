@@ -102,10 +102,6 @@ emeus_constraint_set_property (GObject      *gobject,
 
   switch (prop_id)
     {
-    case PROP_TARGET_OBJECT:
-      self->target_object = g_value_get_object (value);
-      break;
-
     case PROP_TARGET_ATTRIBUTE:
       self->target_attribute = g_value_get_enum (value);
       break;
@@ -198,8 +194,7 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
   emeus_constraint_properties[PROP_TARGET_OBJECT] =
     g_param_spec_object ("target-object", "Target Object", NULL,
                          GTK_TYPE_WIDGET,
-                         G_PARAM_CONSTRUCT_ONLY |
-                         G_PARAM_READWRITE |
+                         G_PARAM_READABLE |
                          G_PARAM_STATIC_STRINGS);
 
   emeus_constraint_properties[PROP_TARGET_ATTRIBUTE] =
@@ -273,7 +268,6 @@ emeus_constraint_init (EmeusConstraint *self)
 
 /**
  * emeus_constraint_new: (constructor)
- * @target_object: (type Gtk.Widget): the target widget for the constraint
  * @target_attribute: the attribute to set on the target widget
  * @relation: the relation between the target and source attributes
  * @source_object: (type Gtk.Widget) (nullable): the source widget, or
@@ -291,8 +285,7 @@ emeus_constraint_init (EmeusConstraint *self)
  * Since: 1.0
  */
 EmeusConstraint *
-emeus_constraint_new (gpointer                 target_object,
-                      EmeusConstraintAttribute target_attribute,
+emeus_constraint_new (EmeusConstraintAttribute target_attribute,
                       EmeusConstraintRelation  relation,
                       gpointer                 source_object,
                       EmeusConstraintAttribute source_attribute,
@@ -300,11 +293,9 @@ emeus_constraint_new (gpointer                 target_object,
                       double                   constant,
                       EmeusConstraintStrength  strength)
 {
-  g_return_val_if_fail (GTK_IS_WIDGET (target_object), NULL);
   g_return_val_if_fail (source_object == NULL || GTK_IS_WIDGET (source_object), NULL);
 
   return g_object_new (EMEUS_TYPE_CONSTRAINT,
-                       "target-object", target_object,
                        "target-attribute", target_attribute,
                        "relation", relation,
                        "source-object", source_object,
@@ -317,7 +308,6 @@ emeus_constraint_new (gpointer                 target_object,
 
 /**
  * emeus_constraint_new_constant: (constructor)
- * @target_object: (type Gtk.Widget): the target widget for the constraint
  * @target_attribute: the attribute to set on the target widget
  * @relation: the relation between the target and the constant
  * @constant: the constant value of the constraint
@@ -335,16 +325,12 @@ emeus_constraint_new (gpointer                 target_object,
  * Since: 1.0
  */
 EmeusConstraint *
-emeus_constraint_new_constant (gpointer                 target_object,
-                               EmeusConstraintAttribute target_attribute,
+emeus_constraint_new_constant (EmeusConstraintAttribute target_attribute,
                                EmeusConstraintRelation  relation,
                                double                   constant,
                                EmeusConstraintStrength  strength)
 {
-  g_return_val_if_fail (target_object != NULL, NULL);
-
   return g_object_new (EMEUS_TYPE_CONSTRAINT,
-                       "target-object", target_object,
                        "target-attribute", target_attribute,
                        "relation", relation,
                        "source-object", NULL,
@@ -452,8 +438,13 @@ emeus_constraint_to_string (EmeusConstraint *constraint)
     return constraint->description;
 
   buf = g_string_new (NULL);
-  g_string_append (buf, G_OBJECT_TYPE_NAME (constraint->target_object));
-  g_string_append (buf, ".");
+
+  if (constraint->target_object != NULL)
+    {
+      g_string_append (buf, G_OBJECT_TYPE_NAME (constraint->target_object));
+      g_string_append (buf, ".");
+    }
+
   g_string_append (buf, get_attribute_name (constraint->target_attribute));
   g_string_append (buf, " ");
   g_string_append (buf, get_relation_symbol (constraint->relation));
@@ -461,7 +452,11 @@ emeus_constraint_to_string (EmeusConstraint *constraint)
 
   if (constraint->target_attribute != EMEUS_CONSTRAINT_ATTRIBUTE_INVALID)
     {
-      g_string_append (buf, G_OBJECT_TYPE_NAME (constraint->source_object));
+      if (constraint->source_object != NULL)
+        g_string_append (buf, G_OBJECT_TYPE_NAME (constraint->source_object));
+      else
+        g_string_append (buf, "parent");
+
       g_string_append (buf, ".");
       g_string_append (buf, G_OBJECT_TYPE_NAME (constraint->source_attribute));
 
@@ -481,17 +476,9 @@ emeus_constraint_to_string (EmeusConstraint *constraint)
 
 gboolean
 emeus_constraint_attach (EmeusConstraint       *constraint,
-                         EmeusConstraintLayout *layout)
+                         EmeusConstraintLayout *layout,
+                         gpointer               target_object)
 {
-  if (!emeus_constraint_layout_has_child_data (layout, constraint->target_object))
-    {
-      g_critical ("The target object '%s' is not part of the layout; the constraint "
-                  "'%s' will be ignored.",
-                  G_OBJECT_TYPE_NAME (constraint->target_object),
-                  emeus_constraint_to_string (constraint));
-      return FALSE;
-    }
-
   if (!emeus_constraint_layout_has_child_data (layout, constraint->source_object))
     {
       g_critical ("The source object '%s' is not part of the layout; the constraint "
@@ -501,6 +488,7 @@ emeus_constraint_attach (EmeusConstraint       *constraint,
       return FALSE;
     }
 
+  constraint->target_object = target_object;
   constraint->solver = emeus_constraint_layout_get_solver (layout);
 
   return TRUE;
@@ -512,6 +500,7 @@ emeus_constraint_detach (EmeusConstraint *constraint)
   if (constraint->constraint != NULL)
     simplex_solver_remove_constraint (constraint->solver, constraint->constraint);
 
+  constraint->target_object = NULL;
   constraint->solver = NULL;
 }
 
@@ -520,5 +509,5 @@ emeus_constraint_is_attached (EmeusConstraint *constraint)
 {
   g_return_val_if_fail (EMEUS_IS_CONSTRAINT (constraint), FALSE);
 
-  return constraint->solver != NULL;
+  return constraint->target_object != NULL;
 }

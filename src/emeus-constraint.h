@@ -28,8 +28,7 @@ EMEUS_AVAILABLE_IN_1_0
 G_DECLARE_FINAL_TYPE (EmeusConstraint, emeus_constraint, EMEUS, CONSTRAINT, GInitiallyUnowned)
 
 EMEUS_AVAILABLE_IN_1_0
-EmeusConstraint *               emeus_constraint_new                    (gpointer                 target_object,
-                                                                         EmeusConstraintAttribute target_attribute,
+EmeusConstraint *               emeus_constraint_new                    (EmeusConstraintAttribute target_attribute,
                                                                          EmeusConstraintRelation  relation,
                                                                          gpointer                 source_object,
                                                                          EmeusConstraintAttribute source_attribute,
@@ -37,8 +36,7 @@ EmeusConstraint *               emeus_constraint_new                    (gpointe
                                                                          double                   constant,
                                                                          EmeusConstraintStrength  strength);
 EMEUS_AVAILABLE_IN_1_0
-EmeusConstraint *               emeus_constraint_new_constant           (gpointer                 target_object,
-                                                                         EmeusConstraintAttribute target_attribute,
+EmeusConstraint *               emeus_constraint_new_constant           (EmeusConstraintAttribute target_attribute,
                                                                          EmeusConstraintRelation  relation,
                                                                          double                   constant,
                                                                          EmeusConstraintStrength  strength);

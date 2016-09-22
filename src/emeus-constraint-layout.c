@@ -338,7 +338,18 @@ add_child_constraint (EmeusConstraintLayout      *layout,
   Variable *attr1, *attr2;
   Expression *expr;
 
-  if (!emeus_constraint_attach (constraint, layout))
+  if (emeus_constraint_is_attached (constraint))
+    {
+      const char *constraint_description = emeus_constraint_to_string (constraint);
+
+      g_critical ("Constraint '%s' cannot be attached to more than "
+                  "one child.",
+                  constraint_description);
+
+      return;
+    }
+
+  if (!emeus_constraint_attach (constraint, layout, child))
     return;
 
   g_hash_table_add (child->constraints, g_object_ref_sink (constraint));
@@ -403,9 +414,7 @@ remove_child_constraint (EmeusConstraintLayout      *layout,
                          EmeusConstraintLayoutChild *child,
                          EmeusConstraint            *constraint)
 {
-  g_assert (emeus_constraint_is_attached (constraint));
-
-  if (&layout->solver != constraint->solver)
+  if (constraint->target_object != child)
     {
       g_critical ("Attempting to remove unknown constraint %p", constraint);
       return FALSE;

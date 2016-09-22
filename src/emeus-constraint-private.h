@@ -47,7 +47,8 @@ struct _EmeusConstraint
 };
 
 gboolean        emeus_constraint_attach                 (EmeusConstraint       *constraint,
-                                                         EmeusConstraintLayout *layout);
+                                                         EmeusConstraintLayout *layout,
+                                                         gpointer               target_object);
 void            emeus_constraint_detach                 (EmeusConstraint       *constraint);
 
 Constraint *    emeus_constraint_get_real_constraint    (EmeusConstraint       *constraint);
