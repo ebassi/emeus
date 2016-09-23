@@ -316,3 +316,25 @@ expression_times (Expression *expression,
 
   return expression;
 }
+
+void
+expression_change_subject (Expression *expression,
+                           Variable *old_subject,
+                           Variable *new_subject)
+{
+  double reciprocal;
+  Term *term;
+
+  term = g_hash_table_lookup (expression->terms, new_subject);
+
+  reciprocal = 0.0;
+  if (fabs (term_get_value (term)) > DBL_EPSILON)
+    reciprocal = 1.0 / term_get_value (term);
+
+  g_hash_table_remove (expression->terms, new_subject);
+
+  expression_times (expression, -1.0 * reciprocal);
+
+  term = g_hash_table_lookup (expression->terms, old_subject);
+  term->coefficient = reciprocal;
+}
