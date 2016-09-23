@@ -93,6 +93,9 @@ typedef struct {
   Expression *expression;
   OperatorType op_type;
 
+  /* The variable used by edit and stay constraints */
+  Variable *variable;
+
   StrengthType strength;
 
   bool is_edit;
@@ -116,10 +119,15 @@ struct _SimplexSolver {
 
   GPtrArray *stay_error_vars;
 
+  GPtrArray *stay_plus_error_vars;
+  GPtrArray *stay_minus_error_vars;
+
   GHashTable *error_vars;
   GHashTable *marker_vars;
 
   GHashTable *edit_var_map;
+
+  Variable *objective;
 
   int slack_counter;
   int artificial_counter;
