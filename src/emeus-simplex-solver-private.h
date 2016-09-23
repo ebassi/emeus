@@ -34,6 +34,18 @@ constraint_is_required (const Constraint *constraint)
   return constraint->strength >= STRENGTH_REQUIRED;
 }
 
+static inline bool
+constraint_is_stay (const Constraint *constraint)
+{
+  return constraint->is_stay;
+}
+
+static inline bool
+constraint_is_edit (const Constraint *constraint)
+{
+  return constraint->is_edit;
+}
+
 Constraint *constraint_ref (Constraint *constraint);
 void constraint_unref (Constraint *constraint);
 

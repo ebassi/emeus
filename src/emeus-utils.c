@@ -20,6 +20,9 @@
 
 #include "emeus-utils-private.h"
 
+#include <math.h>
+#include <float.h>
+
 static const char *attribute_names[] = {
   [EMEUS_CONSTRAINT_ATTRIBUTE_INVALID]  = "invalid",
   [EMEUS_CONSTRAINT_ATTRIBUTE_LEFT]     = "left",
@@ -85,4 +88,11 @@ strength_to_value (EmeusConstraintStrength strength)
     }
 
   return STRENGTH_REQUIRED;
+}
+
+bool
+approx_val (double v1,
+            double v2)
+{
+  return fabs (v1 - v2) < DBL_EPSILON;
 }

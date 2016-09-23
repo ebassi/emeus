@@ -61,11 +61,17 @@ Expression *expression_new (SimplexSolver *solver,
 
 Expression *expression_new_from_variable (Variable *variable);
 
+Expression *expression_clone (Expression *expression);
+
 Expression *expression_ref (Expression *expression);
 void expression_unref (Expression *expression);
 
 void expression_set_constant (Expression *expression,
                               double constant);
+
+void expression_set_variable (Expression *expression,
+                              Variable *variable,
+                              double coefficient);
 
 void expression_add_variable (Expression *expression,
                               Variable *variable,
@@ -108,5 +114,10 @@ void expression_terms_foreach (Expression *expression,
 void expression_change_subject (Expression *expression,
                                 Variable *old_subject,
                                 Variable *new_subject);
+
+double expression_new_subject (Expression *expression,
+                               Variable *subject);
+
+Variable *expression_get_pivotable_variable (Expression *expression);
 
 G_END_DECLS

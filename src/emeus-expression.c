@@ -81,6 +81,39 @@ expression_new_from_variable (Variable *variable)
   return expression_new_full (variable->solver, variable, 1.0, 0.0);
 }
 
+static void
+expression_add_term (Expression *expression,
+                     Term *term)
+{
+  if (expression->terms == NULL)
+    expression->terms = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) term_free);
+
+  g_hash_table_insert (expression->terms, term->variable, term);
+}
+
+Expression *
+expression_clone (Expression *expression)
+{
+  Expression *clone = expression_new_full (expression->solver,
+                                           NULL, 0.0,
+                                           expression->constant);
+  GHashTableIter iter;
+  gpointer value_p;
+
+  if (expression->terms == NULL)
+    return clone;
+
+  g_hash_table_iter_init (&iter, expression->terms);
+  while (g_hash_table_iter_next (&iter, NULL, &value_p))
+    {
+      Term *t = value_p;
+
+      expression_add_term (clone, term_new (t->variable, t->coefficient));
+    }
+
+  return clone;
+}
+
 Expression *
 expression_ref (Expression *expression)
 {
@@ -109,14 +142,11 @@ expression_unref (Expression *expression)
     }
 }
 
-static void
-expression_add_term (Expression *expression,
-                     Term *term)
+void
+expression_set_constant (Expression *expression,
+                         double constant)
 {
-  if (expression->terms == NULL)
-    expression->terms = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) term_free);
-
-  g_hash_table_insert (expression->terms, term->variable, term);
+  expression->constant = constant;
 }
 
 static void
@@ -157,6 +187,17 @@ expression_remove_variable_with_subject (Expression *expression,
 
   simplex_solver_remove_variable (expression->solver, variable, subject);
   g_hash_table_remove (expression->terms, variable);
+}
+
+void
+expression_set_variable (Expression *expression,
+                         Variable *variable,
+                         double coefficient)
+{
+  expression_add_term (expression, term_new (variable, coefficient));
+
+  if (expression->solver != NULL && variable_is_external (variable))
+    simplex_solver_update_variable (expression->solver, variable);
 }
 
 void
@@ -322,19 +363,49 @@ expression_change_subject (Expression *expression,
                            Variable *old_subject,
                            Variable *new_subject)
 {
+  expression_set_variable (expression,
+                           old_subject,
+                           expression_new_subject (expression, new_subject));
+}
+
+double
+expression_new_subject (Expression *expression,
+                        Variable *subject)
+{
   double reciprocal;
   Term *term;
 
-  term = g_hash_table_lookup (expression->terms, new_subject);
+  term = g_hash_table_lookup (expression->terms, subject);
 
   reciprocal = 0.0;
   if (fabs (term_get_value (term)) > DBL_EPSILON)
     reciprocal = 1.0 / term_get_value (term);
 
-  g_hash_table_remove (expression->terms, new_subject);
+  g_hash_table_remove (expression->terms, subject);
 
   expression_times (expression, -1.0 * reciprocal);
 
-  term = g_hash_table_lookup (expression->terms, old_subject);
-  term->coefficient = reciprocal;
+  return reciprocal;
+}
+
+Variable *
+expression_get_pivotable_variable (Expression *expression)
+{
+  GHashTableIter iter;
+  gpointer key_p;
+
+  if (expression->terms == NULL)
+    {
+      g_critical ("Expression %p is a constant", expression);
+      return NULL;
+    }
+
+  g_hash_table_iter_init (&iter, expression->terms);
+  while (g_hash_table_iter_next (&iter, &key_p, NULL))
+    {
+      if (variable_is_pivotable (key_p))
+        return key_p;
+    }
+
+  return NULL;
 }
