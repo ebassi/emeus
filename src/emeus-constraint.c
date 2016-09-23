@@ -50,6 +50,11 @@
  *   button1.width ≥ 120.0
  *   button2.width = button1.width × 1.0 + 0.0
  * ]|
+ *
+ * Each #EmeusConstraint instance references a target attribute; the target
+ * object to which the attribute applies is a child of a #EmeusConstraintLayout,
+ * and it's associated with the #EmeusConstraint instance once the constraint
+ * is added to a child #GtkWidget of the layout.
  */
 
 #include "config.h"
@@ -343,11 +348,17 @@ emeus_constraint_new_constant (EmeusConstraintAttribute target_attribute,
 
 /**
  * emeus_constraint_get_target_object:
- * @constraint: ...
+ * @constraint: a #EmeusConstraint
  *
- * ...
+ * Retrieves the target object of the constraint.
  *
- * Returns: (transfer none) (type Gtk.Widget): ...
+ * This function may return %NULL if the @constraint is not attached
+ * to a #EmeusConstraintLayout.
+ *
+ * Returns: (transfer none) (type Gtk.Widget) (nullable): the target
+ *   object
+ *
+ * Since: 1.0
  */
 gpointer
 emeus_constraint_get_target_object (EmeusConstraint *constraint)
@@ -357,6 +368,16 @@ emeus_constraint_get_target_object (EmeusConstraint *constraint)
   return constraint->target_object;
 }
 
+/**
+ * emeus_constraint_get_target_attribute:
+ * @constraint: a #EmeusConstraint
+ *
+ * Retrieves the attribute of the target object bound by this @constraint.
+ *
+ * Returns: a constraint attribute
+ *
+ * Since: 1.0
+ */
 EmeusConstraintAttribute
 emeus_constraint_get_target_attribute (EmeusConstraint *constraint)
 {
@@ -365,6 +386,16 @@ emeus_constraint_get_target_attribute (EmeusConstraint *constraint)
   return constraint->target_attribute;
 }
 
+/**
+ * emeus_constraint_get_relation:
+ * @constraint: a #EmeusConstraint
+ *
+ * Retrieves the relation between the target and source attributes.
+ *
+ * Returns: a constraint relation
+ *
+ * Since: 1.0
+ */
 EmeusConstraintRelation
 emeus_constraint_get_relation (EmeusConstraint *constraint)
 {
@@ -375,11 +406,11 @@ emeus_constraint_get_relation (EmeusConstraint *constraint)
 
 /**
  * emeus_constraint_get_source_object:
- * @constraint: ...
+ * @constraint: a #EmeusConstraint
  *
- * ...
+ * Retrieves the source object of the @constraint.
  *
- * Returns: (transfer none) (nullable) (type Gtk.Widget): ...
+ * Returns: (transfer none) (nullable) (type Gtk.Widget): the source object
  */
 gpointer
 emeus_constraint_get_source_object (EmeusConstraint *constraint)
@@ -389,6 +420,16 @@ emeus_constraint_get_source_object (EmeusConstraint *constraint)
   return constraint->source_object;
 }
 
+/**
+ * emeus_constraint_get_source_attribute:
+ * @constraint: a #EmeusConstraint
+ *
+ * Retrieves the attribute of the source object bound by this @constraint.
+ *
+ * Returns: a constraint attribute
+ *
+ * Since: 1.0
+ */
 EmeusConstraintAttribute
 emeus_constraint_get_source_attribute (EmeusConstraint *constraint)
 {
@@ -397,6 +438,16 @@ emeus_constraint_get_source_attribute (EmeusConstraint *constraint)
   return constraint->source_attribute;
 }
 
+/**
+ * emeus_constraint_get_multiplier:
+ * @constraint: a #EmeusConstraint
+ *
+ * Retrieves the multiplication factor of the @constraint.
+ *
+ * Returns: a factor
+ *
+ * Since: 1.0
+ */
 double
 emeus_constraint_get_multiplier (EmeusConstraint *constraint)
 {
@@ -405,6 +456,16 @@ emeus_constraint_get_multiplier (EmeusConstraint *constraint)
   return constraint->multiplier;
 }
 
+/**
+ * emeus_constraint_get_constant:
+ * @constraint: a #EmeusConstraint
+ *
+ * Retrieves the additional constant of the @constraint.
+ *
+ * Returns: a constant
+ *
+ * Since: 1.0
+ */
 double
 emeus_constraint_get_constant (EmeusConstraint *constraint)
 {
@@ -413,6 +474,16 @@ emeus_constraint_get_constant (EmeusConstraint *constraint)
   return constraint->constant;
 }
 
+/**
+ * emeus_constraint_get_strength:
+ * @constraint: a #EmeusConstraint
+ *
+ * Retrieves the strength of the @constraint.
+ *
+ * Returns: a constraint strength
+ *
+ * Since: 1.0
+ */
 EmeusConstraintStrength
 emeus_constraint_get_strength (EmeusConstraint *constraint)
 {
@@ -421,6 +492,16 @@ emeus_constraint_get_strength (EmeusConstraint *constraint)
   return constraint->strength;
 }
 
+/**
+ * emeus_constraint_is_required:
+ * @constraint: a #EmeusConstraint
+ *
+ * Checks whether a @constraint is marked as required.
+ *
+ * Returns: %TRUE if the constraint is required
+ *
+ * Since: 1.0
+ */
 gboolean
 emeus_constraint_is_required (EmeusConstraint *constraint)
 {
@@ -504,6 +585,17 @@ emeus_constraint_detach (EmeusConstraint *constraint)
   constraint->solver = NULL;
 }
 
+/**
+ * emeus_constraint_is_attached:
+ * @constraint: a #EmeusConstraint
+ *
+ * Checks whether the @constraint is attached to a child of a
+ * #EmeusConstraintLayout.
+ *
+ * Returns: %TRUE if the constraint is attached
+ *
+ * Since: 1.0
+ */
 gboolean
 emeus_constraint_is_attached (EmeusConstraint *constraint)
 {

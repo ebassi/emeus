@@ -158,3 +158,4 @@ gtk_dep = dependency('gtk+-3.0', version: '>= ' + gtk_version_required, required
 gnome = import('gnome')
 
 subdir('src')
+subdir('doc')
