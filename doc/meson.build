@@ -13,7 +13,7 @@ ignore_headers = [
 
 if get_option('enable-gtk-doc')
   gnome.gtkdoc('emeus',
-               main_xml: 'emeus-docs.xml',
+               main_sgml: 'emeus-docs.xml',
                src_dir: meson.source_root() + '/src',
                scan_args: [
                  '--rebuild-types',
