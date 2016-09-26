@@ -271,6 +271,7 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
     {
       Variable *top, *left, *width, *height;
       GtkAllocation child_alloc;
+      GtkRequisition minimum;
 
       child = g_sequence_get (iter);
       iter = g_sequence_iter_next (iter);
@@ -280,10 +281,16 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
       width = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
       height = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
 
+      gtk_widget_get_preferred_size (GTK_WIDGET (child), &minimum, NULL);
+
       child_alloc.x = floor (variable_get_value (top));
       child_alloc.y = floor (variable_get_value (left));
-      child_alloc.width = ceil (variable_get_value (width));
-      child_alloc.height = ceil (variable_get_value (height));
+      child_alloc.width = variable_get_value (width) > minimum.width
+                        ? ceil (variable_get_value (width))
+                        : minimum.width;
+      child_alloc.height = variable_get_value (height) > minimum.height
+                         ? ceil (variable_get_value (height))
+                         : minimum.height;
 
       gtk_widget_size_allocate (GTK_WIDGET (child), &child_alloc);
     }
@@ -683,7 +690,7 @@ emeus_constraint_layout_child_get_preferred_size (EmeusConstraintLayoutChild *se
     *minimum_p = MAX (child_min, size);
 
   if (natural_p != NULL)
-    *natural_p = MIN (child_nat, size);
+    *natural_p = MAX (child_nat, size);
 }
 
 static void
