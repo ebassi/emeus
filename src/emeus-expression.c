@@ -306,14 +306,21 @@ expression_terms_foreach (Expression *expression,
                           gpointer data)
 {
   GHashTableIter iter;
-  gpointer value_p;
+  gpointer key_p, value_p;
 
   if (expression->terms == NULL)
     return;
 
   g_hash_table_iter_init (&iter, expression->terms);
-  while (g_hash_table_iter_next (&iter, NULL, &value_p))
-    func (value_p, data);
+  while (g_hash_table_iter_next (&iter, &key_p, &value_p))
+    {
+      Variable *v = key_p;
+      Term *t = value_p;
+
+      g_assert (v == t->variable);
+
+      func (t, data);
+    }
 }
 
 Expression *
@@ -323,6 +330,8 @@ expression_plus (Expression *expression,
   Expression *e = expression_new (expression->solver, constant);
 
   expression_add_expression (expression, e, 1.0, NULL);
+
+  expression_unref (e);
 
   return expression;
 }
@@ -334,6 +343,8 @@ expression_plus_variable (Expression *expression,
   Expression *e = expression_new_from_variable (variable);
 
   expression_add_expression (expression, e, 1.0, NULL);
+
+  expression_unref (e);
 
   return expression;
 }

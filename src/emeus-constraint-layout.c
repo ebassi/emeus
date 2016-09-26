@@ -500,6 +500,8 @@ add_child_constraint (EmeusConstraintLayout      *layout,
                                    relation_to_operator (constraint->relation),
                                    expr,
                                    strength_to_value (constraint->strength));
+
+  expression_unref (expr);
 }
 
 static gboolean
