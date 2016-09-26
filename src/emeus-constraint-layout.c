@@ -376,6 +376,8 @@ emeus_constraint_layout_init (EmeusConstraintLayout *self)
 {
   Variable *var;
 
+  gtk_widget_set_has_window (GTK_WIDGET (self), FALSE);
+
   simplex_solver_init (&self->solver);
 
   self->children = g_sequence_new (NULL);
