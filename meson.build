@@ -1,7 +1,7 @@
 project('emeus', 'c',
         version: '1.0.0',
         default_options: [
-          'buildtype=debugoptimized',
+          'buildtype=debug',
           'c_std=c99',
           'warning_level=1'
         ],
