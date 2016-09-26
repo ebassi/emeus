@@ -560,15 +560,6 @@ emeus_constraint_attach (EmeusConstraint       *constraint,
                          EmeusConstraintLayout *layout,
                          gpointer               target_object)
 {
-  if (!emeus_constraint_layout_has_child_data (layout, constraint->source_object))
-    {
-      g_critical ("The source object '%s' is not part of the layout; the constraint "
-                  "'%s' will be ignored.",
-                  G_OBJECT_TYPE_NAME (constraint->source_object),
-                  emeus_constraint_to_string (constraint));
-      return FALSE;
-    }
-
   constraint->target_object = target_object;
   constraint->solver = emeus_constraint_layout_get_solver (layout);
 
