@@ -211,6 +211,9 @@ expression_add_expression (Expression *a,
 
   a->constant += (n * b->constant);
 
+  if (b->terms == NULL)
+    return;
+
   g_hash_table_iter_init (&iter, b->terms);
   while (g_hash_table_iter_next (&iter, NULL, &value_p))
     {

@@ -477,6 +477,9 @@ simplex_solver_optimize (SimplexSolver *solver,
       r = 0;
 
       column_vars = simplex_solver_get_column_set (solver, entry);
+      if (column_vars == NULL)
+        return;
+
       g_hash_table_iter_init (&iter, column_vars);
       while (g_hash_table_iter_next (&iter, &key_p, NULL))
         {
@@ -523,7 +526,7 @@ replace_terms (Term *term,
 
   Expression *e = g_hash_table_lookup (data->solver->rows, v);
 
-  if (e != NULL)
+  if (e == NULL)
     expression_add_variable (data->expr, v, c);
   else
     expression_add_expression (data->expr, e, c, NULL);
@@ -772,7 +775,10 @@ simplex_solver_delta_edit_constant (SimplexSolver *solver,
 
   column_set = g_hash_table_lookup (solver->columns, minus_error_var);
   if (column_set == NULL)
-    g_critical ("Columns are unset during delta edit");
+    {
+      g_critical ("Columns are unset during delta edit");
+      return;
+    }
 
   g_hash_table_iter_init (&iter, column_set);
   while (g_hash_table_iter_next (&iter, &key_p, &value_p))
@@ -1188,24 +1194,27 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
   z_row = g_hash_table_lookup (solver->rows, solver->objective);
   error_vars = g_hash_table_lookup (solver->error_vars, constraint);
 
-  g_hash_table_iter_init (&iter, error_vars);
-  while (g_hash_table_iter_next (&iter, &key_p, NULL))
+  if (error_vars != NULL)
     {
-      Variable *v = key_p;
-      Expression *e;
+      g_hash_table_iter_init (&iter, error_vars);
+      while (g_hash_table_iter_next (&iter, &key_p, NULL))
+        {
+          Variable *v = key_p;
+          Expression *e;
 
-      e = g_hash_table_lookup (solver->rows, v);
+          e = g_hash_table_lookup (solver->rows, v);
 
-      if (e == NULL)
-        expression_add_variable_with_subject (z_row,
-                                              v,
-                                              constraint->strength,
-                                              solver->objective);
-      else
-        expression_add_expression (z_row,
-                                   e,
-                                   constraint->strength,
-                                   solver->objective);
+          if (e == NULL)
+            expression_add_variable_with_subject (z_row,
+                                                  v,
+                                                  constraint->strength,
+                                                  solver->objective);
+          else
+            expression_add_expression (z_row,
+                                       e,
+                                       constraint->strength,
+                                       solver->objective);
+        }
     }
 
   marker = g_hash_table_lookup (solver->marker_vars, constraint);
@@ -1223,6 +1232,9 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
       GHashTable *cols = g_hash_table_lookup (solver->columns, marker);
       Variable *exit_var = NULL;
       double min_ratio = 0;
+
+      if (cols == NULL)
+        goto no_columns;
 
       g_hash_table_iter_init (&iter, cols);
       while (g_hash_table_iter_next (&iter, &key_p, NULL))
@@ -1298,6 +1310,7 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
         simplex_solver_pivot (solver, marker, exit_var);
     }
 
+no_columns:
   if (g_hash_table_lookup (solver->rows, marker) == NULL)
     simplex_solver_remove_row (solver, marker);
 
