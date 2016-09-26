@@ -149,7 +149,7 @@ expression_set_constant (Expression *expression,
   expression->constant = constant;
 }
 
-static void
+void
 expression_add_variable_with_subject (Expression *expression,
                                       Variable *variable,
                                       double coefficient,

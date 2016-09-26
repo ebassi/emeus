@@ -36,10 +36,12 @@ typedef struct {
   Variable *eplus;
   Variable *eminus;
 
-  double prev_edit_constraint;
-
-  int index_;
+  double prev_constant;
 } EditInfo;
+
+typedef struct {
+  Constraint *constraint;
+} StayInfo;
 
 static struct {
   Variable *eplus;
@@ -71,6 +73,18 @@ constraint_unref (Constraint *constraint)
     }
 }
 
+static void
+edit_info_free (gpointer data)
+{
+  g_slice_free (EditInfo, data);
+}
+
+static void
+stay_info_free (gpointer data)
+{
+  g_slice_free (StayInfo, data);
+}
+
 void
 simplex_solver_init (SimplexSolver *solver)
 {
@@ -98,9 +112,23 @@ simplex_solver_init (SimplexSolver *solver)
   solver->stay_plus_error_vars = g_ptr_array_new ();
   solver->stay_minus_error_vars = g_ptr_array_new ();
 
+  solver->error_vars = g_hash_table_new_full (NULL, NULL,
+                                              NULL,
+                                              (GDestroyNotify) variable_unref);
+
   solver->marker_vars = g_hash_table_new_full (NULL, NULL,
                                                NULL,
                                                (GDestroyNotify) variable_unref);
+
+  /* HashTable<Variable, EditInfo>; does not own keys, but owns values */
+  solver->edit_var_map = g_hash_table_new_full (NULL, NULL,
+                                                NULL,
+                                                edit_info_free);
+
+  /* HashTable<Variable, StayInfo>; does not own keys, but owns values */
+  solver->stay_var_map = g_hash_table_new_full (NULL, NULL,
+                                                NULL,
+                                                stay_info_free);
 
   /* The rows table owns the objective variable */
   solver->objective = variable_new (solver, VARIABLE_OBJECTIVE);
@@ -122,7 +150,10 @@ simplex_solver_clear (SimplexSolver *solver)
   g_clear_pointer (&solver->external_rows, g_hash_table_unref);
   g_clear_pointer (&solver->infeasible_rows, g_hash_table_unref);
   g_clear_pointer (&solver->updated_externals, g_hash_table_unref);
+  g_clear_pointer (&solver->error_vars, g_hash_table_unref);
   g_clear_pointer (&solver->marker_vars, g_hash_table_unref);
+  g_clear_pointer (&solver->edit_var_map, g_hash_table_unref);
+  g_clear_pointer (&solver->stay_var_map, g_hash_table_unref);
 
   g_clear_pointer (&solver->stay_plus_error_vars, g_ptr_array_unref);
   g_clear_pointer (&solver->stay_minus_error_vars, g_ptr_array_unref);
@@ -139,7 +170,7 @@ static bool
 simplex_solver_column_has_key (SimplexSolver *solver,
                                Variable *subject)
 {
-  return g_hash_table_lookup (solver->columns, subject) != NULL;
+  return g_hash_table_contains (solver->columns, subject);
 }
 
 static void
@@ -180,7 +211,7 @@ simplex_solver_insert_error_variable (SimplexSolver *solver,
 }
 
 static void
-simplex_solver_reset_stay_constraints (SimplexSolver *solver)
+simplex_solver_reset_stay_constants (SimplexSolver *solver)
 {
   int i;
 
@@ -508,6 +539,10 @@ simplex_solver_normalize_expression (SimplexSolver *solver,
   Variable *eplus, *eminus;
   ReplaceClosure data;
 
+  internal_expression.eplus = NULL;
+  internal_expression.eminus = NULL;
+  internal_expression.prev_constant = 0.0;
+
   expr = expression_new (solver, expression_get_constant (cn_expr));
 
   data.solver = solver;
@@ -617,6 +652,9 @@ simplex_solver_normalize_expression (SimplexSolver *solver,
             }
         }
     }
+
+  if (expression_get_constant (expr) < 0.0)
+    expression_times (expr, -1.0);
 
   return expr;
 }
@@ -937,7 +975,7 @@ simplex_solver_add_with_artificial_variable (SimplexSolver *solver,
       simplex_solver_pivot (solver, entry_var, av);
     }
 
-  g_assert (g_hash_table_lookup (solver->rows, av) == NULL);
+  g_assert (!g_hash_table_contains (solver->rows, av));
 
   simplex_solver_remove_column (solver, av);
   simplex_solver_remove_row (solver, az);
@@ -988,10 +1026,20 @@ static void
 simplex_solver_add_constraint_internal (SimplexSolver *solver,
                                         Constraint *constraint)
 {
+  Expression *normalized;
+
+  normalized = simplex_solver_normalize_expression (solver, constraint);
+
+  if (!simplex_solver_try_adding_directly (solver, normalized))
+    simplex_solver_add_with_artificial_variable (solver, normalized);
+
   solver->needs_solving = true;
 
   if (solver->auto_solve)
-    simplex_solver_resolve (solver);
+    {
+      simplex_solver_optimize (solver, solver->objective);
+      simplex_solver_set_external_variables (solver);
+    }
 }
 
 static void
@@ -1049,6 +1097,7 @@ simplex_solver_add_stay_variable (SimplexSolver *solver,
 {
   Constraint *res;
   Expression *expr;
+  StayInfo *si;
 
   /* Turn stay constraint from:
    *
@@ -1063,6 +1112,7 @@ simplex_solver_add_stay_variable (SimplexSolver *solver,
 
   res = g_slice_new (Constraint);
   res->solver = solver;
+  res->variable = variable;
   res->expression = expr;
   res->op_type = OPERATOR_TYPE_EQ;
   res->strength = strength;
@@ -1071,6 +1121,10 @@ simplex_solver_add_stay_variable (SimplexSolver *solver,
 
   simplex_solver_add_constraint_internal (solver, res);
 
+  si = g_slice_new (StayInfo);
+  si->constraint = res;
+  g_hash_table_insert (solver->stay_var_map, variable, si);
+
   return res;
 }
 
@@ -1078,7 +1132,7 @@ bool
 simplex_solver_has_stay_variable (SimplexSolver *solver,
                                   Variable *variable)
 {
-  return false;
+  return g_hash_table_contains (solver->stay_var_map, variable);
 }
 
 Constraint *
@@ -1087,9 +1141,11 @@ simplex_solver_add_edit_variable (SimplexSolver *solver,
                                   StrengthType strength)
 {
   Constraint *res;
+  EditInfo *ei;
 
   res = g_slice_new (Constraint);
   res->solver = solver;
+  res->variable = variable;
   res->expression = expression_new_from_variable (variable);
   res->op_type = OPERATOR_TYPE_EQ;
   res->strength = strength;
@@ -1098,7 +1154,12 @@ simplex_solver_add_edit_variable (SimplexSolver *solver,
 
   simplex_solver_add_constraint_internal (solver, res);
 
-
+  ei = g_slice_new (EditInfo);
+  ei->constraint = res;
+  ei->eplus = internal_expression.eplus;
+  ei->eminus = internal_expression.eminus;
+  ei->prev_constant = internal_expression.prev_constant;
+  g_hash_table_insert (solver->edit_var_map, variable, ei);
 
   return res;
 }
@@ -1107,14 +1168,184 @@ bool
 simplex_solver_has_edit_variable (SimplexSolver *solver,
                                   Variable *variable)
 {
-  return false;
+  return g_hash_table_contains (solver->edit_var_map, variable);
 }
 
 void
 simplex_solver_remove_constraint (SimplexSolver *solver,
                                   Constraint *constraint)
 {
-  constraint_unref (constraint);
+  Expression *z_row;
+  GHashTable *error_vars;
+  GHashTableIter iter;
+  gpointer key_p;
+  Variable *marker;
+
+  solver->needs_solving = true;
+
+  simplex_solver_reset_stay_constants (solver);
+
+  z_row = g_hash_table_lookup (solver->rows, solver->objective);
+  error_vars = g_hash_table_lookup (solver->error_vars, constraint);
+
+  g_hash_table_iter_init (&iter, error_vars);
+  while (g_hash_table_iter_next (&iter, &key_p, NULL))
+    {
+      Variable *v = key_p;
+      Expression *e;
+
+      e = g_hash_table_lookup (solver->rows, v);
+
+      if (e == NULL)
+        expression_add_variable_with_subject (z_row,
+                                              v,
+                                              constraint->strength,
+                                              solver->objective);
+      else
+        expression_add_expression (z_row,
+                                   e,
+                                   constraint->strength,
+                                   solver->objective);
+    }
+
+  marker = g_hash_table_lookup (solver->marker_vars, constraint);
+  if (marker == NULL)
+    {
+      g_critical ("Constraint %p not found", constraint);
+      return;
+    }
+
+  variable_ref (marker);
+  g_hash_table_remove (solver->marker_vars, constraint);
+
+  if (g_hash_table_lookup (solver->rows, marker) == NULL)
+    {
+      GHashTable *cols = g_hash_table_lookup (solver->columns, marker);
+      Variable *exit_var = NULL;
+      double min_ratio = 0;
+
+      g_hash_table_iter_init (&iter, cols);
+      while (g_hash_table_iter_next (&iter, &key_p, NULL))
+        {
+          Variable *v = key_p;
+
+          if (variable_is_restricted (v))
+            {
+              Expression *e = g_hash_table_lookup (solver->rows, v);
+              double coeff = expression_get_coefficient (e, marker);
+
+              if (coeff < 0.0)
+                {
+                  double r = -expression_get_constant (e) / coeff;
+
+                  if (exit_var == NULL ||
+                      r < min_ratio ||
+                      (approx_val (r, min_ratio) && v < exit_var))
+                    {
+                      min_ratio = r;
+                      exit_var = v;
+                    }
+                }
+            }
+        }
+
+      if (exit_var == NULL)
+        {
+          g_hash_table_iter_init (&iter, cols);
+          while (g_hash_table_iter_next (&iter, &key_p, NULL))
+            {
+              Variable *v = key_p;
+
+              if (variable_is_restricted (v))
+                {
+                  Expression *e = g_hash_table_lookup (solver->rows, v);
+                  double coeff = expression_get_coefficient (e, marker);
+                  double r = 0.0;
+                  
+                  if (!approx_val (coeff, 0.0))
+                    r = expression_get_constant (e) / coeff;
+
+                  if (exit_var == NULL || r < min_ratio)
+                    {
+                      min_ratio = r;
+                      exit_var = v;
+                    }
+                }
+            }
+        }
+
+      if (exit_var == NULL)
+        {
+          if (g_hash_table_size (cols) == 0)
+            simplex_solver_remove_column (solver, marker);
+          else
+            {
+              g_hash_table_iter_init (&iter, cols);
+              while (g_hash_table_iter_next (&iter, &key_p, NULL))
+                {
+                  Variable *v = key_p;
+
+                  if (v != solver->objective)
+                    {
+                      exit_var = v;
+                      break;
+                    }
+                }
+            }
+        }
+
+      if (exit_var != NULL)
+        simplex_solver_pivot (solver, marker, exit_var);
+    }
+
+  if (g_hash_table_lookup (solver->rows, marker) == NULL)
+    simplex_solver_remove_row (solver, marker);
+
+  if (error_vars != NULL)
+    {
+      g_hash_table_iter_init (&iter, error_vars);
+      while (g_hash_table_iter_next (&iter, &key_p, NULL))
+        {
+          Variable *v = key_p;
+
+          if (v != marker)
+            simplex_solver_remove_column (solver, v);
+        }
+    }
+
+  if (constraint_is_stay (constraint))
+    {
+      if (error_vars != NULL)
+        {
+          int i = 0;
+
+          for (i = 0; i < solver->stay_plus_error_vars->len; i++)
+            {
+              Variable *eplus = g_ptr_array_index (solver->stay_plus_error_vars, i);
+              Variable *eminus = g_ptr_array_index (solver->stay_minus_error_vars, i);
+
+              g_hash_table_remove (error_vars, eplus);
+              g_hash_table_remove (error_vars, eminus);
+            }
+        }
+    }
+  else if (constraint_is_edit (constraint))
+    {
+      EditInfo *ei = g_hash_table_lookup (solver->edit_var_map, constraint->variable);
+
+      simplex_solver_remove_column (solver, ei->eminus);
+
+      g_hash_table_remove (solver->edit_var_map, constraint->variable);
+    }
+
+  if (error_vars != NULL)
+    g_hash_table_remove (solver->error_vars, constraint);
+
+  if (solver->auto_solve)
+    {
+      simplex_solver_optimize (solver, solver->objective);
+      simplex_solver_set_external_variables (solver);
+    }
 }
 
 void
@@ -1122,6 +1353,18 @@ simplex_solver_suggest_value (SimplexSolver *solver,
                               Variable *variable,
                               double value)
 {
+  EditInfo *ei = g_hash_table_lookup (solver->edit_var_map, variable);
+
+  if (ei == NULL)
+    {
+      g_critical ("Suggesting value '%g' but variable %p is not editable",
+                  value, variable);
+      return;
+    }
+
+  ei->prev_constant = value - ei->prev_constant;
+
+  simplex_solver_delta_edit_constant (solver, ei->prev_constant, ei->eplus, ei->eminus);
 }
 
 void
@@ -1135,7 +1378,7 @@ simplex_solver_resolve (SimplexSolver *solver)
 
   g_hash_table_remove_all (solver->infeasible_rows);
 
-  simplex_solver_reset_stay_constraints (solver);
+  simplex_solver_reset_stay_constants (solver);
 
   solver->needs_solving = false;
 }

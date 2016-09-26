@@ -126,6 +126,7 @@ struct _SimplexSolver {
   GHashTable *marker_vars;
 
   GHashTable *edit_var_map;
+  GHashTable *stay_var_map;
 
   Variable *objective;
 
