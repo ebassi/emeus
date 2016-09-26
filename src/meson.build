@@ -33,9 +33,11 @@ configure_file(input: 'config.h.meson',
                configuration: conf)
 configure_file(input: 'emeus-version.h.meson',
                output: 'emeus-version.h',
-               configuration: version_conf)
+               configuration: version_conf,
+               install: true,
+               install_dir: 'include/emeus-1.0')
 
-install_headers(public_headers + [ 'emeus-version.h', 'emeus.h' ], subdir: 'emeus-1.0')
+install_headers(public_headers + [ 'emeus.h' ], subdir: 'emeus-1.0')
 
 libemeus = shared_library('emeus-@0@'.format(emeus_api_version),
   sources: sources + private_headers,
