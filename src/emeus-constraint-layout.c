@@ -43,7 +43,7 @@ G_DEFINE_TYPE (EmeusConstraintLayout, emeus_constraint_layout, GTK_TYPE_CONTAINE
 G_DEFINE_TYPE (EmeusConstraintLayoutChild, emeus_constraint_layout_child, GTK_TYPE_BIN)
 
 static void
-emeus_constraint_layout_dispose (GObject *gobject)
+emeus_constraint_layout_finalize (GObject *gobject)
 {
   EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (gobject);
 
@@ -52,7 +52,7 @@ emeus_constraint_layout_dispose (GObject *gobject)
 
   simplex_solver_clear (&self->solver);
 
-  G_OBJECT_CLASS (emeus_constraint_layout_parent_class)->dispose (gobject);
+  G_OBJECT_CLASS (emeus_constraint_layout_parent_class)->finalize (gobject);
 }
 
 static Variable *
@@ -358,7 +358,7 @@ emeus_constraint_layout_class_init (EmeusConstraintLayoutClass *klass)
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
   GtkContainerClass *container_class = GTK_CONTAINER_CLASS (klass);
 
-  gobject_class->dispose = emeus_constraint_layout_dispose;
+  gobject_class->finalize = emeus_constraint_layout_finalize;
 
   widget_class->get_preferred_width = emeus_constraint_layout_get_preferred_width;
   widget_class->get_preferred_height = emeus_constraint_layout_get_preferred_height;
