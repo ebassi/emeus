@@ -26,5 +26,6 @@
 #include "emeus-version-macros.h"
 
 #include "emeus-constraint.h"
+#include "emeus-constraint-layout.h"
 
 #undef EMEUS_H_INSIDE
