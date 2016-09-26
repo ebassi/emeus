@@ -1044,7 +1044,7 @@ simplex_solver_update_variable (SimplexSolver *solver,
                                 Variable *variable)
 {
   if (variable_is_external (variable))
-    g_hash_table_add (solver->external_vars, variable);
+    g_hash_table_add (solver->updated_externals, variable);
 }
 
 Variable *
