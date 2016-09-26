@@ -1111,12 +1111,11 @@ simplex_solver_add_constraint (SimplexSolver *solver,
    */
   expr = expression_new_from_variable (variable);
   expression_add_expression (expr, expression, -1.0, NULL);
-  expression_unref (expression);
-
-  expression_terms_foreach (expression, update_externals, solver);
+  expression_terms_foreach (expr, update_externals, solver);
 
   res = g_slice_new (Constraint);
   res->solver = solver;
+  res->variable = variable;
   res->expression = expr;
   res->op_type = op;
   res->strength = strength;
