@@ -593,6 +593,8 @@ emeus_constraint_layout_pack (EmeusConstraintLayout *layout,
   layout_child->iter = g_sequence_append (layout->children, layout_child);
   layout_child->solver = &layout->solver;
 
+  gtk_widget_set_parent (GTK_WIDGET (layout_child), GTK_WIDGET (layout));
+
   if (first_constraint == NULL)
     return;
 
