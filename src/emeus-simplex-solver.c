@@ -139,14 +139,45 @@ simplex_solver_init (SimplexSolver *solver)
   solver->artificial_counter = 0;
 
   solver->needs_solving = false;
-  solver->auto_solve = false;
+  solver->auto_solve = true;
 }
 
 void
 simplex_solver_clear (SimplexSolver *solver)
 {
-  g_clear_pointer (&solver->columns, g_hash_table_unref);
-  g_clear_pointer (&solver->rows, g_hash_table_unref);
+#ifdef EMEUS_ENABLE_DEBUG
+  g_print ("- Rows: %d, Columns: %d\n"
+           "- Slack variables: %d\n"
+           "- Error variables: %d (plus: %d, minus: %d)\n"
+           "- Marker variables: %d\n"
+           "- Infeasible rows: %d\n"
+           "- External rows: %d\n"
+           "- Edit: %d, Stay: %d\n",
+           g_hash_table_size (solver->rows),
+           g_hash_table_size (solver->columns),
+           solver->slack_counter,
+           g_hash_table_size (solver->error_vars),
+           solver->stay_plus_error_vars->len,
+           solver->stay_minus_error_vars->len,
+           g_hash_table_size (solver->marker_vars),
+           g_hash_table_size (solver->infeasible_rows),
+           g_hash_table_size (solver->external_rows),
+           g_hash_table_size (solver->edit_var_map),
+           g_hash_table_size (solver->stay_var_map));
+#endif
+
+  solver->objective = NULL;
+
+  solver->needs_solving = false;
+  solver->auto_solve = true;
+
+  solver->slack_counter = 0;
+  solver->dummy_counter = 0;
+  solver->artificial_counter = 0;
+
+  g_clear_pointer (&solver->stay_plus_error_vars, g_ptr_array_unref);
+  g_clear_pointer (&solver->stay_minus_error_vars, g_ptr_array_unref);
+
   g_clear_pointer (&solver->external_rows, g_hash_table_unref);
   g_clear_pointer (&solver->infeasible_rows, g_hash_table_unref);
   g_clear_pointer (&solver->updated_externals, g_hash_table_unref);
@@ -155,8 +186,9 @@ simplex_solver_clear (SimplexSolver *solver)
   g_clear_pointer (&solver->edit_var_map, g_hash_table_unref);
   g_clear_pointer (&solver->stay_var_map, g_hash_table_unref);
 
-  g_clear_pointer (&solver->stay_plus_error_vars, g_ptr_array_unref);
-  g_clear_pointer (&solver->stay_minus_error_vars, g_ptr_array_unref);
+  /* The columns need to be deleted last, for reference counting */
+  g_clear_pointer (&solver->rows, g_hash_table_unref);
+  g_clear_pointer (&solver->columns, g_hash_table_unref);
 }
 
 static GHashTable *
