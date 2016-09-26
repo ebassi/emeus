@@ -163,7 +163,9 @@ expression_add_variable_with_subject (Expression *expression,
         {
           if (coefficient == 0.0)
             {
-              simplex_solver_remove_variable (expression->solver, t->variable, subject);
+              if (subject != NULL)
+                simplex_solver_remove_variable (expression->solver, t->variable, subject);
+
               g_hash_table_remove (expression->terms, t);
             }
           else
@@ -174,7 +176,9 @@ expression_add_variable_with_subject (Expression *expression,
     }
 
   expression_add_term (expression, term_new (variable, coefficient));
-  simplex_solver_add_variable (expression->solver, variable, subject);
+
+  if (subject != NULL)
+    simplex_solver_add_variable (expression->solver, variable, subject);
 }
 
 static void
