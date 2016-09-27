@@ -49,7 +49,6 @@ test_cflags = [
   '-Wmissing-prototypes',
   '-Wnested-externs',
   '-Wold-style-definition',
-  '-Wdeclaration-after-statement',
   '-Wunused',
   '-Wuninitialized',
   '-Wshadow',
