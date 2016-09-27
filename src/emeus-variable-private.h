@@ -77,4 +77,9 @@ void variable_unref (Variable *variable);
 void variable_set_value (Variable *variable,
                          double value);
 
+char *variable_to_string (const Variable *variable);
+
+void variable_set_name (Variable *variable,
+                        const char *name);
+
 G_END_DECLS

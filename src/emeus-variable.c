@@ -61,11 +61,12 @@ Variable *
 variable_new (SimplexSolver *solver,
               VariableType   type)
 {
-  Variable *res = g_slice_new (Variable);
+  Variable *res = g_slice_new0 (Variable);
 
   res->solver = solver;
   res->type = type;
   res->ref_count = 1;
+  res->name = NULL;
 
   switch (type)
     {
@@ -121,4 +122,31 @@ variable_set_value (Variable *variable,
                     double value)
 {
   variable->value = value;
+}
+
+void
+variable_set_name (Variable *variable,
+                   const char *name)
+{
+  variable->name = name;
+}
+
+char *
+variable_to_string (const Variable *variable)
+{
+  GString *buf = g_string_new (NULL);
+
+  if (variable == NULL)
+    g_string_append (buf, "<null>");
+  else
+    {
+      g_string_append_c (buf, (char) variable->type);
+      g_string_append_c (buf, '[');
+      g_string_append (buf, variable->name != NULL ? variable->name : "<>");
+      g_string_append_c (buf, ':');
+      g_string_append_printf (buf, "%g", variable->value);
+      g_string_append_c (buf, ']');
+    }
+
+  return g_string_free (buf, FALSE);
 }

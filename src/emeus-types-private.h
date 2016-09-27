@@ -37,6 +37,8 @@ typedef struct {
 
   VariableType type;
 
+  const char *name;
+
   double value;
 
   bool is_external;
