@@ -43,6 +43,11 @@ typedef struct {
   Constraint *constraint;
 } StayInfo;
 
+typedef struct {
+  /* HashSet<Variable>, owns a reference */
+  GHashTable *set;
+} ColumnSet;
+
 static struct {
   Variable *eplus;
   Variable *eminus;
@@ -111,6 +116,55 @@ stay_info_free (gpointer data)
   g_slice_free (StayInfo, data);
 }
 
+static void
+column_set_free (gpointer data)
+{
+  ColumnSet *column_set = data;
+
+  if (data == NULL)
+    return;
+
+  g_hash_table_unref (column_set->set);
+  g_slice_free (ColumnSet, column_set);
+}
+
+static ColumnSet *
+column_set_new (void)
+{
+  ColumnSet *res = g_slice_new (ColumnSet);
+
+  res->set = g_hash_table_new_full (NULL, NULL, (GDestroyNotify) variable_unref, NULL);
+
+  return res;
+}
+
+static void
+column_set_add_variable (ColumnSet *set,
+                         Variable *variable)
+{
+  g_hash_table_add (set->set, variable_ref (variable));
+}
+
+static void
+column_set_remove_variable (ColumnSet *set,
+                            Variable *variable)
+{
+  g_hash_table_remove (set->set, variable);
+}
+
+static void
+column_set_iter_init (ColumnSet *set,
+                      GHashTableIter *iter)
+{
+  g_hash_table_iter_init (iter, set->set);
+}
+
+static int
+column_set_get_size (ColumnSet *set)
+{
+  return g_hash_table_size (set->set);
+}
+
 void
 simplex_solver_init (SimplexSolver *solver)
 {
@@ -119,10 +173,10 @@ simplex_solver_init (SimplexSolver *solver)
 
   memset (solver, 0, sizeof (SimplexSolver));
 
-  /* HashTable<Variable, HashSet<Variable>>; owns keys and values */
+  /* HashTable<Variable, ColumnSet>; owns keys and values */
   solver->columns = g_hash_table_new_full (NULL, NULL,
                                            (GDestroyNotify) variable_unref,
-                                           (GDestroyNotify) g_hash_table_unref);
+                                           column_set_free);
 
   /* HashTable<Variable, Expression>; owns keys and values */
   solver->rows = g_hash_table_new_full (NULL, NULL,
@@ -259,7 +313,7 @@ simplex_solver_clear (SimplexSolver *solver)
   g_clear_pointer (&solver->columns, g_hash_table_unref);
 }
 
-static GHashTable *
+static ColumnSet *
 simplex_solver_get_column_set (SimplexSolver *solver,
                                Variable *param_var)
 {
@@ -284,22 +338,20 @@ simplex_solver_insert_column_variable (SimplexSolver *solver,
                                        Variable *param_var,
                                        Variable *row_var)
 {
-  GHashTable *row_set;
+  ColumnSet *set;
 
   if (!solver->initialized)
     return;
 
-  row_set = simplex_solver_get_column_set (solver, param_var);
-  if (row_set == NULL)
+  set = simplex_solver_get_column_set (solver, param_var);
+  if (set == NULL)
     {
-      row_set = g_hash_table_new_full (NULL, NULL,
-                                       (GDestroyNotify) variable_unref,
-                                       NULL);
-      g_hash_table_insert (solver->columns, variable_ref (param_var), row_set);
+      set = column_set_new ();
+      g_hash_table_insert (solver->columns, variable_ref (param_var), set);
     }
 
   if (row_var != NULL)
-    g_hash_table_add (row_set, variable_ref (row_var));
+    column_set_add_variable (set, row_var);
 }
 
 static void
@@ -433,26 +485,27 @@ static void
 simplex_solver_remove_column (SimplexSolver *solver,
                               Variable *variable)
 {
-  GHashTable *row_set;
+  ColumnSet *set;
   GHashTableIter iter;
   gpointer key_p;
 
   if (!solver->initialized)
     return;
 
-  row_set = g_hash_table_lookup (solver->columns, variable);
-  if (row_set == NULL)
+  set = g_hash_table_lookup (solver->columns, variable);
+  if (set == NULL)
     goto out;
 
-  g_hash_table_iter_init (&iter, row_set);
+  column_set_iter_init (set, &iter);
   while (g_hash_table_iter_next (&iter, &key_p, NULL))
     {
-      Expression *e = key_p;
+      Variable *v = key_p;
+      Expression *e = g_hash_table_lookup (solver->rows, v);
 
       expression_remove_variable (e, variable);
     }
 
-  g_hash_table_remove (row_set, variable);
+  g_hash_table_remove (solver->columns, variable);
 
 out:
   if (variable_is_external (variable))
@@ -464,11 +517,10 @@ remove_expression_columns (Term *term,
                            gpointer data_)
 {
   ForeachClosure *data = data_;
+  ColumnSet *set = g_hash_table_lookup (data->solver->columns, term_get_variable (term));
 
-  GHashTable *row_set = g_hash_table_lookup (data->solver->columns, term_get_variable (term));
-
-  if (row_set != NULL)
-    g_hash_table_remove (row_set, data->variable);
+  if (set != NULL)
+    column_set_remove_variable (set, data->variable);
 
   return true;
 }
@@ -523,18 +575,18 @@ simplex_solver_substitute_out (SimplexSolver *solver,
                                Variable *old_variable,
                                Expression *expression)
 {
-  GHashTable *row_set;
+  ColumnSet *set;
   GHashTableIter iter;
   gpointer key_p;
 
   if (!solver->initialized)
     return;
 
-  row_set = g_hash_table_lookup (solver->columns, old_variable);
-  if (row_set == NULL)
+  set = g_hash_table_lookup (solver->columns, old_variable);
+  if (set == NULL)
     goto out;
 
-  g_hash_table_iter_init (&iter, row_set);
+  column_set_iter_init (set, &iter);
   while (g_hash_table_iter_next (&iter, &key_p, NULL))
     {
       Variable *variable = key_p;
@@ -621,7 +673,7 @@ simplex_solver_optimize (SimplexSolver *solver,
   while (true)
     {
       NegativeClosure data;
-      GHashTable *column_vars;
+      ColumnSet *column_vars;
       GHashTableIter iter;
       gpointer key_p;
       double min_ratio;
@@ -644,7 +696,7 @@ simplex_solver_optimize (SimplexSolver *solver,
       if (column_vars == NULL)
         break;
 
-      g_hash_table_iter_init (&iter, column_vars);
+      column_set_iter_init (column_vars, &iter);
       while (g_hash_table_iter_next (&iter, &key_p, NULL))
         {
           Variable *v = key_p;
@@ -934,7 +986,7 @@ simplex_solver_delta_edit_constant (SimplexSolver *solver,
                                     Variable *minus_error_var)
 {
   Expression *plus_expr, *minus_expr;
-  GHashTable *column_set;
+  ColumnSet *column_set;
   GHashTableIter iter;
   gpointer key_p;
 
@@ -974,7 +1026,7 @@ simplex_solver_delta_edit_constant (SimplexSolver *solver,
       return;
     }
 
-  g_hash_table_iter_init (&iter, column_set);
+  column_set_iter_init (column_set, &iter);
   while (g_hash_table_iter_next (&iter, &key_p, NULL))
     {
       Variable *basic_var = key_p;
@@ -1029,10 +1081,10 @@ find_subject_restricted (Term *term,
         {
           if (!data->found_new_restricted && !variable_is_dummy (v) && c < 0.0)
             {
-              GHashTable *col = g_hash_table_lookup (data->solver->columns, v);
+              ColumnSet *set = g_hash_table_lookup (data->solver->columns, v);
 
-              if (col == NULL ||
-                  (g_hash_table_size (col) == 1 &&
+              if (set == NULL ||
+                  (column_set_get_size (set) == 1 &&
                    simplex_solver_column_has_key (data->solver, data->solver->objective)))
                 {
                   data->subject = v;
@@ -1218,14 +1270,14 @@ simplex_solver_remove_variable (SimplexSolver *solver,
                                 Variable *variable,
                                 Variable *subject)
 {
-  GHashTable *row_set;
+  ColumnSet *set;
 
   if (!solver->initialized)
     return;
 
-  row_set = g_hash_table_lookup (solver->columns, variable);
-  if (row_set != NULL && subject != NULL)
-    g_hash_table_remove (row_set, subject);
+  set = g_hash_table_lookup (solver->columns, variable);
+  if (set != NULL && subject != NULL)
+    column_set_remove_variable (set, subject);
 }
 
 void
@@ -1490,14 +1542,14 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
 
   if (g_hash_table_lookup (solver->rows, marker) == NULL)
     {
-      GHashTable *cols = g_hash_table_lookup (solver->columns, marker);
+      ColumnSet *set = g_hash_table_lookup (solver->columns, marker);
       Variable *exit_var = NULL;
       double min_ratio = 0;
 
-      if (cols == NULL)
+      if (set == NULL)
         goto no_columns;
 
-      g_hash_table_iter_init (&iter, cols);
+      column_set_iter_init (set, &iter);
       while (g_hash_table_iter_next (&iter, &key_p, NULL))
         {
           Variable *v = key_p;
@@ -1524,7 +1576,7 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
 
       if (exit_var == NULL)
         {
-          g_hash_table_iter_init (&iter, cols);
+          column_set_iter_init (set, &iter);
           while (g_hash_table_iter_next (&iter, &key_p, NULL))
             {
               Variable *v = key_p;
@@ -1549,11 +1601,11 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
 
       if (exit_var == NULL)
         {
-          if (g_hash_table_size (cols) == 0)
+          if (column_set_get_size (set) == 0)
             simplex_solver_remove_column (solver, marker);
           else
             {
-              g_hash_table_iter_init (&iter, cols);
+              column_set_iter_init (set, &iter);
               while (g_hash_table_iter_next (&iter, &key_p, NULL))
                 {
                   Variable *v = key_p;
