@@ -96,3 +96,30 @@ approx_val (double v1,
 {
   return fabs (v1 - v2) < DBL_EPSILON;
 }
+
+static const char *operators[] = {
+  "<=",
+  "==",
+  ">=",
+};
+
+const char *
+operator_to_string (OperatorType o)
+{
+  return operators[o + 1];
+}
+
+const char *
+strength_to_string (StrengthType s)
+{
+  if (s >= STRENGTH_REQUIRED)
+    return "required";
+
+  if (s >= STRENGTH_STRONG)
+    return "strong";
+
+  if (s >= STRENGTH_MEDIUM)
+    return "medium";
+
+  return "weak";
+}
