@@ -431,7 +431,7 @@ simplex_solver_set_external_variables (SimplexSolver *solver)
       if (expression == NULL)
         {
           variable_set_value (variable, 0.0);
-          return;
+          continue;
         }
 
       variable_set_value (variable, expression_get_constant (expression));
@@ -502,7 +502,7 @@ simplex_solver_remove_column (SimplexSolver *solver,
       Variable *v = key_p;
       Expression *e = g_hash_table_lookup (solver->rows, v);
 
-      expression_remove_variable (e, variable);
+      expression_remove_variable (e, variable, NULL);
     }
 
   g_hash_table_remove (solver->columns, variable);
@@ -565,7 +565,7 @@ expression_substitute_out (SimplexSolver *solver,
 {
   double coefficient = expression_get_coefficient (expression, out_variable);
 
-  expression_remove_variable (expression, out_variable);
+  expression_remove_variable (expression, out_variable, NULL);
 
   expression->constant += (coefficient * new_expression->constant);
 }
@@ -749,7 +749,7 @@ replace_terms (Term *term,
   Expression *e = g_hash_table_lookup (data->solver->rows, v);
 
   if (e == NULL)
-    expression_add_variable (data->expr, v, c);
+    expression_add_variable (data->expr, v, c, NULL);
   else
     expression_add_expression (data->expr, e, c, NULL);
 
@@ -817,7 +817,7 @@ simplex_solver_normalize_expression (SimplexSolver *solver,
           expression_set_variable (z_row, eminus, constraint->strength);
 
           simplex_solver_insert_error_variable (solver, constraint, eminus);
-          simplex_solver_add_variable (solver, eminus, solver->objective);
+          simplex_solver_note_added_variable (solver, eminus, solver->objective);
         }
     }
   else 
@@ -869,8 +869,8 @@ simplex_solver_normalize_expression (SimplexSolver *solver,
           z_row = g_hash_table_lookup (solver->rows, solver->objective);
           expression_set_variable (z_row, eplus, constraint->strength);
           expression_set_variable (z_row, eminus, constraint->strength);
-          simplex_solver_add_variable (solver, eplus, solver->objective);
-          simplex_solver_add_variable (solver, eminus, solver->objective);
+          simplex_solver_note_added_variable (solver, eplus, solver->objective);
+          simplex_solver_note_added_variable (solver, eminus, solver->objective);
 
           simplex_solver_insert_error_variable (solver, constraint, eplus);
           simplex_solver_insert_error_variable (solver, constraint, eminus);
@@ -1254,9 +1254,9 @@ simplex_solver_add_with_artificial_variable (SimplexSolver *solver,
 }
 
 void
-simplex_solver_add_variable (SimplexSolver *solver,
-                             Variable *variable,
-                             Variable *subject)
+simplex_solver_note_added_variable (SimplexSolver *solver,
+                                    Variable *variable,
+                                    Variable *subject)
 {
   if (!solver->initialized)
     return;
@@ -1266,9 +1266,9 @@ simplex_solver_add_variable (SimplexSolver *solver,
 }
 
 void
-simplex_solver_remove_variable (SimplexSolver *solver,
-                                Variable *variable,
-                                Variable *subject)
+simplex_solver_note_removed_variable (SimplexSolver *solver,
+                                      Variable *variable,
+                                      Variable *subject)
 {
   ColumnSet *set;
 
@@ -1518,10 +1518,10 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
           e = g_hash_table_lookup (solver->rows, v);
 
           if (e == NULL)
-            expression_add_variable_with_subject (z_row,
-                                                  v,
-                                                  constraint->strength,
-                                                  solver->objective);
+            expression_add_variable (z_row,
+                                     v,
+                                     constraint->strength,
+                                     solver->objective);
           else
             expression_add_expression (z_row,
                                        e,

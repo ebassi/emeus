@@ -68,7 +68,7 @@ expression_new_full (SimplexSolver *solver,
   res->ref_count = 1;
 
   if (variable != NULL)
-    expression_add_variable (res, variable, coefficient);
+    expression_add_variable (res, variable, coefficient, NULL);
 
 #ifdef EMEUS_ENABLE_DEBUG
   if (expressions == NULL)
@@ -167,10 +167,10 @@ expression_set_constant (Expression *expression,
 }
 
 void
-expression_add_variable_with_subject (Expression *expression,
-                                      Variable *variable,
-                                      double coefficient,
-                                      Variable *subject)
+expression_add_variable (Expression *expression,
+                         Variable *variable,
+                         double coefficient,
+                         Variable *subject)
 {
   if (expression->terms != NULL)
     {
@@ -181,7 +181,7 @@ expression_add_variable_with_subject (Expression *expression,
           if (approx_val (coefficient, 0.0))
             {
               if (subject != NULL)
-                simplex_solver_remove_variable (expression->solver, t->variable, subject);
+                simplex_solver_note_removed_variable (expression->solver, t->variable, subject);
 
               g_hash_table_remove (expression->terms, t);
             }
@@ -195,18 +195,18 @@ expression_add_variable_with_subject (Expression *expression,
   expression_add_term (expression, term_new (variable, coefficient));
 
   if (subject != NULL)
-    simplex_solver_add_variable (expression->solver, variable, subject);
+    simplex_solver_note_added_variable (expression->solver, variable, subject);
 }
 
-static void
-expression_remove_variable_with_subject (Expression *expression,
-                                         Variable *variable,
-                                         Variable *subject)
+void
+expression_remove_variable (Expression *expression,
+                            Variable *variable,
+                            Variable *subject)
 {
   if (expression->terms == NULL)
     return;
 
-  simplex_solver_remove_variable (expression->solver, variable, subject);
+  simplex_solver_note_removed_variable (expression->solver, variable, subject);
   g_hash_table_remove (expression->terms, variable);
 }
 
@@ -240,23 +240,8 @@ expression_add_expression (Expression *a,
     {
       Term *t = value_p;
 
-      expression_add_variable_with_subject (a, t->variable, n * t->coefficient, subject);
+      expression_add_variable (a, t->variable, n * t->coefficient, subject);
     }
-}
-
-void
-expression_add_variable (Expression *expression,
-                         Variable *variable,
-                         double coefficient)
-{
-  expression_add_variable_with_subject (expression, variable, coefficient, NULL);
-}
-
-void
-expression_remove_variable (Expression *expression,
-                            Variable *variable)
-{
-  expression_remove_variable_with_subject (expression, variable, NULL);
 }
 
 void
@@ -265,7 +250,7 @@ expression_set_coefficient (Expression *expression,
                             double coefficient)
 {
   if (approx_val (coefficient, 0.0))
-    expression_remove_variable (expression, variable);
+    expression_remove_variable (expression, variable, NULL);
   else
     {
       Term *t = g_hash_table_lookup (expression->terms, variable);
@@ -278,7 +263,7 @@ expression_set_coefficient (Expression *expression,
             simplex_solver_update_variable (expression->solver, t->variable);
         }
       else
-        expression_add_variable (expression, variable, coefficient);
+        expression_add_variable (expression, variable, coefficient, NULL);
     }
 }
 

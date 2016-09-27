@@ -96,8 +96,6 @@ variable_free (Variable *variable)
   if (variable == NULL)
     return;
 
-  simplex_solver_remove_variable (variable->solver, variable, NULL);
-
   g_slice_free (Variable, variable);
 }
 

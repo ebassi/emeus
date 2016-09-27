@@ -75,18 +75,15 @@ void expression_set_variable (Expression *expression,
 
 void expression_add_variable (Expression *expression,
                               Variable *variable,
-                              double value);
+                              double value,
+                              Variable *subject);
 
 void expression_remove_variable (Expression *expression,
-                                 Variable *variable);
+                                 Variable *variable,
+                                 Variable *subject);
 
 bool expression_has_variable (const Expression *expression,
                               Variable *variable);
-
-void expression_add_variable_with_subject (Expression *expression,
-                                           Variable *variable,
-                                           double value,
-                                           Variable *subject);
 
 void expression_add_expression (Expression *a,
                                 Expression *b,
