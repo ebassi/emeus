@@ -21,10 +21,15 @@
 #include "emeus-expression-private.h"
 #include "emeus-variable-private.h"
 #include "emeus-simplex-solver-private.h"
+#include "emeus-utils-private.h"
 
 #include <glib.h>
 #include <math.h>
 #include <float.h>
+
+#ifdef EMEUS_ENABLE_DEBUG
+static GHashTable *expressions;
+#endif
 
 static Term *
 term_new (Variable *variable,
@@ -64,6 +69,13 @@ expression_new_full (SimplexSolver *solver,
 
   if (variable != NULL)
     expression_add_variable (res, variable, coefficient);
+
+#ifdef EMEUS_ENABLE_DEBUG
+  if (expressions == NULL)
+    expressions = g_hash_table_new (NULL, NULL);
+
+  g_hash_table_add (expressions, res);
+#endif
 
   return res;
 }
@@ -138,6 +150,11 @@ expression_unref (Expression *expression)
       if (expression->terms != NULL)
         g_hash_table_unref (expression->terms);
 
+#ifdef EMEUS_ENABLE_DEBUG
+      g_assert (expressions != NULL);
+      g_hash_table_remove (expressions, expression);
+#endif
+
       g_slice_free (Expression, expression);
     }
 }
@@ -161,7 +178,7 @@ expression_add_variable_with_subject (Expression *expression,
 
       if (t != NULL)
         {
-          if (coefficient == 0.0)
+          if (approx_val (coefficient, 0.0))
             {
               if (subject != NULL)
                 simplex_solver_remove_variable (expression->solver, t->variable, subject);
@@ -247,7 +264,7 @@ expression_set_coefficient (Expression *expression,
                             Variable *variable,
                             double coefficient)
 {
-  if (coefficient == 0.0)
+  if (approx_val (coefficient, 0.0))
     expression_remove_variable (expression, variable);
   else
     {
@@ -323,7 +340,8 @@ expression_terms_foreach (Expression *expression,
 
       g_assert (v == t->variable);
 
-      func (t, data);
+      if (!func (t, data))
+        break;
     }
 }
 
@@ -393,7 +411,12 @@ expression_new_subject (Expression *expression,
   double reciprocal;
   Term *term;
 
+  if (expression->terms == NULL)
+    return 0.0;
+
   term = g_hash_table_lookup (expression->terms, subject);
+  if (term == NULL)
+    return 0.0;
 
   reciprocal = 0.0;
   if (fabs (term_get_value (term)) > DBL_EPSILON)
@@ -427,3 +450,76 @@ expression_get_pivotable_variable (Expression *expression)
 
   return NULL;
 }
+
+char *
+expression_to_string (const Expression *expression)
+{
+  GString *buf = g_string_new (NULL);
+
+  if (expression == NULL)
+    g_string_append (buf, "<null>");
+  else
+    {
+      bool needs_plus = false;
+
+      if (!expression_is_constant (expression))
+        {
+          GHashTableIter iter;
+          gpointer value_p;
+
+          g_hash_table_iter_init (&iter, expression->terms);
+          while (g_hash_table_iter_next (&iter, NULL, &value_p))
+            {
+              const Term *t = value_p;
+              char *var = variable_to_string (t->variable);
+
+              if (needs_plus)
+                g_string_append (buf, " + ");
+
+              g_string_append_printf (buf, "(%g * %s)", t->coefficient, var);
+
+              g_free (var);
+
+              if (!needs_plus)
+                needs_plus = true;
+            }
+        }
+
+      if (!approx_val (expression->constant, 0.0))
+        {
+          if (needs_plus)
+            g_string_append (buf, " + ");
+
+          g_string_append_printf (buf, "%g", expression->constant);
+        }
+    }
+
+  return g_string_free (buf, FALSE);
+}
+
+#ifdef EMEUS_ENABLE_DEBUG
+void
+check_expressions (void)
+{
+  if (expressions == NULL)
+    g_print ("No allocated expressions.");
+  else
+    {
+      GHashTableIter iter;
+      gpointer key_p;
+
+      g_print ("%d expressions still reachable\n", g_hash_table_size (expressions));
+      g_print ("Contents:\n");
+
+      g_hash_table_iter_init (&iter, expressions);
+      while (g_hash_table_iter_next (&iter, &key_p, NULL))
+        {
+          char *str = expression_to_string (key_p);
+
+          g_print ("-- %s\n", str);
+
+          g_free (str);
+        }
+    }
+}
+#endif

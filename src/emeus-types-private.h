@@ -138,6 +138,7 @@ struct _SimplexSolver {
 
   bool auto_solve;
   bool needs_solving;
+  bool initialized;
 };
 
 G_END_DECLS

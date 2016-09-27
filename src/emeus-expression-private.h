@@ -110,7 +110,7 @@ double expression_get_coefficient (const Expression *expression,
 
 double expression_get_value (const Expression *expression);
 
-typedef void (* ExpressionForeachTermFunc) (Term *term, gpointer data);
+typedef bool (* ExpressionForeachTermFunc) (Term *term, gpointer data);
 
 void expression_terms_foreach (Expression *expression,
                                ExpressionForeachTermFunc func,
@@ -124,5 +124,11 @@ double expression_new_subject (Expression *expression,
                                Variable *subject);
 
 Variable *expression_get_pivotable_variable (Expression *expression);
+
+char *expression_to_string (const Expression *expression);
+
+#ifdef EMEUS_ENABLE_DEBUG
+void check_expressions (void);
+#endif
 
 G_END_DECLS
