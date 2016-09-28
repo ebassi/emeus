@@ -1362,6 +1362,8 @@ simplex_solver_add_constraint (SimplexSolver *solver,
   }
 #endif
 
+  expression_unref (expr);
+
   return res;
 }
 
@@ -1422,6 +1424,8 @@ simplex_solver_add_stay_variable (SimplexSolver *solver,
     g_free (str2);
   }
 #endif
+
+  expression_unref (expr);
 
   return res;
 }
@@ -1493,6 +1497,8 @@ simplex_solver_add_edit_variable (SimplexSolver *solver,
     g_free (str2);
   }
 #endif
+
+  expression_unref (expr);
 
   return res;
 }
