@@ -210,15 +210,29 @@ expression_remove_variable (Expression *expression,
   g_hash_table_remove (expression->terms, variable);
 }
 
+bool
+expression_has_variable (Expression *expression,
+                         Variable *variable)
+{
+  if (expression->terms == NULL)
+    return false;
+
+  return g_hash_table_lookup (expression->terms, variable) != NULL;
+}
+
 void
 expression_set_variable (Expression *expression,
                          Variable *variable,
                          double coefficient)
 {
-  expression_add_term (expression, term_new (variable, coefficient));
+  if (expression_has_variable (expression, variable))
+    {
+      Term *t = g_hash_table_lookup (expression->terms, variable);
 
-  if (expression->solver != NULL && variable_is_external (variable))
-    simplex_solver_update_variable (expression->solver, variable);
+      t->coefficient = coefficient;
+    }
+  else
+    expression_add_term (expression, term_new (variable, coefficient));
 }
 
 void
@@ -412,6 +426,53 @@ expression_new_subject (Expression *expression,
   expression_times (expression, -1.0 * reciprocal);
 
   return reciprocal;
+}
+
+void
+expression_substitute_out (Expression *expression,
+                           Variable *out_var,
+                           Expression *expr,
+                           Variable *subject)
+{
+  if (expression->terms == NULL)
+    return;
+
+  double multiplier = expression_get_coefficient (expression, out_var);
+
+  expression_remove_variable (expression, out_var, NULL);
+
+  expression->constant = expression->constant + multiplier * expr->constant;
+
+  GHashTableIter iter;
+  gpointer value_p;
+  g_hash_table_iter_init (&iter, expr->terms);
+  while (g_hash_table_iter_next (&iter, NULL, &value_p))
+    {
+      Variable *clv = term_get_variable (value_p);
+      double coeff = term_get_coefficient (value_p);
+
+      double old_coefficient = expression_get_coefficient (expression, clv);
+
+      if (old_coefficient > 0.0)
+        {
+          double new_coefficient = old_coefficient + multiplier * coeff;
+
+          if (approx_val (new_coefficient, 0.0))
+            {
+              g_hash_table_remove (expression->terms, clv);
+              if (expression->solver != NULL)
+                simplex_solver_note_removed_variable (expression->solver, clv, subject);
+            }
+          else
+            expression_set_variable (expression, clv, new_coefficient);
+        }
+      else
+        {
+          expression_set_variable (expression, clv, multiplier * coeff);
+          if (expression->solver)
+            simplex_solver_note_added_variable (expression->solver, clv, subject);
+        }
+    }
 }
 
 Variable *

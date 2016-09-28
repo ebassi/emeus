@@ -557,20 +557,6 @@ simplex_solver_remove_row (SimplexSolver *solver,
 }
 
 static void
-expression_substitute_out (SimplexSolver *solver,
-                           Expression *expression,
-                           Variable *out_variable,
-                           Expression *new_expression,
-                           Variable *subject)
-{
-  double coefficient = expression_get_coefficient (expression, out_variable);
-
-  expression_remove_variable (expression, out_variable, NULL);
-
-  expression->constant += (coefficient * new_expression->constant);
-}
-
-static void
 simplex_solver_substitute_out (SimplexSolver *solver,
                                Variable *old_variable,
                                Expression *expression)
@@ -592,13 +578,13 @@ simplex_solver_substitute_out (SimplexSolver *solver,
       Variable *variable = key_p;
       Expression *e = g_hash_table_lookup (solver->rows, variable);
 
-      expression_substitute_out (solver, e, old_variable, expression, variable);
-
-      if (variable_is_external (variable))
-        g_hash_table_add (solver->updated_externals, variable_ref (variable));
+      expression_substitute_out (e, old_variable, expression, variable);
 
       if (variable_is_restricted (variable) && expression_get_constant (e) < 0)
         g_hash_table_add (solver->infeasible_rows, variable_ref (variable));
+
+      if (variable_is_external (variable))
+        g_hash_table_add (solver->updated_externals, variable_ref (variable));
     }
 
 out:

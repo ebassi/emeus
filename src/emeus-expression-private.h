@@ -82,7 +82,7 @@ void expression_remove_variable (Expression *expression,
                                  Variable *variable,
                                  Variable *subject);
 
-bool expression_has_variable (const Expression *expression,
+bool expression_has_variable (Expression *expression,
                               Variable *variable);
 
 void expression_add_expression (Expression *a,
@@ -119,6 +119,11 @@ void expression_change_subject (Expression *expression,
 
 double expression_new_subject (Expression *expression,
                                Variable *subject);
+
+void expression_substitute_out (Expression *expression,
+                                Variable *out_var,
+                                Expression *expr,
+                                Variable *subject);
 
 Variable *expression_get_pivotable_variable (Expression *expression);
 
