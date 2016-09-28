@@ -27,10 +27,6 @@
 #include <math.h>
 #include <float.h>
 
-#ifdef EMEUS_ENABLE_DEBUG
-static GHashTable *expressions;
-#endif
-
 static Term *
 term_new (Variable *variable,
           double coefficient)
@@ -79,13 +75,6 @@ expression_new_full (SimplexSolver *solver,
 
   if (variable != NULL)
     expression_add_term (res, term_new (variable, coefficient));
-
-#ifdef EMEUS_ENABLE_DEBUG
-  if (expressions == NULL)
-    expressions = g_hash_table_new (NULL, NULL);
-
-  g_hash_table_add (expressions, res);
-#endif
 
   return res;
 }
@@ -149,11 +138,6 @@ expression_unref (Expression *expression)
     {
       if (expression->terms != NULL)
         g_hash_table_unref (expression->terms);
-
-#ifdef EMEUS_ENABLE_DEBUG
-      g_assert (expressions != NULL);
-      g_hash_table_remove (expressions, expression);
-#endif
 
       g_slice_free (Expression, expression);
     }
@@ -525,30 +509,3 @@ expression_to_string (const Expression *expression)
 
   return g_string_free (buf, FALSE);
 }
-
-#ifdef EMEUS_ENABLE_DEBUG
-void
-check_expressions (void)
-{
-  if (expressions == NULL)
-    g_print ("No allocated expressions.");
-  else
-    {
-      GHashTableIter iter;
-      gpointer key_p;
-
-      g_print ("%d expressions still reachable\n", g_hash_table_size (expressions));
-      g_print ("Contents:\n");
-
-      g_hash_table_iter_init (&iter, expressions);
-      while (g_hash_table_iter_next (&iter, &key_p, NULL))
-        {
-          char *str = expression_to_string (key_p);
-
-          g_print ("-- %s\n", str);
-
-          g_free (str);
-        }
-    }
-}
-#endif
