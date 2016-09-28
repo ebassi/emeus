@@ -572,6 +572,7 @@ emeus_constraint_detach (EmeusConstraint *constraint)
   if (constraint->constraint != NULL)
     simplex_solver_remove_constraint (constraint->solver, constraint->constraint);
 
+  constraint->constraint = NULL;
   constraint->target_object = NULL;
   constraint->solver = NULL;
 }
