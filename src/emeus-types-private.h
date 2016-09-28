@@ -116,7 +116,7 @@ struct _SimplexSolver {
   /* Sets */
   GHashTable *infeasible_rows;
   GHashTable *external_rows;
-  GHashTable *updated_externals;
+  GHashTable *external_parametric_vars;
 
   GPtrArray *stay_error_vars;
 

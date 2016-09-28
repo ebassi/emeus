@@ -258,29 +258,6 @@ expression_add_expression (Expression *a,
     }
 }
 
-void
-expression_set_coefficient (Expression *expression,
-                            Variable *variable,
-                            double coefficient)
-{
-  if (approx_val (coefficient, 0.0))
-    expression_remove_variable (expression, variable, NULL);
-  else
-    {
-      Term *t = g_hash_table_lookup (expression->terms, variable);
-
-      if (t != NULL)
-        {
-          t->coefficient = coefficient;
-
-          if (variable_is_external (t->variable))
-            simplex_solver_update_variable (expression->solver, t->variable);
-        }
-      else
-        expression_add_variable (expression, variable, coefficient, NULL);
-    }
-}
-
 double
 expression_get_coefficient (const Expression *expression,
                             Variable *variable)

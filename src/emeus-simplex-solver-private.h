@@ -92,7 +92,5 @@ void simplex_solver_note_added_variable (SimplexSolver *solver,
 void simplex_solver_note_removed_variable (SimplexSolver *solver,
                                            Variable *variable,
                                            Variable *subject);
-void simplex_solver_update_variable (SimplexSolver *solver,
-                                     Variable *variable);
 
 G_END_DECLS

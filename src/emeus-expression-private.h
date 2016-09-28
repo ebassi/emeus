@@ -98,10 +98,6 @@ Expression *expression_times (Expression *expression,
 Expression *expression_plus_variable (Expression *expression,
                                       Variable *variable);
 
-void expression_set_coefficient (Expression *expression,
-                                 Variable *variable,
-                                 double coefficient);
-
 double expression_get_coefficient (const Expression *expression,
                                    Variable *variable);
 
