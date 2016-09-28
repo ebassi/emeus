@@ -136,6 +136,8 @@ endif
 # Required dependencies
 mathlib_dep = cc.find_library('m', required: true)
 
+glib_dep = dependency('glib-2.0', version: '>= 2.46', required: true)
+
 gtk_version_req_major = 3
 gtk_version_req_minor = 20
 gtk_version_req_micro = 0

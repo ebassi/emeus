@@ -86,3 +86,5 @@ if get_option('enable-introspection')
                      install: true,
                      extra_args: gir_extra_args)
 endif
+
+subdir('tests')
