@@ -35,7 +35,7 @@ static const char *attribute_names[] = {
   [EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT]   = "height",
   [EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X] = "center-x",
   [EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y] = "center-y",
-  [EMEUS_CONSTRAINT_ATTRIBUTE_BASELINE] = "center-y",
+  [EMEUS_CONSTRAINT_ATTRIBUTE_BASELINE] = "baseline",
 };
 
 static const char *relation_symbols[] = {
