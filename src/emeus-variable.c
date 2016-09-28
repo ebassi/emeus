@@ -140,7 +140,7 @@ variable_to_string (const Variable *variable)
     {
       g_string_append_c (buf, (char) variable->type);
       g_string_append_c (buf, '[');
-      g_string_append (buf, variable->name != NULL ? variable->name : "<>");
+      g_string_append (buf, variable->name != NULL ? variable->name : "*");
       g_string_append_c (buf, ':');
       g_string_append_printf (buf, "%g", variable->value);
       g_string_append_c (buf, ']');
