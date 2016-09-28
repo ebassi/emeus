@@ -46,9 +46,6 @@ constraint_is_edit (const Constraint *constraint)
   return constraint->is_edit;
 }
 
-Constraint *constraint_ref (Constraint *constraint);
-void constraint_unref (Constraint *constraint);
-
 void simplex_solver_init (SimplexSolver *solver);
 void simplex_solver_clear (SimplexSolver *solver);
 

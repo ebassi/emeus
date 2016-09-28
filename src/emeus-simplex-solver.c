@@ -48,20 +48,37 @@ typedef struct {
   GHashTable *set;
 } ColumnSet;
 
-Constraint *
-constraint_ref (Constraint *constraint)
-{
-  constraint->ref_count += 1;
+static const char *operators[] = {
+  "<=",
+  "==",
+  ">=",
+};
 
-  return constraint;
+static const char *
+operator_to_string (OperatorType o)
+{
+  return operators[o + 1];
 }
 
-void
-constraint_unref (Constraint *constraint)
+static const char *
+strength_to_string (StrengthType s)
 {
-  constraint->ref_count -= 1;
+  if (s >= STRENGTH_REQUIRED)
+    return "required";
 
-  if (constraint->ref_count == 0)
+  if (s >= STRENGTH_STRONG)
+    return "strong";
+
+  if (s >= STRENGTH_MEDIUM)
+    return "medium";
+
+  return "weak";
+}
+
+static void
+constraint_free (Constraint *constraint)
+{
+  if (constraint != NULL)
     {
       expression_unref (constraint->expression);
       variable_unref (constraint->variable);
@@ -188,6 +205,7 @@ simplex_solver_init (SimplexSolver *solver)
                                                             (GDestroyNotify) variable_unref,
                                                             NULL);
 
+  /* Vec<Variable> */
   solver->stay_plus_error_vars = g_ptr_array_new ();
   solver->stay_minus_error_vars = g_ptr_array_new ();
 
@@ -1668,6 +1686,8 @@ no_columns:
       simplex_solver_optimize (solver, solver->objective);
       simplex_solver_set_external_variables (solver);
     }
+
+  constraint_free (constraint);
 }
 
 void

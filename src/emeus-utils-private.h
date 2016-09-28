@@ -29,9 +29,6 @@ const char *get_relation_symbol (EmeusConstraintRelation rel);
 OperatorType relation_to_operator (EmeusConstraintRelation rel);
 StrengthType strength_to_value (EmeusConstraintStrength strength);
 
-const char *operator_to_string (OperatorType op);
-const char *strength_to_string (StrengthType s);
-
 bool approx_val (double v1, double v2);
 
 G_END_DECLS

@@ -79,8 +79,6 @@ typedef enum {
 } StrengthType;
 
 typedef struct {
-  int ref_count;
-
   /* While the Constraint's normal form is expressed in terms of a linear
    * equation between two terms, e.g.:
    *
