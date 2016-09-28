@@ -54,6 +54,16 @@ term_free (Term *term)
   g_slice_free (Term, term);
 }
 
+static void
+expression_add_term (Expression *expression,
+                     Term *term)
+{
+  if (expression->terms == NULL)
+    expression->terms = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) term_free);
+
+  g_hash_table_insert (expression->terms, term->variable, term);
+}
+
 static Expression *
 expression_new_full (SimplexSolver *solver,
                      Variable *variable,
@@ -68,7 +78,7 @@ expression_new_full (SimplexSolver *solver,
   res->ref_count = 1;
 
   if (variable != NULL)
-    expression_add_variable (res, variable, coefficient, NULL);
+    expression_add_term (res, term_new (variable, coefficient));
 
 #ifdef EMEUS_ENABLE_DEBUG
   if (expressions == NULL)
@@ -91,16 +101,6 @@ Expression *
 expression_new_from_variable (Variable *variable)
 {
   return expression_new_full (variable->solver, variable, 1.0, 0.0);
-}
-
-static void
-expression_add_term (Expression *expression,
-                     Term *term)
-{
-  if (expression->terms == NULL)
-    expression->terms = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) term_free);
-
-  g_hash_table_insert (expression->terms, term->variable, term);
 }
 
 Expression *
@@ -180,7 +180,7 @@ expression_add_variable (Expression *expression,
         {
           if (approx_val (coefficient, 0.0))
             {
-              if (subject != NULL)
+              if (expression->solver != NULL)
                 simplex_solver_note_removed_variable (expression->solver, t->variable, subject);
 
               g_hash_table_remove (expression->terms, t);
@@ -194,7 +194,7 @@ expression_add_variable (Expression *expression,
 
   expression_add_term (expression, term_new (variable, coefficient));
 
-  if (subject != NULL)
+  if (expression->solver != NULL)
     simplex_solver_note_added_variable (expression->solver, variable, subject);
 }
 
@@ -206,7 +206,9 @@ expression_remove_variable (Expression *expression,
   if (expression->terms == NULL)
     return;
 
-  simplex_solver_note_removed_variable (expression->solver, variable, subject);
+  if (expression->solver != NULL)
+    simplex_solver_note_removed_variable (expression->solver, variable, subject);
+
   g_hash_table_remove (expression->terms, variable);
 }
 
@@ -225,14 +227,18 @@ expression_set_variable (Expression *expression,
                          Variable *variable,
                          double coefficient)
 {
-  if (expression_has_variable (expression, variable))
+  if (expression->terms != NULL)
     {
       Term *t = g_hash_table_lookup (expression->terms, variable);
 
-      t->coefficient = coefficient;
+      if (t != NULL)
+        {
+          t->coefficient = coefficient;
+          return;
+        }
     }
-  else
-    expression_add_term (expression, term_new (variable, coefficient));
+
+  expression_add_term (expression, term_new (variable, coefficient));
 }
 
 void
