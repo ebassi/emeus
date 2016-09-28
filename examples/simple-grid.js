@@ -1,20 +1,16 @@
 const Emeus = imports.gi.Emeus;
-const GObject = imports.gi.GObject;
-const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 
 Emeus.ConstraintLayout.prototype.pack = function(child, constraints=[]) {
     let layout_child = new Emeus.ConstraintLayoutChild();
     layout_child.add(child);
-    Gtk.Container.prototype.add.call(this, layout_child);
+    this.add(layout_child);
 
-    for (let constraint of constraints) {
-        layout_child.add_constraint(constraint);
-    }
-}
+    constraints.forEach(layout_child.add_constraint, layout_child);
+};
 
-const MyApplicationWindow = Lang.Class({
+const MyApplicationWindow = new Lang.Class({
     Name: 'MyApplicationWindow',
     Extends: Gtk.ApplicationWindow,
 
@@ -26,20 +22,17 @@ const MyApplicationWindow = Lang.Class({
         this.add(box);
         box.show();
 
-        let layout = new Emeus.ConstraintLayout();
-        layout.hexpand = true;
-        layout.vexpand = true;
+        let layout = new Emeus.ConstraintLayout({ hexpand: true, vexpand: true });
         box.add(layout);
         layout.show();
 
         this._layout = layout;
 
-        let button = new Gtk.Button({ label: 'Quit' });
-        button.hexpand = true;
+        let button = new Gtk.Button({ label: 'Quit', hexpand: true });
         box.add(button);
         button.show();
 
-        button.connect('clicked', Lang.bind(this, function() { this.destroy(); }));
+        button.connect('clicked', this.destroy.bind(this));
 
         this._buildGrid();
     },
@@ -102,7 +95,7 @@ const MyApplicationWindow = Lang.Class({
     },
 });
 
-const MyApplication = Lang.Class({
+const MyApplication = new Lang.Class({
     Name: 'MyApplication',
     Extends: Gtk.Application,
 
