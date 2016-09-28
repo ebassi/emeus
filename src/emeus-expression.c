@@ -374,21 +374,22 @@ double
 expression_new_subject (Expression *expression,
                         Variable *subject)
 {
-  double reciprocal;
-  Term *term;
+  double reciprocal = 0.0;
 
-  if (expression->terms == NULL)
-    return 0.0;
+  if (expression->terms != NULL)
+    {
+      Term *term = g_hash_table_lookup (expression->terms, subject);
 
-  term = g_hash_table_lookup (expression->terms, subject);
-  if (term == NULL)
-    return 0.0;
+      if (term != NULL)
+        {
+          reciprocal = 0.0;
+          if (fabs (term_get_value (term)) > DBL_EPSILON)
+            reciprocal = 1.0 / term_get_value (term);
 
-  reciprocal = 0.0;
-  if (fabs (term_get_value (term)) > DBL_EPSILON)
-    reciprocal = 1.0 / term_get_value (term);
+          g_hash_table_remove (expression->terms, subject);
+        }
 
-  g_hash_table_remove (expression->terms, subject);
+    }
 
   expression_times (expression, -1.0 * reciprocal);
 

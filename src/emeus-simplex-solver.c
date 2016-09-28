@@ -564,29 +564,29 @@ simplex_solver_substitute_out (SimplexSolver *solver,
                                Expression *expression)
 {
   ColumnSet *set;
-  GHashTableIter iter;
-  gpointer key_p;
 
   if (!solver->initialized)
     return;
 
   set = g_hash_table_lookup (solver->columns, old_variable);
-  if (set == NULL)
-    goto out;
-
-  column_set_iter_init (set, &iter);
-  while (g_hash_table_iter_next (&iter, &key_p, NULL))
+  if (set != NULL)
     {
-      Variable *variable = key_p;
-      Expression *e = g_hash_table_lookup (solver->rows, variable);
+      GHashTableIter iter;
+      gpointer key_p;
 
-      expression_substitute_out (e, old_variable, expression, variable);
+      column_set_iter_init (set, &iter);
+      while (g_hash_table_iter_next (&iter, &key_p, NULL))
+        {
+          Variable *variable = key_p;
+          Expression *e = g_hash_table_lookup (solver->rows, variable);
 
-      if (variable_is_restricted (variable) && expression_get_constant (e) < 0)
-        g_hash_table_add (solver->infeasible_rows, variable_ref (variable));
+          expression_substitute_out (e, old_variable, expression, variable);
+
+          if (variable_is_restricted (variable) && expression_get_constant (e) < 0)
+            g_hash_table_add (solver->infeasible_rows, variable_ref (variable));
+        }
     }
 
-out:
   if (variable_is_external (old_variable))
     {
       g_hash_table_add (solver->external_rows, variable_ref (old_variable));
@@ -605,6 +605,11 @@ simplex_solver_pivot (SimplexSolver *solver,
 
   if (!solver->initialized)
     return;
+
+  if (entry_var == NULL)
+    g_critical ("No entry variable for pivot");
+  if (exit_var == NULL)
+    g_critical ("No exit variable for pivot");
 
   expr = simplex_solver_remove_row (solver, exit_var);
   expression_change_subject (expr, exit_var, entry_var);
@@ -654,6 +659,8 @@ simplex_solver_optimize (SimplexSolver *solver,
 
   entry = exit = NULL;
 
+  solver->optimize_count += 1;
+
 #ifdef EMEUS_ENABLE_DEBUG
   gint64 start_time = g_get_monotonic_time ();
 #endif
@@ -672,7 +679,7 @@ simplex_solver_optimize (SimplexSolver *solver,
 
       expression_terms_foreach (z_row, find_negative_coefficient, &data);
 
-      if (data.objective_coefficient >= -DBL_EPSILON)
+      if (data.objective_coefficient >= -DBL_EPSILON || data.entry_variable == NULL)
         break;
 
       entry = data.entry_variable;
@@ -688,22 +695,19 @@ simplex_solver_optimize (SimplexSolver *solver,
       while (g_hash_table_iter_next (&iter, &key_p, NULL))
         {
           Variable *v = key_p;
-          Expression *expr;
-          double coeff;
 
-          if (!variable_is_pivotable (v))
-            continue;
-
-          expr = g_hash_table_lookup (solver->rows, v);
-          coeff = expression_get_coefficient (expr, entry);
-          if (coeff < 0.0)
+          if (variable_is_pivotable (v))
             {
-              r = -1.0 * expression_get_constant (expr) / coeff;
-              if (r < min_ratio ||
-                  (approx_val (r, min_ratio) && v < entry))
+              Expression *expr = g_hash_table_lookup (solver->rows, v);
+              double coeff = expression_get_coefficient (expr, entry);
+              if (coeff < 0.0)
                 {
-                  min_ratio = r;
-                  exit = v;
+                  r = -1.0 * expression_get_constant (expr) / coeff;
+                  if (r < min_ratio)
+                    {
+                      min_ratio = r;
+                      exit = v;
+                    }
                 }
             }
         }
@@ -715,10 +719,10 @@ simplex_solver_optimize (SimplexSolver *solver,
     }
 
 #ifdef EMEUS_ENABLE_DEBUG
-  g_print ("optimize.time := %.3f us\n", (float) (g_get_monotonic_time () - start_time));
+  g_print ("optimize.time := %.3f us (pass:%d)\n",
+           (float) (g_get_monotonic_time () - start_time),
+           solver->optimize_count);
 #endif
-
-  solver->optimize_count += 1;
 }
 
 typedef struct {
@@ -1385,12 +1389,12 @@ simplex_solver_add_stay_variable (SimplexSolver *solver,
   res->is_stay = true;
   res->is_edit = false;
 
-  res->expression = expression_new (solver, variable_get_value (variable));
-  expression_add_variable (res->expression, variable, -1.0, NULL);
+  res->expression = expression_new (solver, variable_get_value (res->variable));
+  expression_add_variable (res->expression, res->variable, -1.0, NULL);
 
   si = g_slice_new (StayInfo);
   si->constraint = res;
-  g_hash_table_insert (solver->stay_var_map, variable, si);
+  g_hash_table_insert (solver->stay_var_map, res->variable, si);
 
   expr = simplex_solver_normalize_expression (solver, res, NULL, NULL, NULL);
 
@@ -1586,7 +1590,7 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
 
                   if (exit_var == NULL ||
                       r < min_ratio ||
-                      (approx_val (r, min_ratio) && v < exit_var))
+                      approx_val (r, min_ratio))
                     {
                       min_ratio = r;
                       exit_var = v;
