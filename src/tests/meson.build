@@ -5,10 +5,7 @@ solver_sources = [
   'emeus-variable.c',
 ]
 
-solver_objects = []
-foreach s: solver_sources
-  solver_objects += libemeus.extract_objects(s)
-endforeach
+solver_objects = libemeus.extract_objects(solver_sources)
 
 e = executable('solver', 'solver.c',
                include_directories: emeus_inc,
