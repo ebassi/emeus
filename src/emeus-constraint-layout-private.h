@@ -66,6 +66,10 @@ struct _EmeusConstraintLayout
   SimplexSolver solver;
 
   GHashTable *bound_attributes;
+
+  /* Internal constraints */
+  Constraint *top_constraint;
+  Constraint *left_constraint;
 };
 
 SimplexSolver * emeus_constraint_layout_get_solver      (EmeusConstraintLayout *layout);

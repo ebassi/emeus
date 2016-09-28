@@ -50,6 +50,9 @@ emeus_constraint_layout_finalize (GObject *gobject)
   g_clear_pointer (&self->children, g_sequence_free);
   g_clear_pointer (&self->bound_attributes, g_hash_table_unref);
 
+  simplex_solver_remove_constraint (&self->solver, self->top_constraint);
+  simplex_solver_remove_constraint (&self->solver, self->left_constraint);
+
   simplex_solver_clear (&self->solver);
 
   G_OBJECT_CLASS (emeus_constraint_layout_parent_class)->finalize (gobject);
@@ -410,7 +413,7 @@ emeus_constraint_layout_init (EmeusConstraintLayout *self)
 
   self->children = g_sequence_new (NULL);
 
-  self->bound_attributes = g_hash_table_new_full (g_str_hash, g_str_equal,
+  self->bound_attributes = g_hash_table_new_full (NULL, NULL,
                                                   NULL,
                                                   (GDestroyNotify) variable_unref);
 
@@ -419,17 +422,19 @@ emeus_constraint_layout_init (EmeusConstraintLayout *self)
   variable_set_name (var, "top");
   variable_set_value (var, 0.0);
   g_hash_table_insert (self->bound_attributes,
-                       g_strdup (get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_TOP)),
+                       (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_TOP),
                        var);
-  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_REQUIRED);
+  self->top_constraint =
+    simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_REQUIRED);
 
   var = simplex_solver_create_variable (&self->solver);
   variable_set_name (var, "left");
   variable_set_value (var, 0.0);
   g_hash_table_insert (self->bound_attributes,
-                       g_strdup (get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT)),
+                       (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT),
                        var);
-  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_REQUIRED);
+  self->left_constraint =
+    simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_REQUIRED);
 }
 
 /**
