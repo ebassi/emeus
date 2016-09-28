@@ -81,7 +81,13 @@ constraint_free (Constraint *constraint)
   if (constraint != NULL)
     {
       expression_unref (constraint->expression);
-      variable_unref (constraint->variable);
+
+      if (constraint->is_edit || constraint->is_stay)
+        {
+          g_assert (constraint->variable != NULL);
+          variable_unref (constraint->variable);
+        }
+
       g_slice_free (Constraint, constraint);
     }
 }
