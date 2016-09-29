@@ -614,7 +614,7 @@ emeus_constraint_layout_pack (EmeusConstraintLayout *layout,
 
   g_return_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT (layout));
   g_return_if_fail (GTK_IS_WIDGET (child));
-  g_return_if_fail (EMEUS_IS_CONSTRAINT (first_constraint));
+  g_return_if_fail (EMEUS_IS_CONSTRAINT (first_constraint) || first_constraint == NULL);
 
   g_return_if_fail (gtk_widget_get_parent (child) == NULL);
 

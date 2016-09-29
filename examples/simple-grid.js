@@ -1,43 +1,38 @@
 const Emeus = imports.gi.Emeus;
-const GObject = imports.gi.GObject;
-const Gio = imports.gi.Gio;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 
-Emeus.ConstraintLayout.prototype.pack = function(child, constraints) {
-    Gtk.Container.prototype.add.call(this, child);
+Emeus.ConstraintLayout.prototype.pack = function(child, constraints=[]) {
+    let layout_child = new Emeus.ConstraintLayoutChild();
+    layout_child.add(child);
+    this.add(layout_child);
 
-    let childConstraints = constraints || [];
-    for (let constraint of constraints) {
-        Emeus.ConstraintLayout.prototype.child_add_constraint.call(this, child, constraint);
-    }
-}
+    constraints.forEach(layout_child.add_constraint, layout_child);
+};
 
-const MyApplicationWindow = Lang.Class({
+const MyApplicationWindow = new Lang.Class({
     Name: 'MyApplicationWindow',
     Extends: Gtk.ApplicationWindow,
 
-    _init: function() {
+    _init: function(props={}) {
+        this.parent(props);
         this.set_default_size(400, 500);
 
         let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, spacing: 6 });
         this.add(box);
         box.show();
 
-        let layout = new Emeus.ConstraintLayout();
-        layout.hexpand = true;
-        layout.vexpand = true;
+        let layout = new Emeus.ConstraintLayout({ hexpand: true, vexpand: true });
         box.add(layout);
         layout.show();
 
         this._layout = layout;
 
-        let button = new Gtk.Button({ label: 'Quit' });
-        button.hexpand = true;
+        let button = new Gtk.Button({ label: 'Quit', hexpand: true });
         box.add(button);
         button.show();
 
-        button.signal_connect('clicked', Lang.bind(this, function() { this.destroy(); }));
+        button.connect('clicked', this.destroy.bind(this));
 
         this._buildGrid();
     },
@@ -56,9 +51,9 @@ const MyApplicationWindow = Lang.Class({
          * +--------------------------+
          */
         let button1 = new Gtk.Button({ label: 'Child 1' });
-        this._layout.pack(button1 [
+        this._layout.pack(button1, [
             new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.WIDTH,
-                                   relation: Emeus.ConstraintRelation.GEQ,
+                                   relation: Emeus.ConstraintRelation.GE,
                                    constant: 120, }),
         ]);
         button1.show();
@@ -100,7 +95,7 @@ const MyApplicationWindow = Lang.Class({
     },
 });
 
-const MyApplication = Lang.Class({
+const MyApplication = new Lang.Class({
     Name: 'MyApplication',
     Extends: Gtk.Application,
 
@@ -121,4 +116,4 @@ const MyApplication = Lang.Class({
 });
 
 let app = new MyApplication();
-app.run();
+app.run(['simple-grid'].concat(ARGV));

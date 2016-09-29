@@ -1303,7 +1303,7 @@ simplex_solver_add_constraint (SimplexSolver *solver,
 
   if (!solver->initialized)
     {
-      g_critical ("SimplexSolver %p has not been initialized.");
+      g_critical ("SimplexSolver %p has not been initialized.", solver);
       return NULL;
     }
 
@@ -1378,7 +1378,7 @@ simplex_solver_add_stay_variable (SimplexSolver *solver,
 
   if (!solver->initialized)
     {
-      g_critical ("SimplexSolver %p has not been initialized.");
+      g_critical ("SimplexSolver %p has not been initialized.", solver);
       return NULL;
     }
 
