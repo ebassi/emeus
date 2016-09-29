@@ -281,7 +281,7 @@ expression_get_value (const Expression *expression)
     {
       const Term *t = value_p;
 
-      res += term_get_value (t);
+      res += (t->coefficient * variable_get_value (t->variable));
     }
 
   return res;
@@ -374,24 +374,20 @@ double
 expression_new_subject (Expression *expression,
                         Variable *subject)
 {
-  double reciprocal = 0.0;
+  double reciprocal = 1.0;
+  Term *term;
 
-  if (expression->terms != NULL)
-    {
-      Term *term = g_hash_table_lookup (expression->terms, subject);
+  g_assert (!expression_is_constant (expression));
 
-      if (term != NULL)
-        {
-          reciprocal = 0.0;
-          if (fabs (term_get_value (term)) > DBL_EPSILON)
-            reciprocal = 1.0 / term_get_value (term);
+  term = g_hash_table_lookup (expression->terms, subject);
+  g_assert (term != NULL);
+  g_assert (term->coefficient != 0.0);
 
-          g_hash_table_remove (expression->terms, subject);
-        }
+  reciprocal = 1.0 / term->coefficient;
 
-    }
+  g_hash_table_remove (expression->terms, subject);
 
-  expression_times (expression, -1.0 * reciprocal);
+  expression_times (expression, -reciprocal);
 
   return reciprocal;
 }
@@ -490,7 +486,7 @@ expression_to_string (const Expression *expression)
               if (needs_plus)
                 g_string_append (buf, " + ");
 
-              g_string_append_printf (buf, "(%g * %s)", t->coefficient, var);
+              g_string_append_printf (buf, "%g * %s", t->coefficient, var);
 
               g_free (var);
 

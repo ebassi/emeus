@@ -23,15 +23,6 @@
 
 G_BEGIN_DECLS
 
-static inline double
-term_get_value (const Term *term)
-{
-  if (term == NULL)
-    return 0.0;
-
-  return variable_get_value (term->variable) * term->coefficient;
-}
-
 static inline Variable *
 term_get_variable (const Term *term)
 {
