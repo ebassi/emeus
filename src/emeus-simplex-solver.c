@@ -182,7 +182,10 @@ void
 simplex_solver_init (SimplexSolver *solver)
 {
   if (solver->initialized)
-    return;
+    {
+      g_critical ("The SimplexSolver %p has already been initialized");
+      return;
+    }
 
   memset (solver, 0, sizeof (SimplexSolver));
 
@@ -1275,7 +1278,10 @@ Variable *
 simplex_solver_create_variable (SimplexSolver *solver)
 {
   if (!solver->initialized)
-    return NULL;
+    {
+      g_critical ("SimplexSolver %p is not initialized.", solver);
+      return NULL;
+    }
 
   return variable_new (solver, VARIABLE_REGULAR);
 }
@@ -1285,7 +1291,10 @@ simplex_solver_create_expression (SimplexSolver *solver,
                                   double constant)
 {
   if (!solver->initialized)
-    return NULL;
+    {
+      g_critical ("SimplexSolver %p is not initialized.", solver);
+      return NULL;
+    }
 
   return expression_new (solver, constant);
 }

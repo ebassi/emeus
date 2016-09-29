@@ -104,7 +104,22 @@ typedef struct {
   SimplexSolver *solver;
 } Constraint;
 
+#define SIMPLEX_SOLVER_INIT     \
+  { false, \
+    NULL, NULL, \
+    NULL, NULL, NULL, \
+    NULL, \
+    NULL, NULL, \
+    NULL, NULL, \
+    NULL, NULL, \
+    NULL, \
+    0, 0, 0, 0, \
+    false, false, \
+  }
+
 struct _SimplexSolver {
+  bool initialized;
+
   /* HashTable<Variable, HashSet<Variable>> */
   GHashTable *columns;
 
@@ -136,7 +151,6 @@ struct _SimplexSolver {
 
   bool auto_solve;
   bool needs_solving;
-  bool initialized;
 };
 
 G_END_DECLS
