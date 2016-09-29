@@ -60,6 +60,8 @@ struct _EmeusConstraintLayoutChild
   Constraint *bottom_constraint;
   Constraint *center_x_constraint;
   Constraint *center_y_constraint;
+  Constraint *width_constraint;
+  Constraint *height_constraint;
 };
 
 struct _EmeusConstraintLayout

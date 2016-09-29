@@ -1056,14 +1056,24 @@ emeus_constraint_layout_child_set_intrinsic_width (EmeusConstraintLayoutChild *c
   attr = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
 
   if (child->intrinsic_width < 0)
-    simplex_solver_add_edit_variable (child->solver, attr, STRENGTH_REQUIRED);
+    {
+      child->width_constraint =
+        simplex_solver_add_edit_variable (child->solver, attr, STRENGTH_REQUIRED);
+    }
+
+  if (width < 0)
+    {
+      simplex_solver_remove_constraint (child->solver, child->width_constraint);
+      child->width_constraint = NULL;
+    }
 
   child->intrinsic_width = width;
 
-  if (width > 0)
-    simplex_solver_suggest_value (child->solver, attr, width);
-
-  simplex_solver_resolve (child->solver);
+  if (child->intrinsic_width > 0)
+    {
+      simplex_solver_suggest_value (child->solver, attr, child->intrinsic_width);
+      simplex_solver_resolve (child->solver);
+    }
 
   if (gtk_widget_get_visible (GTK_WIDGET (child)))
     gtk_widget_queue_resize (GTK_WIDGET (child));
@@ -1083,14 +1093,24 @@ emeus_constraint_layout_child_set_intrinsic_height (EmeusConstraintLayoutChild *
   attr = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
 
   if (child->intrinsic_height < 0)
-    simplex_solver_add_edit_variable (child->solver, attr, STRENGTH_REQUIRED - 1);
+    {
+      child->height_constraint =
+        simplex_solver_add_edit_variable (child->solver, attr, STRENGTH_REQUIRED - 1);
+    }
+
+  if (height < 0)
+    {
+      simplex_solver_remove_constraint (child->solver, child->height_constraint);
+      child->height_constraint = NULL;
+    }
 
   child->intrinsic_height = height;
 
-  if (height > 0)
-    simplex_solver_suggest_value (child->solver, attr, height);
-
-  simplex_solver_resolve (child->solver);
+  if (child->intrinsic_height > 0)
+    {
+      simplex_solver_suggest_value (child->solver, attr, height);
+      simplex_solver_resolve (child->solver);
+    }
 
   if (gtk_widget_get_visible (GTK_WIDGET (child)))
     gtk_widget_queue_resize (GTK_WIDGET (child));
