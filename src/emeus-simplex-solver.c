@@ -907,13 +907,9 @@ find_ratio (Term *term,
   if (cd > 0.0 && variable_is_pivotable (v))
     {
       double zc = expression_get_coefficient (data->z_row, v);
-      double r = 0.0;
+      double r = zc / cd;
 
-      if (!approx_val (cd, 0.0))
-        r = zc / cd;
-
-      if (r < data->ratio ||
-          (approx_val (r, data->ratio) && data->entry != NULL && v < data->entry))
+      if (r < data->ratio)
         {
           data->entry = v;
           data->ratio = r;
@@ -942,7 +938,6 @@ simplex_solver_dual_optimize (SimplexSolver *solver)
       RatioClosure data;
 
       exit_var = variable_ref (key_p);
-
       g_hash_table_iter_remove (&iter);
 
       expr = g_hash_table_lookup (solver->rows, exit_var);
