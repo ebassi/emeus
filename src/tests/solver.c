@@ -81,6 +81,56 @@ emeus_solver_stay (void)
   simplex_solver_clear (&solver);
 }
 
+static void
+emeus_solver_variable_geq_constant (void)
+{
+  SimplexSolver solver = SIMPLEX_SOLVER_INIT;
+
+  simplex_solver_init (&solver);
+
+  Variable *x = simplex_solver_create_variable (&solver);
+  variable_set_value (x, 10.0);
+  variable_set_name (x, "x");
+
+  Expression *e = simplex_solver_create_expression (&solver, 100.0);
+
+  simplex_solver_add_constraint (&solver, x, OPERATOR_TYPE_GE, e, STRENGTH_REQUIRED);
+
+  double x_value = variable_get_value (x);
+
+  emeus_assert_fuzzy_equals (x_value, 100.0, 1e-8);
+
+  expression_unref (e);
+  variable_unref (x);
+
+  simplex_solver_clear (&solver);
+}
+
+static void
+emeus_solver_variable_leq_constant (void)
+{
+  SimplexSolver solver = SIMPLEX_SOLVER_INIT;
+
+  simplex_solver_init (&solver);
+
+  Variable *x = simplex_solver_create_variable (&solver);
+  variable_set_value (x, 100.0);
+  variable_set_name (x, "x");
+
+  Expression *e = simplex_solver_create_expression (&solver, 10.0);
+
+  simplex_solver_add_constraint (&solver, x, OPERATOR_TYPE_LE, e, STRENGTH_REQUIRED);
+
+  double x_value = variable_get_value (x);
+
+  emeus_assert_fuzzy_equals (x_value, 10.0, 1e-8);
+
+  expression_unref (e);
+  variable_unref (x);
+
+  simplex_solver_clear (&solver);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -88,6 +138,8 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/emeus/solver/simple", emeus_solver_simple);
   g_test_add_func ("/emeus/solver/stay", emeus_solver_stay);
+  g_test_add_func ("/emeus/solver/variable-geq-constant", emeus_solver_variable_geq_constant);
+  g_test_add_func ("/emeus/solver/variable-leq-constant", emeus_solver_variable_leq_constant);
 
   return g_test_run ();
 }
