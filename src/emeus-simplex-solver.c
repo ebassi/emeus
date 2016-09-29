@@ -1154,7 +1154,7 @@ simplex_solver_choose_subject (SimplexSolver *solver,
   if (data.retval != NULL)
     return data.retval;
 
-  if (approx_val (expression_get_constant (expression), 0.0))
+  if (!approx_val (expression_get_constant (expression), 0.0))
     {
       g_critical ("Unable to satisfy a required constraint");
       return NULL;
