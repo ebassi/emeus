@@ -27,6 +27,11 @@ struct _EmeusConstraintLayoutChild
 {
   GtkBin parent_instance;
 
+  /* An optional name for the child, to be used when building
+   * constraints from string descriptions
+   */
+  char *name;
+
   /* Position in the layout's GSequence */
   GSequenceIter *iter;
 

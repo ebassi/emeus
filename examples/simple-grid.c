@@ -63,7 +63,7 @@ build_grid (EmeusTestApplicationWindow *self)
   EmeusConstraintLayout *layout = (EmeusConstraintLayout *) self->layout;
 
   GtkWidget *button1 = gtk_button_new_with_label ("Child 1");
-  emeus_constraint_layout_pack (layout, button1,
+  emeus_constraint_layout_pack (layout, button1, "child1",
                                 emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_START,
                                                       EMEUS_CONSTRAINT_RELATION_EQ,
                                                       NULL,
@@ -75,7 +75,7 @@ build_grid (EmeusTestApplicationWindow *self)
   gtk_widget_show (button1);
 
   GtkWidget *button2 = gtk_button_new_with_label ("Child 2");
-  emeus_constraint_layout_pack (layout, button2,
+  emeus_constraint_layout_pack (layout, button2, "child2",
                                 emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_END,
                                                       EMEUS_CONSTRAINT_RELATION_EQ,
                                                       NULL,
@@ -108,7 +108,7 @@ build_grid (EmeusTestApplicationWindow *self)
   gtk_widget_show (button2);
 
   GtkWidget *button3 = gtk_button_new_with_label ("Child 3");
-  emeus_constraint_layout_pack (layout, button3,
+  emeus_constraint_layout_pack (layout, button3, "child3",
                                 emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_START,
                                                       EMEUS_CONSTRAINT_RELATION_EQ,
                                                       button1,

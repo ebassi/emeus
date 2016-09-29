@@ -33,6 +33,7 @@ GtkWidget *     emeus_constraint_layout_new     (void);
 EMEUS_AVAILABLE_IN_1_0
 void            emeus_constraint_layout_pack    (EmeusConstraintLayout *layout,
                                                  GtkWidget             *child,
+                                                 const char            *name,
                                                  EmeusConstraint       *first_constraint,
                                                  ...);
 
@@ -42,8 +43,10 @@ EMEUS_AVAILABLE_IN_1_0
 G_DECLARE_FINAL_TYPE (EmeusConstraintLayoutChild, emeus_constraint_layout_child, EMEUS, CONSTRAINT_LAYOUT_CHILD, GtkBin)
 
 EMEUS_AVAILABLE_IN_1_0
-GtkWidget *     emeus_constraint_layout_child_new                       (void);
+GtkWidget *     emeus_constraint_layout_child_new                       (const char                 *name);
 
+EMEUS_AVAILABLE_IN_1_0
+const char *    emeus_constraint_layout_child_get_name                  (EmeusConstraintLayoutChild *child);
 EMEUS_AVAILABLE_IN_1_0
 int             emeus_constraint_layout_child_get_top                   (EmeusConstraintLayoutChild *child);
 EMEUS_AVAILABLE_IN_1_0

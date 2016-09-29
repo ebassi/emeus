@@ -38,6 +38,14 @@
 
 #include <math.h>
 
+enum {
+  CHILD_PROP_NAME = 1,
+
+  CHILD_N_PROPS
+};
+
+static GParamSpec *emeus_constraint_layout_child_properties[CHILD_N_PROPS];
+
 G_DEFINE_TYPE (EmeusConstraintLayout, emeus_constraint_layout, GTK_TYPE_CONTAINER)
 
 G_DEFINE_TYPE (EmeusConstraintLayoutChild, emeus_constraint_layout_child, GTK_TYPE_BIN)
@@ -324,7 +332,7 @@ emeus_constraint_layout_add (GtkContainer *container,
 {
   EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (container);
 
-  emeus_constraint_layout_pack (self, widget, NULL);
+  emeus_constraint_layout_pack (self, widget, NULL, NULL);
 }
 
 static void
@@ -589,6 +597,7 @@ emeus_constraint_layout_has_child_data (EmeusConstraintLayout *layout,
  * emeus_constraint_layout_pack:
  * @layout: a #EmeusConstraintLayout
  * @child: a #GtkWidget
+ * @name: (nullable): an optional name for the @child
  * @first_constraint: (nullable): a #EmeusConstraint
  * @...: a %NULL-terminated list of #EmeusConstraint instances
  *
@@ -603,6 +612,7 @@ emeus_constraint_layout_has_child_data (EmeusConstraintLayout *layout,
 void
 emeus_constraint_layout_pack (EmeusConstraintLayout *layout,
                               GtkWidget             *child,
+                              const char            *name,
                               EmeusConstraint       *first_constraint,
                               ...)
 {
@@ -620,7 +630,7 @@ emeus_constraint_layout_pack (EmeusConstraintLayout *layout,
     layout_child = EMEUS_CONSTRAINT_LAYOUT_CHILD (child);
   else
     {
-      layout_child = (EmeusConstraintLayoutChild *) emeus_constraint_layout_child_new ();
+      layout_child = (EmeusConstraintLayoutChild *) emeus_constraint_layout_child_new (name);
 
       gtk_widget_show (GTK_WIDGET (layout_child));
       gtk_container_add (GTK_CONTAINER (layout_child), child);
@@ -645,6 +655,16 @@ emeus_constraint_layout_pack (EmeusConstraintLayout *layout,
     }
 
   va_end (args);
+}
+
+static void
+emeus_constraint_layout_child_finalize (GObject *gobject)
+{
+  EmeusConstraintLayoutChild *self = EMEUS_CONSTRAINT_LAYOUT_CHILD (gobject);
+
+  g_free (self->name);
+
+  G_OBJECT_CLASS (emeus_constraint_layout_child_parent_class)->finalize (gobject);
 }
 
 static void
@@ -680,6 +700,44 @@ emeus_constraint_layout_child_dispose (GObject *gobject)
   g_clear_pointer (&self->bound_attributes, g_hash_table_unref);
 
   G_OBJECT_CLASS (emeus_constraint_layout_child_parent_class)->dispose (gobject);
+}
+
+static void
+emeus_constraint_layout_child_set_property (GObject      *gobject,
+                                            guint         prop_id,
+                                            const GValue *value,
+                                            GParamSpec   *pspec)
+{
+  EmeusConstraintLayoutChild *self = EMEUS_CONSTRAINT_LAYOUT_CHILD (gobject);
+
+  switch (prop_id)
+    {
+    case CHILD_PROP_NAME:
+      self->name = g_value_dup_string (value);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+    }
+}
+
+static void
+emeus_constraint_layout_child_get_property (GObject    *gobject,
+                                            guint       prop_id,
+                                            GValue     *value,
+                                            GParamSpec *pspec)
+{
+  EmeusConstraintLayoutChild *self = EMEUS_CONSTRAINT_LAYOUT_CHILD (gobject);
+
+  switch (prop_id)
+    {
+    case CHILD_PROP_NAME:
+      g_value_set_string (value, self->name);
+      break;
+
+    default:
+      G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
+    }
 }
 
 static void
@@ -749,12 +807,25 @@ emeus_constraint_layout_child_class_init (EmeusConstraintLayoutChildClass *klass
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
   GtkContainerClass *container_class = GTK_CONTAINER_CLASS (klass);
 
+  gobject_class->set_property = emeus_constraint_layout_child_set_property;
+  gobject_class->get_property = emeus_constraint_layout_child_get_property;
   gobject_class->dispose = emeus_constraint_layout_child_dispose;
+  gobject_class->finalize = emeus_constraint_layout_child_finalize;
 
   widget_class->get_preferred_width = emeus_constraint_layout_child_get_preferred_width;
   widget_class->get_preferred_height = emeus_constraint_layout_child_get_preferred_height;
 
   gtk_container_class_handle_border_width (container_class);
+
+  emeus_constraint_layout_child_properties[CHILD_PROP_NAME] =
+    g_param_spec_string ("name", "Name", "The name of the child",
+                         NULL,
+                         G_PARAM_READWRITE |
+                         G_PARAM_CONSTRUCT_ONLY |
+                         G_PARAM_STATIC_STRINGS);
+
+  g_object_class_install_properties (gobject_class, CHILD_N_PROPS,
+                                     emeus_constraint_layout_child_properties);
 }
 
 static void
@@ -773,6 +844,7 @@ emeus_constraint_layout_child_init (EmeusConstraintLayoutChild *self)
 
 /**
  * emeus_constraint_layout_child_new: (constructor)
+ * @name: (nullable): a name for the child
  *
  * Creates a new #EmeusConstraintLayoutChild widget.
  *
@@ -781,9 +853,11 @@ emeus_constraint_layout_child_init (EmeusConstraintLayoutChild *self)
  * Since: 1.0
  */
 GtkWidget *
-emeus_constraint_layout_child_new (void)
+emeus_constraint_layout_child_new (const char *name)
 {
-  return g_object_new (EMEUS_TYPE_CONSTRAINT_LAYOUT_CHILD, NULL);
+  return g_object_new (EMEUS_TYPE_CONSTRAINT_LAYOUT_CHILD,
+                       "name", name,
+                       NULL);
 }
 
 /**

@@ -2,8 +2,8 @@ const Emeus = imports.gi.Emeus;
 const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 
-Emeus.ConstraintLayout.prototype.pack = function(child, constraints=[]) {
-    let layout_child = new Emeus.ConstraintLayoutChild();
+Emeus.ConstraintLayout.prototype.pack = function(child, name=null, constraints=[]) {
+    let layout_child = new Emeus.ConstraintLayoutChild(name);
     layout_child.add(child);
     this.add(layout_child);
 
@@ -51,7 +51,7 @@ const MyApplicationWindow = new Lang.Class({
          * +--------------------------+
          */
         let button1 = new Gtk.Button({ label: 'Child 1' });
-        this._layout.pack(button1, [
+        this._layout.pack(button1, 'child1', [
             new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.WIDTH,
                                    relation: Emeus.ConstraintRelation.GE,
                                    constant: 120, }),
@@ -59,7 +59,7 @@ const MyApplicationWindow = new Lang.Class({
         button1.show();
 
         let button2 = new Gtk.Button({ label: 'Child 2' });
-        this._layout.pack(button2, [
+        this._layout.pack(button2, 'child2', [
             new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.WIDTH,
                                    relation: Emeus.ConstraintRelation.EQ,
                                    source_object: button1,
@@ -77,7 +77,7 @@ const MyApplicationWindow = new Lang.Class({
         button2.show();
 
         let button3 = new Gtk.Button({ label: 'Child 3' });
-        this._layout.pack(button3, [
+        this._layout.pack(button3, 'child3', [
             new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.START,
                                    relation: Emeus.ConstraintRelation.EQ,
                                    source_object: button1,
