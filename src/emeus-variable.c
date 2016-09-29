@@ -138,11 +138,30 @@ variable_to_string (const Variable *variable)
     g_string_append (buf, "<null>");
   else
     {
-      g_string_append_c (buf, (char) variable->type);
+      switch (variable->type)
+        {
+        case VARIABLE_DUMMY:
+          g_string_append (buf, "dummy");
+          break;
+        case VARIABLE_OBJECTIVE:
+          g_string_append (buf, "objective");
+          break;
+        case VARIABLE_SLACK:
+          g_string_append (buf, "slack");
+          break;
+        case VARIABLE_REGULAR:
+          break;
+        }
+
       g_string_append_c (buf, '[');
       g_string_append (buf, variable->name != NULL ? variable->name : "*");
-      g_string_append_c (buf, ':');
-      g_string_append_printf (buf, "%g", variable->value);
+
+      if (variable->type == VARIABLE_REGULAR)
+        {
+          g_string_append_c (buf, ':');
+          g_string_append_printf (buf, "%g", variable->value);
+        }
+
       g_string_append_c (buf, ']');
     }
 
