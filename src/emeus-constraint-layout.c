@@ -67,8 +67,7 @@ get_layout_attribute (EmeusConstraintLayout   *layout,
 
   if (res == NULL)
     {
-      res = simplex_solver_create_variable (&layout->solver);
-      variable_set_name (res, attr_name);
+      res = simplex_solver_create_variable (&layout->solver, attr_name, 0.0);
       g_hash_table_insert (layout->bound_attributes, (gpointer) attr_name, res);
     }
 
@@ -106,8 +105,7 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
   if (res != NULL)
     return res;
 
-  res = simplex_solver_create_variable (child->solver);
-  variable_set_name (res, attr_name);
+  res = simplex_solver_create_variable (child->solver, attr_name, 0.0);
   g_hash_table_insert (child->bound_attributes, (gpointer) attr_name, res);
 
   /* Some attributes are really constraints computed from other
@@ -418,18 +416,14 @@ emeus_constraint_layout_init (EmeusConstraintLayout *self)
                                                   (GDestroyNotify) variable_unref);
 
   /* Add two required stay constraints for the top left corner */
-  var = simplex_solver_create_variable (&self->solver);
-  variable_set_name (var, "top");
-  variable_set_value (var, 0.0);
+  var = simplex_solver_create_variable (&self->solver, "parent.top", 0.0);
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_TOP),
                        var);
   self->top_constraint =
     simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_REQUIRED);
 
-  var = simplex_solver_create_variable (&self->solver);
-  variable_set_name (var, "left");
-  variable_set_value (var, 0.0);
+  var = simplex_solver_create_variable (&self->solver, "parent.left", 0.0);
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT),
                        var);
@@ -486,9 +480,8 @@ add_child_constraint (EmeusConstraintLayout      *layout,
    */
   if (constraint->source_attribute == EMEUS_CONSTRAINT_ATTRIBUTE_INVALID)
     {
-      attr2 = simplex_solver_create_variable (constraint->solver);
-      variable_set_name (attr2, "const");
-      variable_set_value (attr2, emeus_constraint_get_constant (constraint));
+      attr2 = simplex_solver_create_variable (constraint->solver, "const",
+                                              emeus_constraint_get_constant (constraint));
 
       simplex_solver_add_stay_variable (child->solver, attr2, STRENGTH_REQUIRED);
 

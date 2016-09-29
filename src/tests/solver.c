@@ -26,13 +26,8 @@ emeus_solver_simple (void)
 
   simplex_solver_init (&solver);
 
-  Variable *x = simplex_solver_create_variable (&solver);
-  variable_set_value (x, 167.0);
-  variable_set_name (x, "x");
-
-  Variable *y = simplex_solver_create_variable (&solver);
-  variable_set_value (y, 2.0);
-  variable_set_name (y, "y");
+  Variable *x = simplex_solver_create_variable (&solver, "x", 167.0);
+  Variable *y = simplex_solver_create_variable (&solver, "y", 2.0);
 
   Expression *e = expression_new_from_variable (y);
 
@@ -61,13 +56,8 @@ emeus_solver_stay (void)
 
   simplex_solver_init (&solver);
 
-  Variable *x = simplex_solver_create_variable (&solver);
-  variable_set_value (x, 5.0);
-  variable_set_name (x, "x");
-
-  Variable *y = simplex_solver_create_variable (&solver);
-  variable_set_value (y, 10.0);
-  variable_set_name (y, "y");
+  Variable *x = simplex_solver_create_variable (&solver, "x", 5.0);
+  Variable *y = simplex_solver_create_variable (&solver, "y", 10.0);
 
   simplex_solver_add_stay_variable (&solver, x, STRENGTH_WEAK);
   simplex_solver_add_stay_variable (&solver, y, STRENGTH_WEAK);
@@ -88,10 +78,7 @@ emeus_solver_variable_geq_constant (void)
 
   simplex_solver_init (&solver);
 
-  Variable *x = simplex_solver_create_variable (&solver);
-  variable_set_value (x, 10.0);
-  variable_set_name (x, "x");
-
+  Variable *x = simplex_solver_create_variable (&solver, "x", 10.0);
   Expression *e = simplex_solver_create_expression (&solver, 100.0);
 
   simplex_solver_add_constraint (&solver, x, OPERATOR_TYPE_GE, e, STRENGTH_REQUIRED);
@@ -113,10 +100,7 @@ emeus_solver_variable_leq_constant (void)
 
   simplex_solver_init (&solver);
 
-  Variable *x = simplex_solver_create_variable (&solver);
-  variable_set_value (x, 100.0);
-  variable_set_name (x, "x");
-
+  Variable *x = simplex_solver_create_variable (&solver, "x", 100.0);
   Expression *e = simplex_solver_create_expression (&solver, 10.0);
 
   simplex_solver_add_constraint (&solver, x, OPERATOR_TYPE_LE, e, STRENGTH_REQUIRED);

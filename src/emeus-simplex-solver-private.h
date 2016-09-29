@@ -49,7 +49,9 @@ constraint_is_edit (const Constraint *constraint)
 void simplex_solver_init (SimplexSolver *solver);
 void simplex_solver_clear (SimplexSolver *solver);
 
-Variable *simplex_solver_create_variable (SimplexSolver *solver);
+Variable *simplex_solver_create_variable (SimplexSolver *solver,
+                                          const char *name,
+                                          double value);
 Expression *simplex_solver_create_expression (SimplexSolver *solver,
                                               double constant);
 

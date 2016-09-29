@@ -1276,15 +1276,23 @@ simplex_solver_note_removed_variable (SimplexSolver *solver,
 }
 
 Variable *
-simplex_solver_create_variable (SimplexSolver *solver)
+simplex_solver_create_variable (SimplexSolver *solver,
+                                const char *name,
+                                double value)
 {
+  Variable *res;
+
   if (!solver->initialized)
     {
       g_critical ("SimplexSolver %p is not initialized.", solver);
       return NULL;
     }
 
-  return variable_new (solver, VARIABLE_REGULAR);
+  res = variable_new (solver, VARIABLE_REGULAR);
+  variable_set_name (res, name);
+  variable_set_value (res, value);
+
+  return res;
 }
 
 Expression *
@@ -1329,20 +1337,23 @@ simplex_solver_add_constraint (SimplexSolver *solver,
     {
       res->expression = expression_ref (expression);
 
-      switch (res->op_type)
+      if (variable != NULL)
         {
-        case OPERATOR_TYPE_EQ:
-          expression_add_variable (res->expression, variable, -1.0, NULL);
-          break;
+          switch (res->op_type)
+            {
+            case OPERATOR_TYPE_EQ:
+              expression_add_variable (res->expression, variable, -1.0, NULL);
+              break;
 
-        case OPERATOR_TYPE_LE:
-          expression_add_variable (res->expression, variable, -1.0, NULL);
-          break;
+            case OPERATOR_TYPE_LE:
+              expression_add_variable (res->expression, variable, -1.0, NULL);
+              break;
 
-        case OPERATOR_TYPE_GE:
-          expression_times (res->expression, -1.0);
-          expression_add_variable (res->expression, variable, 1.0, NULL);
-          break;
+            case OPERATOR_TYPE_GE:
+              expression_times (res->expression, -1.0);
+              expression_add_variable (res->expression, variable, 1.0, NULL);
+              break;
+            }
         }
     }
 
