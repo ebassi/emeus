@@ -227,7 +227,7 @@ emeus_constraint_layout_get_preferred_size (EmeusConstraintLayout *self,
       break;
 
     case GTK_ORIENTATION_VERTICAL:
-      size = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
+      size = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
       break;
     }
 
