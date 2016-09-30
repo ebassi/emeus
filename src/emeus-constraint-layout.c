@@ -76,6 +76,8 @@ get_layout_attribute (EmeusConstraintLayout   *layout,
   if (res == NULL)
     {
       res = simplex_solver_create_variable (&layout->solver, attr_name, 0.0);
+      variable_set_prefix (res, "super");
+
       g_hash_table_insert (layout->bound_attributes, (gpointer) attr_name, res);
     }
 
@@ -114,6 +116,8 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
     return res;
 
   res = simplex_solver_create_variable (child->solver, attr_name, 0.0);
+  variable_set_prefix (res, child->name);
+
   g_hash_table_insert (child->bound_attributes, (gpointer) attr_name, res);
 
   /* Some attributes are really constraints computed from other
@@ -424,14 +428,16 @@ emeus_constraint_layout_init (EmeusConstraintLayout *self)
                                                   (GDestroyNotify) variable_unref);
 
   /* Add two required stay constraints for the top left corner */
-  var = simplex_solver_create_variable (&self->solver, "parent.top", 0.0);
+  var = simplex_solver_create_variable (&self->solver, "top", 0.0);
+  variable_set_prefix (var, "super");
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_TOP),
                        var);
   self->top_constraint =
     simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_REQUIRED);
 
-  var = simplex_solver_create_variable (&self->solver, "parent.left", 0.0);
+  var = simplex_solver_create_variable (&self->solver, "left", 0.0);
+  variable_set_prefix (var, "super");
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT),
                        var);

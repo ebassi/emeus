@@ -796,6 +796,7 @@ simplex_solver_new_expression (SimplexSolver *solver,
       solver->slack_counter += 1;
 
       slack_var = variable_new (solver, VARIABLE_SLACK);
+      variable_set_prefix (slack_var, "s");
       expression_set_variable (expr, slack_var, -1.0);
 
       g_hash_table_insert (solver->marker_vars, constraint, slack_var);
@@ -1201,6 +1202,7 @@ simplex_solver_add_with_artificial_variable (SimplexSolver *solver,
     return;
   
   av = variable_new (solver, VARIABLE_SLACK);
+  variable_set_prefix (av, "a");
   solver->artificial_counter += 1;
 
   az = variable_new (solver, VARIABLE_OBJECTIVE);
