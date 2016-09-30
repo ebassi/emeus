@@ -486,7 +486,10 @@ expression_to_string (const Expression *expression)
               if (needs_plus)
                 g_string_append (buf, " + ");
 
-              g_string_append_printf (buf, "%g * %s", t->coefficient, var);
+              if (t->coefficient > 0.0 && approx_val (t->coefficient, 1.0))
+                g_string_append (buf, var);
+              else
+                g_string_append_printf (buf, "%g * %s", t->coefficient, var);
 
               g_free (var);
 
