@@ -40,22 +40,39 @@ emeus_test_application_window_class_init (EmeusTestApplicationWindowClass *klass
 {
 }
 
-/* The grid:
+/* Layout:
  *
- * +-----------------------------+
- * | +-----------+ +-----------+ |
- * | |  Child 1  | |  Child 2  | |
- * | +-----------+ +-----------+ |
- * | +-------------------------+ |
- * | |         Child 3         | |
- * | +-------------------------+ |
- * +-----------------------------+
+ *   +-----------------------------+
+ *   | +-----------+ +-----------+ |
+ *   | |  Child 1  | |  Child 2  | |
+ *   | +-----------+ +-----------+ |
+ *   | +-------------------------+ |
+ *   | |         Child 3         | |
+ *   | +-------------------------+ |
+ *   +-----------------------------+
  *
  * Visual format:
  *
- * H:|-8-[view1(==view2)]-12-[view2]-8-|
- * H:|-8-[view3]-8-|
- * V:|-8-[view1,view2]-12-[view3(==view1,view2)]-8-|
+ *   H:|-8-[view1(==view2)]-12-[view2]-8-|
+ *   H:|-8-[view3]-8-|
+ *   V:|-8-[view1,view2]-12-[view3(==view1,view2)]-8-|
+ *
+ * Constraints:
+ *
+ *   super.start = child1.start - 8
+ *   child1.width = child2.width
+ *   child1.end = child2.start - 12
+ *   child2.end = super.end - 8
+ *   super.start = child3.start - 8
+ *   child3.end = super.end - 8
+ *   super.top = child1.top - 8
+ *   super.top = child2.top - 8
+ *   child1.bottom = child3.top - 12
+ *   child2.bottom = child3.top - 12
+ *   child3.height = child1.height
+ *   child3.height = child2.height
+ *   child3.bottom = super.bottom - 8
+ *
  */
 static void
 build_grid (EmeusTestApplicationWindow *self)
@@ -64,10 +81,10 @@ build_grid (EmeusTestApplicationWindow *self)
 
   GtkWidget *button1 = gtk_button_new_with_label ("Child 1");
   emeus_constraint_layout_pack (layout, button1, "child1",
-                                emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT,
+                                emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_START,
                                                       EMEUS_CONSTRAINT_RELATION_EQ,
                                                       NULL,
-                                                      EMEUS_CONSTRAINT_ATTRIBUTE_LEFT,
+                                                      EMEUS_CONSTRAINT_ATTRIBUTE_START,
                                                       1.0,
                                                       8.0,
                                                       EMEUS_CONSTRAINT_STRENGTH_REQUIRED),
@@ -90,17 +107,17 @@ build_grid (EmeusTestApplicationWindow *self)
                                                       1.0,
                                                       0.0,
                                                       EMEUS_CONSTRAINT_STRENGTH_REQUIRED),
-                                emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT,
+                                emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_START,
                                                       EMEUS_CONSTRAINT_RELATION_EQ,
                                                       button1,
-                                                      EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT,
+                                                      EMEUS_CONSTRAINT_ATTRIBUTE_END,
                                                       1.0,
                                                       12.0,
                                                       EMEUS_CONSTRAINT_STRENGTH_REQUIRED),
-                                emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT,
+                                emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_END,
                                                       EMEUS_CONSTRAINT_RELATION_EQ,
                                                       NULL,
-                                                      EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT,
+                                                      EMEUS_CONSTRAINT_ATTRIBUTE_END,
                                                       1.0,
                                                       -8.0,
                                                       EMEUS_CONSTRAINT_STRENGTH_REQUIRED),
@@ -116,23 +133,30 @@ build_grid (EmeusTestApplicationWindow *self)
 
   GtkWidget *button3 = gtk_button_new_with_label ("Child 3");
   emeus_constraint_layout_pack (layout, button3, "child3",
-                                emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT,
+                                emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_START,
                                                       EMEUS_CONSTRAINT_RELATION_EQ,
                                                       NULL,
-                                                      EMEUS_CONSTRAINT_ATTRIBUTE_LEFT,
+                                                      EMEUS_CONSTRAINT_ATTRIBUTE_START,
                                                       1.0,
                                                       8.0,
                                                       EMEUS_CONSTRAINT_STRENGTH_REQUIRED),
-                                emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT,
+                                emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_END,
                                                       EMEUS_CONSTRAINT_RELATION_EQ,
                                                       NULL,
-                                                      EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT,
+                                                      EMEUS_CONSTRAINT_ATTRIBUTE_END,
                                                       1.0,
                                                       -8.0,
                                                       EMEUS_CONSTRAINT_STRENGTH_REQUIRED),
                                 emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_TOP,
                                                       EMEUS_CONSTRAINT_RELATION_EQ,
                                                       button1,
+                                                      EMEUS_CONSTRAINT_ATTRIBUTE_BOTTOM,
+                                                      1.0,
+                                                      12.0,
+                                                      EMEUS_CONSTRAINT_STRENGTH_REQUIRED),
+                                emeus_constraint_new (EMEUS_CONSTRAINT_ATTRIBUTE_TOP,
+                                                      EMEUS_CONSTRAINT_RELATION_EQ,
+                                                      button2,
                                                       EMEUS_CONSTRAINT_ATTRIBUTE_BOTTOM,
                                                       1.0,
                                                       12.0,
