@@ -82,4 +82,7 @@ char *variable_to_string (const Variable *variable);
 void variable_set_name (Variable *variable,
                         const char *name);
 
+void variable_set_prefix (Variable *variable,
+                          const char *prefix);
+
 G_END_DECLS

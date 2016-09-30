@@ -37,6 +37,7 @@ typedef struct {
 
   VariableType type;
 
+  const char *prefix;
   const char *name;
 
   double value;

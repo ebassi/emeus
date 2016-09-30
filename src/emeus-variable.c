@@ -67,6 +67,7 @@ variable_new (SimplexSolver *solver,
   res->type = type;
   res->ref_count = 1;
   res->name = NULL;
+  res->prefix = NULL;
 
   switch (type)
     {
@@ -129,6 +130,13 @@ variable_set_name (Variable *variable,
   variable->name = name;
 }
 
+void
+variable_set_prefix (Variable *variable,
+                     const char *prefix)
+{
+  variable->prefix = prefix;
+}
+
 char *
 variable_to_string (const Variable *variable)
 {
@@ -154,7 +162,15 @@ variable_to_string (const Variable *variable)
         }
 
       g_string_append_c (buf, '[');
-      g_string_append (buf, variable->name != NULL ? variable->name : "*");
+
+      if (variable->prefix != NULL)
+        {
+          g_string_append (buf, variable->prefix);
+          g_string_append_c (buf, '.');
+        }
+
+      if (variable->name != NULL)
+        g_string_append (buf, variable->name);
 
       if (variable->type == VARIABLE_REGULAR)
         {
