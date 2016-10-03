@@ -282,26 +282,6 @@ simplex_solver_clear (SimplexSolver *solver)
              g_hash_table_size (solver->external_rows),
              g_hash_table_size (solver->edit_var_map),
              g_hash_table_size (solver->stay_var_map));
-
-    GHashTableIter iter;
-    gpointer key_p, value_p;
-
-    g_print ("Tableau:\n");
-
-    g_hash_table_iter_init (&iter, solver->rows);
-    while (g_hash_table_iter_next (&iter, &key_p, &value_p))
-      {
-        Variable *v = key_p;
-        Expression *e = value_p;
-
-        char *str1 = variable_to_string (v);
-        char *str2 = expression_to_string (e);
-
-        g_print ("- %s <=> %s\n", str1, str2);
-
-        g_free (str1);
-        g_free (str2);
-      }
   }
 #endif
 
