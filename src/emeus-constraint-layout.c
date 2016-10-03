@@ -71,15 +71,98 @@ static Variable *
 get_layout_attribute (EmeusConstraintLayout   *layout,
                       EmeusConstraintAttribute attr)
 {
-  const char *attr_name = get_attribute_name (attr);
-  Variable *res = g_hash_table_lookup (layout->bound_attributes, attr_name);
+  GtkTextDirection text_dir;
+  const char *attr_name;
+  Variable *res;
 
-  if (res == NULL)
+  /* Resolve the start/end attributes depending on the child's text direction */
+  if (attr == EMEUS_CONSTRAINT_ATTRIBUTE_START)
     {
-      res = simplex_solver_create_variable (&layout->solver, attr_name, 0.0);
-      variable_set_prefix (res, "super");
+      text_dir = gtk_widget_get_direction (GTK_WIDGET (layout));
+      if (text_dir == GTK_TEXT_DIR_RTL)
+        attr = EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT;
+      else
+        attr = EMEUS_CONSTRAINT_ATTRIBUTE_LEFT;
+    }
+  else if (attr == EMEUS_CONSTRAINT_ATTRIBUTE_END)
+    {
+      text_dir = gtk_widget_get_direction (GTK_WIDGET (layout));
+      if (text_dir == GTK_TEXT_DIR_RTL)
+        attr = EMEUS_CONSTRAINT_ATTRIBUTE_LEFT;
+      else
+        attr = EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT;
+    }
 
-      g_hash_table_insert (layout->bound_attributes, (gpointer) attr_name, res);
+  attr_name = get_attribute_name (attr);
+  res = g_hash_table_lookup (layout->bound_attributes, attr_name);
+  if (res != NULL)
+    return res;
+
+  res = simplex_solver_create_variable (&layout->solver, attr_name, 0.0);
+  variable_set_prefix (res, "super");
+
+  g_hash_table_insert (layout->bound_attributes, (gpointer) attr_name, res);
+
+  /* Some attributes are really constraints computed from other
+   * attributes, to avoid creating additional constraints from
+   * the user's perspective
+   */
+  switch (attr)
+    {
+    case EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT:
+      {
+        Variable *left = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_LEFT);
+        Variable *width = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
+        Expression *expr = expression_plus_variable (expression_new_from_variable (left), width);
+
+        simplex_solver_add_constraint (&layout->solver,
+                                       res, OPERATOR_TYPE_EQ, expr,
+                                       STRENGTH_REQUIRED);
+      }
+      break;
+
+    case EMEUS_CONSTRAINT_ATTRIBUTE_BOTTOM:
+      {
+        Variable *top = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_TOP);
+        Variable *height = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
+        Expression *expr = expression_plus_variable (expression_new_from_variable (top), height);
+
+        simplex_solver_add_constraint (&layout->solver,
+                                       res, OPERATOR_TYPE_EQ, expr,
+                                       STRENGTH_REQUIRED);
+      }
+      break;
+
+    case EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X:
+      {
+        Variable *left = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_LEFT);
+        Variable *width = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
+        Expression *expr =
+          expression_times (expression_plus_variable (expression_new_from_variable (left), width),
+                            0.5);
+
+        simplex_solver_add_constraint (&layout->solver,
+                                       res, OPERATOR_TYPE_EQ, expr,
+                                       STRENGTH_REQUIRED);
+      }
+      break;
+
+    case EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y:
+      {
+        Variable *top = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_TOP);
+        Variable *height = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
+        Expression *expr =
+          expression_times (expression_plus_variable (expression_new_from_variable (top), height),
+                            0.5);
+
+        simplex_solver_add_constraint (&layout->solver,
+                                       res, OPERATOR_TYPE_EQ, expr,
+                                       STRENGTH_REQUIRED);
+      }
+      break;
+
+    default:
+      break;
     }
 
   return res;
