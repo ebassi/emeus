@@ -74,6 +74,11 @@ struct _EmeusConstraintLayout
 
   GHashTable *bound_attributes;
 
+  /* HashSet<EmeusConstraint>; the set of constraints on the
+   * widget, using the public API objects.
+   */
+  GHashTable *constraints;
+
   /* Internal constraints */
   Constraint *top_constraint;
   Constraint *left_constraint;

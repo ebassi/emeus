@@ -31,11 +31,18 @@ G_DECLARE_FINAL_TYPE (EmeusConstraintLayout, emeus_constraint_layout, EMEUS, CON
 EMEUS_AVAILABLE_IN_1_0
 GtkWidget *     emeus_constraint_layout_new     (void);
 EMEUS_AVAILABLE_IN_1_0
-void            emeus_constraint_layout_pack    (EmeusConstraintLayout *layout,
-                                                 GtkWidget             *child,
-                                                 const char            *name,
-                                                 EmeusConstraint       *first_constraint,
-                                                 ...);
+void            emeus_constraint_layout_pack                    (EmeusConstraintLayout *layout,
+                                                                 GtkWidget             *child,
+                                                                 const char            *name,
+                                                                 EmeusConstraint       *first_constraint,
+                                                                 ...);
+EMEUS_AVAILABLE_IN_1_0
+void            emeus_constraint_layout_add_constraint          (EmeusConstraintLayout *layout,
+                                                                 EmeusConstraint       *constraint);
+EMEUS_AVAILABLE_IN_1_0
+void            emeus_constraint_layout_add_constraints         (EmeusConstraintLayout *layout,
+                                                                 EmeusConstraint       *first_constraint,
+                                                                 ...) G_GNUC_NULL_TERMINATED;
 
 #define EMEUS_TYPE_CONSTRAINT_LAYOUT_CHILD (emeus_constraint_layout_child_get_type())
 
