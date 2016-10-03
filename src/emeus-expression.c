@@ -469,47 +469,46 @@ expression_get_pivotable_variable (Expression *expression)
 char *
 expression_to_string (const Expression *expression)
 {
-  GString *buf = g_string_new (NULL);
+  GString *buf;
+  GList *keys, *l;
+  bool needs_plus = false;
 
   if (expression == NULL)
-    g_string_append (buf, "<null>");
-  else
+    return g_strdup ("<null>");
+
+  buf = g_string_new (NULL);
+
+  if (!approx_val (expression->constant, 0.0) || expression->terms == NULL)
     {
-      bool needs_plus = false;
+      g_string_append_printf (buf, "%g", expression->constant);
+      needs_plus = true;
+    }
 
-      if (!expression_is_constant (expression))
-        {
-          GHashTableIter iter;
-          gpointer value_p;
+  if (expression->terms == NULL)
+    return g_string_free (buf, FALSE);
 
-          g_hash_table_iter_init (&iter, expression->terms);
-          while (g_hash_table_iter_next (&iter, NULL, &value_p))
-            {
-              const Term *t = value_p;
-              char *var = variable_to_string (t->variable);
+  keys = g_hash_table_get_keys (expression->terms);
+  keys = g_list_sort (keys, sort_variable_name);
 
-              if (needs_plus)
-                g_string_append (buf, " + ");
+  for (l = keys; l != NULL; l = l->next)
+    {
+      Term *t = g_hash_table_lookup (expression->terms, l->data);
+      Variable *clv = term_get_variable (t);
+      double coeff = term_get_coefficient (t);
+      char *str = variable_to_string (clv);
 
-              if (t->coefficient > 0.0 && approx_val (t->coefficient, 1.0))
-                g_string_append (buf, var);
-              else
-                g_string_append_printf (buf, "%g * %s", t->coefficient, var);
+      if (needs_plus)
+        g_string_append (buf, " + ");
 
-              g_free (var);
+      if (approx_val (coeff, 1.0))
+        g_string_append_printf (buf, "%s", str);
+      else
+        g_string_append_printf (buf, "%g * %s", coeff, str);
 
-              if (!needs_plus)
-                needs_plus = true;
-            }
-        }
+      g_free (str);
 
-      if (!approx_val (expression->constant, 0.0))
-        {
-          if (needs_plus)
-            g_string_append (buf, " + ");
-
-          g_string_append_printf (buf, "%g", expression->constant);
-        }
+      if (!needs_plus)
+        needs_plus = true;
     }
 
   return g_string_free (buf, FALSE);
