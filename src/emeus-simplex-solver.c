@@ -715,10 +715,13 @@ simplex_solver_optimize (SimplexSolver *solver,
             }
         }
 
-      if (approx_val (min_ratio, DBL_MAX))
-        g_critical ("Unbounded objective variable during optimization");
-      else
-        simplex_solver_pivot (solver, entry, exit);
+      if (min_ratio == DBL_MAX)
+        {
+          g_critical ("Unbounded objective variable during optimization");
+          break;
+        }
+
+      simplex_solver_pivot (solver, entry, exit);
     }
 
 #ifdef EMEUS_ENABLE_DEBUG
@@ -1043,128 +1046,102 @@ simplex_solver_delta_edit_constant (SimplexSolver *solver,
     }
 }
 
-typedef struct {
-  SimplexSolver *solver;
-  Variable *subject;
-  bool found_unrestricted;
-  bool found_new_restricted;
-  Variable *retval;
-  double coefficient;
-} ChooseClosure;
-
-static bool
-find_subject_restricted (Term *term,
-                         gpointer data_)
+static Variable *
+simplex_solver_choose_subject (SimplexSolver *solver,
+                               Expression *expression)
 {
-  Variable *v = term_get_variable (term);
-  double c = term_get_coefficient (term);
-  ChooseClosure *data = data_;
+  Variable *subject = NULL;
+  Variable *retval = NULL;
+  bool found_unrestricted = false;
+  bool found_new_restricted = false;
+  bool retval_found = false;
+  double coeff = 0.0;
+  GHashTableIter iter;
+  gpointer value_p;
 
-  if (data->found_unrestricted)
+  g_hash_table_iter_init (&iter, expression->terms);
+  while (g_hash_table_iter_next (&iter, NULL, &value_p))
     {
-      if (!variable_is_restricted (v))
-        {
-          if (!simplex_solver_column_has_key (data->solver, v))
-            {
-              data->retval = v;
-              return false;
-            }
-        }
-    }
-  else
-    {
-      if (variable_is_restricted (v))
-        {
-          if (!data->found_new_restricted && !variable_is_dummy (v) && c < 0.0)
-            {
-              ColumnSet *set = g_hash_table_lookup (data->solver->columns, v);
+      Term *t = value_p;
+      Variable *v = term_get_variable (t);
+      double c = term_get_coefficient (t);
 
-              if (set == NULL ||
-                  (column_set_get_size (set) == 1 &&
-                   simplex_solver_column_has_key (data->solver, data->solver->objective)))
+      if (found_unrestricted)
+        {
+          if (!variable_is_restricted (v))
+            {
+              if (!g_hash_table_contains (solver->columns, v))
                 {
-                  data->subject = v;
-                  data->found_new_restricted = true;
+                  retval_found = true;
+                  retval = v;
+                  break;
                 }
             }
         }
       else
         {
-          data->subject = v;
-          data->found_unrestricted = true;
+          if (variable_is_restricted (v))
+            {
+              if (!found_new_restricted && !variable_is_dummy (v) && c < 0.0)
+                {
+                  ColumnSet *cset = g_hash_table_lookup (solver->columns, v);
+
+                  if (cset == NULL ||
+                      (column_set_get_size (cset) == 1 && g_hash_table_contains (solver->columns, solver->objective)))
+                    {
+                      subject = v;
+                      found_new_restricted = true;
+                    }
+                }
+            }
+          else
+            {
+              subject = v;
+              found_unrestricted = true;
+            }
         }
     }
 
-  return true;
-}
+  if (retval_found)
+    return retval;
 
-static bool
-find_subject_dummy (Term *term,
-                    gpointer data_)
-{
-  Variable *v = term_get_variable (term);
-  double c = term_get_coefficient (term);
-  ChooseClosure *data = data_;
+  if (subject != NULL)
+    return subject;
 
-  if (!variable_is_dummy (v))
+  g_hash_table_iter_init (&iter, expression->terms);
+  while (g_hash_table_iter_next (&iter, NULL, &value_p))
     {
-      data->retval = NULL;
-      return false;
+      Term *t = value_p;
+      Variable *v = term_get_variable (t);
+      double c = term_get_coefficient (t);
+
+      if (!variable_is_dummy (v))
+        {
+          retval_found = true;
+          retval = NULL;
+          break;
+        }
+
+      if (!g_hash_table_contains (solver->columns, v))
+        {
+          subject = v;
+          coeff = c;
+        }
     }
 
-  if (!simplex_solver_column_has_key (data->solver, v))
+  if (retval_found)
+    return retval;
+
+  if (!approx_val (expression->constant, 0.0))
     {
-      data->subject = v;
-      data->coefficient = c;
-    }
-
-  return true;
-}
-
-static Variable *
-simplex_solver_choose_subject (SimplexSolver *solver,
-                               Expression *expression)
-{
-  ChooseClosure data;
-
-  if (!solver->initialized)
-    return NULL;
-
-  data.solver = solver;
-  data.subject = NULL;
-  data.retval = NULL;
-  data.found_unrestricted = false;
-  data.found_new_restricted = false;
-  data.coefficient = 0.0;
-  expression_terms_foreach (expression, find_subject_restricted, &data);
-
-  if (data.retval != NULL)
-    return data.retval;
-
-  if (data.subject != NULL)
-    return data.subject;
-
-  data.solver = solver;
-  data.subject = NULL;
-  data.retval = NULL;
-  data.found_unrestricted = false;
-  data.found_new_restricted = false;
-  data.coefficient = 0.0;
-  expression_terms_foreach (expression, find_subject_dummy, &data);
-
-  if (data.retval != NULL)
-    return data.retval;
-
-  if (!approx_val (expression_get_constant (expression), 0.0))
-    {
-      g_critical ("Unable to satisfy a required constraint");
+      g_critical ("Unable to satisfy required constraint (choose_subject)");
       return NULL;
     }
 
-  if (data.coefficient > 0.0)
+  if (coeff > 0)
     expression_times (expression, -1.0);
 
-  return data.subject;
+  return subject;
 }
 
 static bool
