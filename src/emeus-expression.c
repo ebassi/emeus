@@ -466,6 +466,19 @@ expression_get_pivotable_variable (Expression *expression)
   return NULL;
 }
 
+static int
+sort_variable_name (gconstpointer a,
+                    gconstpointer b)
+{
+  const Variable *va = a;
+  const Variable *vb = b;
+
+  if (va == vb)
+    return 0;
+
+  return g_strcmp0 (va->name, vb->name);
+}
+
 char *
 expression_to_string (const Expression *expression)
 {
