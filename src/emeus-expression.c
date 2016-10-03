@@ -162,7 +162,9 @@ expression_add_variable (Expression *expression,
 
       if (t != NULL)
         {
-          if (approx_val (coefficient, 0.0))
+          double new_coefficient = term_get_coefficient (t) + coefficient;
+
+          if (approx_val (new_coefficient, 0.0))
             {
               if (expression->solver != NULL)
                 simplex_solver_note_removed_variable (expression->solver, t->variable, subject);
@@ -170,16 +172,19 @@ expression_add_variable (Expression *expression,
               g_hash_table_remove (expression->terms, t);
             }
           else
-            t->coefficient = coefficient;
+            t->coefficient = new_coefficient;
 
           return;
         }
     }
 
-  expression_add_term (expression, term_new (variable, coefficient));
+  if (!approx_val (coefficient, 0.0))
+    {
+      expression_add_term (expression, term_new (variable, coefficient));
 
-  if (expression->solver != NULL)
-    simplex_solver_note_added_variable (expression->solver, variable, subject);
+      if (expression->solver != NULL)
+        simplex_solver_note_added_variable (expression->solver, variable, subject);
+    }
 }
 
 void
