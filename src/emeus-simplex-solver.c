@@ -1306,6 +1306,69 @@ simplex_solver_create_expression (SimplexSolver *solver,
   return expression_new (solver, constant);
 }
 
+static void
+simplex_solver_add_constraint_internal (SimplexSolver *solver,
+                                        Constraint *constraint)
+{
+  Expression *expr;
+  Variable *eplus;
+  Variable *eminus;
+  double prev_constant;
+
+  expr = simplex_solver_new_expression (solver, constraint,
+                                        &eplus,
+                                        &eminus,
+                                        &prev_constant);
+
+#ifdef EMEUS_ENABLE_DEBUG
+  {
+    char *str1 = constraint_to_string (constraint);
+    char *str2 = expression_to_string (expr);
+
+    g_debug ("Adding constraint: %s (normalized expression: %s)\n", str1, str2);
+
+    g_free (str1);
+    g_free (str2);
+  }
+#endif
+
+  if (constraint_is_stay (constraint))
+    {
+      StayInfo *si = g_slice_new (StayInfo);
+
+      si->constraint = constraint;
+
+      g_hash_table_insert (solver->stay_var_map, constraint->variable, si);
+    }
+
+  if (constraint_is_edit (constraint))
+    {
+      EditInfo *ei = g_slice_new (EditInfo);
+
+      ei->constraint = constraint;
+      ei->eplus = eplus;
+      ei->eminus = eminus;
+      ei->prev_constant = prev_constant;
+
+      g_hash_table_insert (solver->edit_var_map, constraint->variable, ei);
+    }
+
+  if (!simplex_solver_try_adding_directly (solver, expr))
+    simplex_solver_add_with_artificial_variable (solver, expr);
+
+  solver->needs_solving = true;
+
+  if (solver->auto_solve)
+    {
+      simplex_solver_optimize (solver, solver->objective);
+      simplex_solver_set_external_variables (solver);
+    }
+
+  expression_unref (expr);
+
+  g_hash_table_add (solver->constraints, constraint);
+}
+
 Constraint *
 simplex_solver_add_constraint (SimplexSolver *solver,
                                Variable *variable,
@@ -1314,7 +1377,6 @@ simplex_solver_add_constraint (SimplexSolver *solver,
                                StrengthType strength)
 {
   Constraint *res;
-  Expression *expr;
 
   if (!solver->initialized)
     {
@@ -1357,34 +1419,7 @@ simplex_solver_add_constraint (SimplexSolver *solver,
         }
     }
 
-  expr = simplex_solver_new_expression (solver, res, NULL, NULL, NULL);
-
-#ifdef EMEUS_ENABLE_DEBUG
-  {
-    char *str1 = constraint_to_string (res);
-    char *str2 = expression_to_string (expr);
-
-    g_debug ("Adding constraint: %s (normalized expression: %s)\n", str1, str2);
-
-    g_free (str1);
-    g_free (str2);
-  }
-#endif
-
-  if (!simplex_solver_try_adding_directly (solver, expr))
-    simplex_solver_add_with_artificial_variable (solver, expr);
-
-  solver->needs_solving = true;
-
-  if (solver->auto_solve)
-    {
-      simplex_solver_optimize (solver, solver->objective);
-      simplex_solver_set_external_variables (solver);
-    }
-
-  expression_unref (expr);
-
-  g_hash_table_add (solver->constraints, res);
+  simplex_solver_add_constraint_internal (solver, res);
 
   return res;
 }
@@ -1395,8 +1430,6 @@ simplex_solver_add_stay_variable (SimplexSolver *solver,
                                   StrengthType strength)
 {
   Constraint *res;
-  Expression *expr;
-  StayInfo *si;
 
   if (!solver->initialized)
     {
@@ -1415,41 +1448,7 @@ simplex_solver_add_stay_variable (SimplexSolver *solver,
   res->expression = expression_new (solver, variable_get_value (res->variable));
   expression_add_variable (res->expression, res->variable, -1.0, NULL);
 
-  si = g_slice_new (StayInfo);
-  si->constraint = res;
-  g_hash_table_insert (solver->stay_var_map, res->variable, si);
-
-  expr = simplex_solver_new_expression (solver, res, NULL, NULL, NULL);
-
-#ifdef EMEUS_ENABLE_DEBUG
-  {
-    char *str1 = variable_to_string (res->variable);
-    char *str2 = expression_to_string (expr);
-
-    g_debug ("Adding stay variable '%s' = %g (normalized expression: %s)\n",
-             str1,
-             variable_get_value (res->variable),
-             str2);
-
-    g_free (str1);
-    g_free (str2);
-  }
-#endif
-
-  if (!simplex_solver_try_adding_directly (solver, expr))
-    simplex_solver_add_with_artificial_variable (solver, expr);
-
-  solver->needs_solving = true;
-
-  if (solver->auto_solve)
-    {
-      simplex_solver_optimize (solver, solver->objective);
-      simplex_solver_set_external_variables (solver);
-    }
-
-  expression_unref (expr);
-
-  g_hash_table_add (solver->constraints, res);
+  simplex_solver_add_constraint_internal (solver, res);
 
   return res;
 }
@@ -1470,8 +1469,6 @@ simplex_solver_add_edit_variable (SimplexSolver *solver,
                                   StrengthType strength)
 {
   Constraint *res;
-  Expression *expr;
-  EditInfo *ei;
 
   if (!solver->initialized)
     return NULL;
@@ -1487,44 +1484,7 @@ simplex_solver_add_edit_variable (SimplexSolver *solver,
   res->expression = expression_new (solver, variable_get_value (variable));
   expression_add_variable (res->expression, variable, -1.0, NULL);
 
-  ei = g_slice_new (EditInfo);
-  ei->constraint = res;
-  ei->eplus = NULL;
-  ei->eminus = NULL;
-  ei->prev_constant = 0.0;
-
-  expr = simplex_solver_new_expression (solver, res,
-                                        &ei->eplus,
-                                        &ei->eminus,
-                                        &ei->prev_constant);
-  g_hash_table_insert (solver->edit_var_map, variable, ei);
-
-#ifdef EMEUS_ENABLE_DEBUG
-  {
-    char *str1 = constraint_to_string (res);
-    char *str2 = expression_to_string (expr);
-
-    g_debug ("Adding edit constraint: %s (normalized expression: %s)\n", str1, str2);
-
-    g_free (str1);
-    g_free (str2);
-  }
-#endif
-
-  if (!simplex_solver_try_adding_directly (solver, expr))
-    simplex_solver_add_with_artificial_variable (solver, expr);
-
-  solver->needs_solving = true;
-
-  if (solver->auto_solve)
-    {
-      simplex_solver_optimize (solver, solver->objective);
-      simplex_solver_set_external_variables (solver);
-    }
-
-  expression_unref (expr);
-
-  g_hash_table_add (solver->constraints, res);
+  simplex_solver_add_constraint_internal (solver, res);
 
   return res;
 }
