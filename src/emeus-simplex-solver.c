@@ -48,6 +48,11 @@ typedef struct {
   GHashTable *set;
 } VariableSet;
 
+typedef struct {
+  Variable *first;
+  Variable *second;
+} VariablePair;
+
 static const char *operators[] = {
   "<=",
   "==",
@@ -191,6 +196,34 @@ variable_set_get_size (VariableSet *set)
   return g_hash_table_size (set->set);
 }
 
+static VariablePair *
+variable_pair_new (Variable *first,
+                   Variable *second)
+{
+  VariablePair *res = g_slice_new (VariablePair);
+
+  res->first = variable_ref (first);
+  res->second = variable_ref (second);
+
+  return res;
+}
+
+static void
+variable_pair_free (gpointer data)
+{
+  VariablePair *pair = data;
+
+  if (data == NULL)
+    return;
+
+  if (pair->first != NULL)
+    variable_unref (pair->first);
+  if (pair->second != NULL)
+    variable_unref (pair->second);
+
+  g_slice_free (VariablePair, pair);
+}
+
 void
 simplex_solver_init (SimplexSolver *solver)
 {
@@ -227,9 +260,8 @@ simplex_solver_init (SimplexSolver *solver)
                                                             (GDestroyNotify) variable_unref,
                                                             NULL);
 
-  /* Vec<Variable> */
-  solver->stay_plus_error_vars = g_ptr_array_new ();
-  solver->stay_minus_error_vars = g_ptr_array_new ();
+  /* Vec<VariablePair> */
+  solver->stay_error_vars = g_ptr_array_new_with_free_func (variable_pair_free);
 
   /* HashTable<Constraint, VariableSet> */
   solver->error_vars = g_hash_table_new_full (NULL, NULL,
@@ -278,7 +310,7 @@ simplex_solver_clear (SimplexSolver *solver)
     g_print ("Solver [%p]:\n"
              "- Rows: %d, Columns: %d\n"
              "- Slack variables: %d\n"
-             "- Error variables: %d (plus: %d, minus: %d)\n"
+             "- Error variables: %d (pairs: %d)\n"
              "- Marker variables: %d\n"
              "- Infeasible rows: %d\n"
              "- External rows: %d\n"
@@ -288,8 +320,7 @@ simplex_solver_clear (SimplexSolver *solver)
              g_hash_table_size (solver->columns),
              solver->slack_counter,
              g_hash_table_size (solver->error_vars),
-             solver->stay_plus_error_vars->len,
-             solver->stay_minus_error_vars->len,
+             solver->stay_error_vars->len,
              g_hash_table_size (solver->marker_vars),
              g_hash_table_size (solver->infeasible_rows),
              g_hash_table_size (solver->external_rows),
@@ -307,8 +338,7 @@ simplex_solver_clear (SimplexSolver *solver)
   solver->dummy_counter = 0;
   solver->artificial_counter = 0;
 
-  g_clear_pointer (&solver->stay_plus_error_vars, g_ptr_array_unref);
-  g_clear_pointer (&solver->stay_minus_error_vars, g_ptr_array_unref);
+  g_clear_pointer (&solver->stay_error_vars, g_ptr_array_unref);
 
   g_clear_pointer (&solver->external_rows, g_hash_table_unref);
   g_clear_pointer (&solver->infeasible_rows, g_hash_table_unref);
@@ -389,17 +419,14 @@ simplex_solver_reset_stay_constants (SimplexSolver *solver)
 {
   int i;
 
-  g_assert (solver->stay_plus_error_vars->len == solver->stay_minus_error_vars->len);
-
-  for (i = 0; i < solver->stay_plus_error_vars->len; i++)
+  for (i = 0; i < solver->stay_error_vars->len; i++)
     {
-      Variable *p_var = g_ptr_array_index (solver->stay_plus_error_vars, i);
-      Variable *m_var = g_ptr_array_index (solver->stay_minus_error_vars, i);
+      VariablePair *pair = g_ptr_array_index (solver->stay_error_vars, i);
       Expression *expression;
 
-      expression = g_hash_table_lookup (solver->rows, p_var);
+      expression = g_hash_table_lookup (solver->rows, pair->first);
       if (expression == NULL)
-        expression = g_hash_table_lookup (solver->rows, m_var);
+        expression = g_hash_table_lookup (solver->rows, pair->second);
 
       if (expression != NULL)
         expression_set_constant (expression, 0.0);
@@ -871,8 +898,7 @@ simplex_solver_new_expression (SimplexSolver *solver,
 
           if (constraint_is_stay (constraint))
             {
-              g_ptr_array_add (solver->stay_plus_error_vars, eplus);
-              g_ptr_array_add (solver->stay_minus_error_vars, eminus);
+              g_ptr_array_add (solver->stay_error_vars, variable_pair_new (eplus, eminus));
             }
           else if (constraint_is_edit (constraint))
             {
@@ -1658,13 +1684,12 @@ no_columns:
         {
           int i = 0;
 
-          for (i = 0; i < solver->stay_plus_error_vars->len; i++)
+          for (i = 0; i < solver->stay_error_vars->len; i++)
             {
-              Variable *eplus = g_ptr_array_index (solver->stay_plus_error_vars, i);
-              Variable *eminus = g_ptr_array_index (solver->stay_minus_error_vars, i);
+              VariablePair *pair = g_ptr_array_index (solver->stay_error_vars, i);
 
-              variable_set_remove_variable (error_vars, eplus);
-              variable_set_remove_variable (error_vars, eminus);
+              variable_set_remove_variable (error_vars, pair->first);
+              variable_set_remove_variable (error_vars, pair->second);
             }
         }
     }

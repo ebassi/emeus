@@ -112,7 +112,6 @@ typedef struct {
     NULL, \
     NULL, NULL, \
     NULL, NULL, \
-    NULL, NULL, \
     NULL, \
     0, 0, 0, 0, \
     false, false, \
@@ -133,9 +132,6 @@ struct _SimplexSolver {
   GHashTable *external_parametric_vars;
 
   GPtrArray *stay_error_vars;
-
-  GPtrArray *stay_plus_error_vars;
-  GPtrArray *stay_minus_error_vars;
 
   GHashTable *error_vars;
   GHashTable *marker_vars;
