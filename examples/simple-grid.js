@@ -38,60 +38,122 @@ const MyApplicationWindow = new Lang.Class({
     },
 
     _buildGrid: function() {
-        /* Grid:
+        /* Layout:
          *
-         * +--------------------------+
-         * | +---------+  +---------+ |
-         * | | Child 1 |  | Child 2 | |
-         * | +---------+  +---------+ |
-         * |                          |
-         * | +----------------------+ |
-         * | |        Child 3       | |
-         * | +----------------------+ |
-         * +--------------------------+
+         *   +-----------------------------+
+         *   | +-----------+ +-----------+ |
+         *   | |  Child 1  | |  Child 2  | |
+         *   | +-----------+ +-----------+ |
+         *   | +-------------------------+ |
+         *   | |         Child 3         | |
+         *   | +-------------------------+ |
+         *   +-----------------------------+
+         *
+         * Visual format:
+         *
+         *   H:|-8-[view1(==view2)]-12-[view2]-8-|
+         *   H:|-8-[view3]-8-|
+         *   V:|-8-[view1,view2]-12-[view3(==view1,view2)]-8-|
+         *
+         * Constraints:
+         *
+         *   super.start = child1.start - 8
+         *   child1.width = child2.width
+         *   child1.end = child2.start - 12
+         *   child2.end = super.end - 8
+         *   super.start = child3.start - 8
+         *   child3.end = super.end - 8
+         *   super.top = child1.top - 8
+         *   super.top = child2.top - 8
+         *   child1.bottom = child3.top - 12
+         *   child2.bottom = child3.top - 12
+         *   child3.height = child1.height
+         *   child3.height = child2.height
+         *   child3.bottom = super.bottom - 8
+         *
          */
         let button1 = new Gtk.Button({ label: 'Child 1' });
-        this._layout.pack(button1, 'child1', [
-            new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.WIDTH,
-                                   relation: Emeus.ConstraintRelation.GE,
-                                   constant: 120, }),
-        ]);
+        this._layout.pack(button1, 'child1');
         button1.show();
 
         let button2 = new Gtk.Button({ label: 'Child 2' });
-        this._layout.pack(button2, 'child2', [
-            new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.WIDTH,
-                                   relation: Emeus.ConstraintRelation.EQ,
-                                   source_object: button1,
-                                   source_attribute: Emeus.ConstraintAttribute.WIDTH, }),
-            new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.HEIGHT,
-                                   relation: Emeus.ConstraintRelation.EQ,
-                                   source_object: button1,
-                                   source_attribute: Emeus.ConstraintAttribute.HEIGHT, }),
-            new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.START,
-                                   relation: Emeus.ConstraintRelation.EQ,
-                                   source_object: button1,
-                                   source_attribute: Emeus.ConstraintAttribute.END,
-                                   constant: 12, }),
-        ]);
+        this._layout.pack(button2, 'child2');
         button2.show();
 
         let button3 = new Gtk.Button({ label: 'Child 3' });
-        this._layout.pack(button3, 'child3', [
+        this._layout.pack(button3, 'child3');
+        button3.show();
+
+        [
             new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.START,
                                    relation: Emeus.ConstraintRelation.EQ,
                                    source_object: button1,
-                                   source_attribute: Emeus.ConstraintAttribute.START, }),
-            new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.END,
+                                   source_attribute: Emeus.ConstraintAttribute.START,
+                                   constant: -8.0 }),
+            new Emeus.Constraint({ target_object: button1,
+                                   target_attribute: Emeus.ConstraintAttribute.WIDTH,
                                    relation: Emeus.ConstraintRelation.EQ,
                                    source_object: button2,
-                                   source_attribute: Emeus.ConstraintAttribute.END, }),
+                                   source_attribute: Emeus.ConstraintAttribute.WIDTH }),
+            new Emeus.Constraint({ target_object: button1,
+                                   target_attribute: Emeus.ConstraintAttribute.END,
+                                   relation: Emeus.ConstraintRelation.EQ,
+                                   source_object: button2,
+                                   source_attribute: Emeus.ConstraintAttribute.START,
+                                   constant: -12.0 }),
+            new Emeus.Constraint({ target_object: button2,
+                                   target_attribute: Emeus.ConstraintAttribute.END,
+                                   relation: Emeus.ConstraintRelation.EQ,
+                                   source_attribute: Emeus.ConstraintAttribute.END,
+                                   constant: -8.0 }),
+            new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.START,
+                                   relation: Emeus.ConstraintRelation.EQ,
+                                   source_object: button3,
+                                   source_attribute: Emeus.ConstraintAttribute.START,
+                                   constant: -8.0 }),
+            new Emeus.Constraint({ target_object: button3,
+                                   target_attribute: Emeus.ConstraintAttribute.END,
+                                   relation: Emeus.ConstraintRelation.EQ,
+                                   source_attribute: Emeus.ConstraintAttribute.END,
+                                   constant: -8.0 }),
             new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.TOP,
                                    relation: Emeus.ConstraintRelation.EQ,
                                    source_object: button1,
+                                   source_attribute: Emeus.ConstraintAttribute.TOP,
+                                   constant: -8.0 }),
+            new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.TOP,
+                                   relation: Emeus.ConstraintRelation.EQ,
+                                   source_object: button2,
+                                   source_attribute: Emeus.ConstraintAttribute.TOP,
+                                   constant: -8.0 }),
+            new Emeus.Constraint({ target_object: button1,
+                                   target_attribute: Emeus.ConstraintAttribute.BOTTOM,
+                                   relation: Emeus.ConstraintRelation.EQ,
+                                   source_object: button3,
+                                   source_attribute: Emeus.ConstraintAttribute.TOP,
+                                   constant: -12.0 }),
+            new Emeus.Constraint({ target_object: button2,
+                                   target_attribute: Emeus.ConstraintAttribute.BOTTOM,
+                                   relation: Emeus.ConstraintRelation.EQ,
+                                   source_object: button3,
+                                   source_attribute: Emeus.ConstraintAttribute.TOP,
+                                   constant: -12.0 }),
+            new Emeus.Constraint({ target_object: button3,
+                                   target_attribute: Emeus.ConstraintAttribute.HEIGHT,
+                                   relation: Emeus.ConstraintRelation.EQ,
+                                   source_object: button1,
+                                   source_attribute: Emeus.ConstraintAttribute.HEIGHT }),
+            new Emeus.Constraint({ target_object: button3,
+                                   target_attribute: Emeus.ConstraintAttribute.HEIGHT,
+                                   relation: Emeus.ConstraintRelation.EQ,
+                                   source_object: button2,
+                                   source_attribute: Emeus.ConstraintAttribute.HEIGHT }),
+            new Emeus.Constraint({ target_object: button3,
+                                   target_attribute: Emeus.ConstraintAttribute.BOTTOM,
+                                   relation: Emeus.ConstraintRelation.EQ,
                                    source_attribute: Emeus.ConstraintAttribute.BOTTOM,
-                                   constant: 12, })
-        ]);
+                                   constant: -8.0 }),
+        ].forEach(this._layout.add_constraint, this._layout);
     },
 });
 
