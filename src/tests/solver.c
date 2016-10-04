@@ -167,6 +167,41 @@ emeus_solver_eq_with_stay (void)
   simplex_solver_clear (&solver);
 }
 
+static void
+emeus_solver_cassowary (void)
+{
+  SimplexSolver solver = SIMPLEX_SOLVER_INIT;
+
+  simplex_solver_init (&solver);
+
+  Variable *x = simplex_solver_create_variable (&solver, "x", 0.0);
+  Variable *y = simplex_solver_create_variable (&solver, "y", 0.0);
+
+  simplex_solver_add_constraint (&solver,
+                                 x, OPERATOR_TYPE_LE, expression_new_from_variable (y),
+                                 STRENGTH_REQUIRED);
+  simplex_solver_add_constraint (&solver,
+                                 y, OPERATOR_TYPE_EQ, expression_plus (expression_new_from_variable (x), 3.0),
+                                 STRENGTH_REQUIRED);
+  simplex_solver_add_constraint (&solver,
+                                 x, OPERATOR_TYPE_EQ, expression_new (&solver, 10.0),
+                                 STRENGTH_WEAK);
+  simplex_solver_add_constraint (&solver,
+                                 y, OPERATOR_TYPE_EQ, expression_new (&solver, 10.0),
+                                 STRENGTH_WEAK);
+
+  double x_val = variable_get_value (x);
+  double y_val = variable_get_value (y);
+
+  if (g_test_verbose ())
+    g_print ("x = %g, y = %g\n", x_val, y_val);
+
+  g_assert_true ((emeus_fuzzy_equals (x_val, 10, 1e-8) && emeus_fuzzy_equals (y_val, 13, 1e-8)) ||
+                 (emeus_fuzzy_equals (x_val,  7, 1e-8) && emeus_fuzzy_equals (y_val, 10, 1e-9)));
+
+  simplex_solver_clear (&solver);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -178,6 +213,7 @@ main (int argc, char *argv[])
   g_test_add_func ("/emeus/solver/variable-leq-constant", emeus_solver_variable_leq_constant);
   g_test_add_func ("/emeus/solver/variable-eq-constant", emeus_solver_variable_eq_constant);
   g_test_add_func ("/emeus/solver/eq-with-stay", emeus_solver_eq_with_stay);
+  g_test_add_func ("/emeus/solver/cassowary", emeus_solver_cassowary);
 
   return g_test_run ();
 }
