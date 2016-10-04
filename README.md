@@ -1,11 +1,9 @@
 ## Emeus - Constraint-based layout manager for GTK+
 
-**[ Coming soon. ]**
-
 ### What is Emeus?
 
 Emeus is a constraint-based layout manager widget for [GTK+][gtk-web],
-written using the [Cassowary][cassowary-wiki] constraint solving algorithm.
+written using the [Cassowary][cassowary-web] constraint solving algorithm.
 
 ### What's the difference between Emeus and GTK+'s layout managers?
 
@@ -43,20 +41,18 @@ linear equation:
 
 Where:
 
-  * `item1` is the target widget, that is the widget we want to constraint
+  * `item1` is the target widget, that is the widget we want to constraint;
+    if unset, the target will be the layout itself
   * `attr1` is an attribute of the target widget, like `width` or `end`,
     that we want to constraint
   * `item2` is the source widget, that is the widget that provides the value
-    of the constraint
+    of the constraint; if unset, the source will be the layout itself
   * `attr2` is an attribute of the source widget that provides the value
     of the constraint
   * `multiplier` is a multiplication factor, expressed as a floating point
     value
   * `constant` is an additional constant factor, expressed as a floating
     point value
-
-The `item2.attr2` value is optional, which allows us to declare constraints
-that map to a constant.
 
 Using both notations, then, we can construct user interfaces like:
 
@@ -98,8 +94,8 @@ constraints, and lay out its children according to them.
   * `$ ninja`
 
 [gtk-web]: https://www.gtk.org
-[cassowary-wiki]:
-[gtk-container-api]:
-[gtk-fixed-api]:
-[gtk-layout-api]:
-[gtk-box-api]:
+[cassowary-web]: http://overconstrained.io/
+[gtk-container-api]: https://developer.gnome.org/gtk3/stable/GtkContainer.html
+[gtk-fixed-api]: https://developer.gnome.org/gtk3/stable/GtkFixed.html
+[gtk-layout-api]: https://developer.gnome.org/gtk3/stable/GtkLayout.html
+[gtk-box-api]: https://developer.gnome.org/gtk3/stable/GtkBox.html
