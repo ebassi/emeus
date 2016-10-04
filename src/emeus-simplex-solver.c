@@ -1334,6 +1334,8 @@ simplex_solver_add_constraint (SimplexSolver *solver,
   else
     {
       res->expression = expression_ref (expression);
+      if (res->expression->solver == NULL)
+        res->expression->solver = solver;
 
       if (variable != NULL)
         {
