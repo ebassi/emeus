@@ -231,10 +231,10 @@ simplex_solver_init (SimplexSolver *solver)
   solver->stay_plus_error_vars = g_ptr_array_new ();
   solver->stay_minus_error_vars = g_ptr_array_new ();
 
-  /* HashTable<Constraint, HashSet<Variable>> */
+  /* HashTable<Constraint, VariableSet> */
   solver->error_vars = g_hash_table_new_full (NULL, NULL,
                                               NULL,
-                                              (GDestroyNotify) g_hash_table_unref);
+                                              variable_set_free);
 
   /* HashTable<Constraint, Variable> */
   solver->marker_vars = g_hash_table_new_full (NULL, NULL,
@@ -369,19 +369,19 @@ simplex_solver_insert_error_variable (SimplexSolver *solver,
                                       Constraint *constraint,
                                       Variable *variable)
 {
-  GHashTable *constraint_set;
+  VariableSet *cset;
 
   if (!solver->initialized)
     return;
 
-  constraint_set = g_hash_table_lookup (solver->error_vars, constraint);
-  if (constraint_set == NULL)
+  cset = g_hash_table_lookup (solver->error_vars, constraint);
+  if (cset == NULL)
     {
-      constraint_set = g_hash_table_new (NULL, NULL);
-      g_hash_table_insert (solver->error_vars, constraint, constraint_set);
+      cset = variable_set_new ();
+      g_hash_table_insert (solver->error_vars, constraint, cset);
     }
 
-  g_hash_table_add (constraint_set, variable);
+  variable_set_add_variable (cset, variable);
 }
 
 static void
@@ -1506,10 +1506,9 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
                                   Constraint *constraint)
 {
   Expression *z_row;
-  GHashTable *error_vars;
+  VariableSet *error_vars;
   GHashTableIter iter;
   Variable *marker;
-  gpointer key_p;
 
   if (!solver->initialized)
     return;
@@ -1523,24 +1522,29 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
 
   if (error_vars != NULL)
     {
-      g_hash_table_iter_init (&iter, error_vars);
-      while (g_hash_table_iter_next (&iter, &key_p, NULL))
+      Variable *v;
+
+      variable_set_iter_init (error_vars, &iter);
+      while (variable_set_iter_next (&iter, &v))
         {
-          Variable *v = key_p;
           Expression *e;
 
           e = g_hash_table_lookup (solver->rows, v);
 
           if (e == NULL)
-            expression_add_variable (z_row,
-                                     v,
-                                     constraint->strength,
-                                     solver->objective);
-          else
-            expression_add_expression (z_row,
-                                       e,
+            {
+              expression_add_variable (z_row,
+                                       v,
                                        constraint->strength,
                                        solver->objective);
+            }
+          else
+            {
+              expression_add_expression (z_row,
+                                         e,
+                                         constraint->strength,
+                                         solver->objective);
+            }
         }
     }
 
@@ -1638,11 +1642,11 @@ no_columns:
 
   if (error_vars != NULL)
     {
-      g_hash_table_iter_init (&iter, error_vars);
-      while (g_hash_table_iter_next (&iter, &key_p, NULL))
-        {
-          Variable *v = key_p;
+      Variable *v;
 
+      variable_set_iter_init (error_vars, &iter);
+      while (variable_set_iter_next (&iter, &v))
+        {
           if (v != marker)
             simplex_solver_remove_column (solver, v);
         }
@@ -1659,8 +1663,8 @@ no_columns:
               Variable *eplus = g_ptr_array_index (solver->stay_plus_error_vars, i);
               Variable *eminus = g_ptr_array_index (solver->stay_minus_error_vars, i);
 
-              g_hash_table_remove (error_vars, eplus);
-              g_hash_table_remove (error_vars, eminus);
+              variable_set_remove_variable (error_vars, eplus);
+              variable_set_remove_variable (error_vars, eminus);
             }
         }
     }
