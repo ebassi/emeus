@@ -35,6 +35,8 @@ typedef enum {
 typedef struct {
   int ref_count;
 
+  int id_;
+
   VariableType type;
 
   const char *prefix;

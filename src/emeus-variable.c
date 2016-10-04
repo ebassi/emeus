@@ -25,6 +25,8 @@
 #include <math.h>
 #include <float.h>
 
+static int variable_id;
+
 static void
 dummy_variable_init (Variable *v)
 {
@@ -64,6 +66,7 @@ variable_new (SimplexSolver *solver,
   Variable *res = g_slice_new0 (Variable);
 
   res->solver = solver;
+  res->id_ = ++variable_id;
   res->type = type;
   res->ref_count = 1;
   res->name = NULL;
