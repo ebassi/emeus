@@ -269,9 +269,7 @@ simplex_solver_init (SimplexSolver *solver)
                                               variable_set_free);
 
   /* HashTable<Constraint, Variable> */
-  solver->marker_vars = g_hash_table_new_full (NULL, NULL,
-                                               NULL,
-                                               (GDestroyNotify) variable_unref);
+  solver->marker_vars = g_hash_table_new (NULL, NULL);
 
   /* HashTable<Variable, EditInfo>; does not own keys, but owns values */
   solver->edit_var_map = g_hash_table_new_full (NULL, NULL,
@@ -1581,7 +1579,6 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
       return;
     }
 
-  variable_ref (marker);
   g_hash_table_remove (solver->marker_vars, constraint);
 
   if (g_hash_table_lookup (solver->rows, marker) == NULL)
