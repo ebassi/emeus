@@ -184,10 +184,10 @@ emeus_solver_cassowary (void)
                                  y, OPERATOR_TYPE_EQ, expression_plus (expression_new_from_variable (x), 3.0),
                                  STRENGTH_REQUIRED);
   simplex_solver_add_constraint (&solver,
-                                 x, OPERATOR_TYPE_EQ, expression_new (&solver, 10.0),
+                                 x, OPERATOR_TYPE_EQ, expression_new_from_constant (10.0),
                                  STRENGTH_WEAK);
   simplex_solver_add_constraint (&solver,
-                                 y, OPERATOR_TYPE_EQ, expression_new (&solver, 10.0),
+                                 y, OPERATOR_TYPE_EQ, expression_new_from_constant (10.0),
                                  STRENGTH_WEAK);
 
   double x_val = variable_get_value (x);
