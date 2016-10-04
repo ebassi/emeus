@@ -50,6 +50,28 @@ term_free (Term *term)
   g_slice_free (Term, term);
 }
 
+static int
+sort_by_variable_id (gconstpointer a,
+                     gconstpointer b)
+{
+  const Term *ta = a;
+  const Term *tb = b;
+
+  if (ta == tb)
+    return 0;
+
+  if (ta == NULL)
+    return -1;
+
+  if (tb == NULL)
+    return 1;
+
+  if (ta->variable == tb->variable)
+    return 0;
+
+  return (tb->variable->id_ - ta->variable->id_);
+}
+
 static void
 expression_add_term (Expression *expression,
                      Term *term)
@@ -57,6 +79,7 @@ expression_add_term (Expression *expression,
   if (expression->terms == NULL)
     expression->terms = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) term_free);
 
+  expression->ordered_terms = g_list_insert_sorted (expression->ordered_terms, term, sort_by_variable_id);
   g_hash_table_insert (expression->terms, term->variable, term);
 }
 
@@ -71,6 +94,7 @@ expression_new_full (SimplexSolver *solver,
   res->solver = solver;
   res->constant = constant;
   res->terms = NULL;
+  res->ordered_terms = NULL;
   res->ref_count = 1;
 
   if (variable != NULL)
@@ -165,12 +189,7 @@ expression_add_variable (Expression *expression,
           double new_coefficient = term_get_coefficient (t) + coefficient;
 
           if (approx_val (new_coefficient, 0.0))
-            {
-              if (expression->solver != NULL)
-                simplex_solver_note_removed_variable (expression->solver, t->variable, subject);
-
-              g_hash_table_remove (expression->terms, t);
-            }
+            expression_remove_variable (expression, variable, subject);
           else
             t->coefficient = new_coefficient;
 
@@ -192,13 +211,30 @@ expression_remove_variable (Expression *expression,
                             Variable *variable,
                             Variable *subject)
 {
+  Term *term;
+
   if (expression->terms == NULL)
     return;
+
+  term = g_hash_table_lookup (expression->terms, variable);
+  if (term == NULL)
+    return;
+
+  variable_ref (variable);
+
+  if (subject != NULL)
+    variable_ref (subject);
 
   if (expression->solver != NULL)
     simplex_solver_note_removed_variable (expression->solver, variable, subject);
 
+  expression->ordered_terms = g_list_remove (expression->ordered_terms, term);
   g_hash_table_remove (expression->terms, variable);
+
+  if (subject != NULL)
+    variable_unref (subject);
+
+  variable_unref (variable);
 }
 
 bool
@@ -297,19 +333,16 @@ expression_terms_foreach (Expression *expression,
                           ExpressionForeachTermFunc func,
                           gpointer data)
 {
-  GHashTableIter iter;
-  gpointer key_p, value_p;
+  GList *l;
 
   if (expression->terms == NULL)
     return;
 
-  g_hash_table_iter_init (&iter, expression->terms);
-  while (g_hash_table_iter_next (&iter, &key_p, &value_p))
+  for (l = g_list_last (expression->ordered_terms); l != NULL; l = l->prev)
     {
-      Variable *v = key_p;
-      Term *t = value_p;
+      Term *t = l->data;
 
-      g_assert (v == t->variable);
+      g_assert (t != NULL && t->variable != NULL);
 
       if (!func (t, data))
         break;
@@ -390,6 +423,7 @@ expression_new_subject (Expression *expression,
 
   reciprocal = 1.0 / term->coefficient;
 
+  expression->ordered_terms = g_list_remove (expression->ordered_terms, term);
   g_hash_table_remove (expression->terms, subject);
 
   expression_times (expression, -reciprocal);
@@ -427,17 +461,14 @@ expression_substitute_out (Expression *expression,
           double new_coefficient = old_coefficient + multiplier * coeff;
 
           if (approx_val (new_coefficient, 0.0))
-            {
-              g_hash_table_remove (expression->terms, clv);
-              if (expression->solver != NULL)
-                simplex_solver_note_removed_variable (expression->solver, clv, subject);
-            }
+            expression_remove_variable (expression, clv, subject);
           else
             expression_set_variable (expression, clv, new_coefficient);
         }
       else
         {
           expression_set_variable (expression, clv, multiplier * coeff);
+
           if (expression->solver)
             simplex_solver_note_added_variable (expression->solver, clv, subject);
         }
@@ -467,8 +498,8 @@ expression_get_pivotable_variable (Expression *expression)
 }
 
 static int
-sort_variable_name (gconstpointer a,
-                    gconstpointer b)
+sort_by_variable_name (gconstpointer a,
+                       gconstpointer b)
 {
   const Variable *va = a;
   const Variable *vb = b;
@@ -501,7 +532,7 @@ expression_to_string (const Expression *expression)
     return g_string_free (buf, FALSE);
 
   keys = g_hash_table_get_keys (expression->terms);
-  keys = g_list_sort (keys, sort_variable_name);
+  keys = g_list_sort (keys, sort_by_variable_name);
 
   for (l = keys; l != NULL; l = l->next)
     {

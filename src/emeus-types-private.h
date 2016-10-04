@@ -65,6 +65,8 @@ typedef struct {
   /* HashTable<Variable,Term> */
   GHashTable *terms;
 
+  GList *ordered_terms;
+
   SimplexSolver *solver;
 } Expression;
 
