@@ -117,6 +117,7 @@ typedef struct {
     NULL, NULL, \
     NULL, NULL, \
     NULL, \
+    NULL, \
     0, 0, 0, 0, \
     false, false, \
   }
@@ -144,6 +145,8 @@ struct _SimplexSolver {
   GHashTable *stay_var_map;
 
   Variable *objective;
+
+  GHashTable *constraints;
 
   int slack_counter;
   int artificial_counter;

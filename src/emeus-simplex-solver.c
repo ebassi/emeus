@@ -81,20 +81,22 @@ strength_to_string (StrengthType s)
 }
 
 static void
-constraint_free (Constraint *constraint)
+constraint_free (gpointer data)
 {
-  if (constraint != NULL)
+  Constraint *constraint = data;
+
+  if (data == NULL)
+    return;
+
+  expression_unref (constraint->expression);
+
+  if (constraint->is_edit || constraint->is_stay)
     {
-      expression_unref (constraint->expression);
-
-      if (constraint->is_edit || constraint->is_stay)
-        {
-          g_assert (constraint->variable != NULL);
-          variable_unref (constraint->variable);
-        }
-
-      g_slice_free (Constraint, constraint);
+      g_assert (constraint->variable != NULL);
+      variable_unref (constraint->variable);
     }
+
+  g_slice_free (Constraint, constraint);
 }
 
 static char *
@@ -286,6 +288,9 @@ simplex_solver_init (SimplexSolver *solver)
   variable_set_name (solver->objective, "Z");
   g_hash_table_insert (solver->rows, solver->objective, expression_new (solver, 0.0));
 
+  /* HashSet<Constraint> */
+  solver->constraints = g_hash_table_new_full (NULL, NULL, constraint_free, NULL);
+
   solver->slack_counter = 0;
   solver->dummy_counter = 0;
   solver->artificial_counter = 0;
@@ -345,6 +350,7 @@ simplex_solver_clear (SimplexSolver *solver)
   g_clear_pointer (&solver->marker_vars, g_hash_table_unref);
   g_clear_pointer (&solver->edit_var_map, g_hash_table_unref);
   g_clear_pointer (&solver->stay_var_map, g_hash_table_unref);
+  g_clear_pointer (&solver->constraints, g_hash_table_unref);
 
   /* The columns need to be deleted last, for reference counting */
   g_clear_pointer (&solver->rows, g_hash_table_unref);
@@ -1376,6 +1382,8 @@ simplex_solver_add_constraint (SimplexSolver *solver,
 
   expression_unref (expr);
 
+  g_hash_table_add (solver->constraints, res);
+
   return res;
 }
 
@@ -1438,6 +1446,8 @@ simplex_solver_add_stay_variable (SimplexSolver *solver,
     }
 
   expression_unref (expr);
+
+  g_hash_table_add (solver->constraints, res);
 
   return res;
 }
@@ -1512,6 +1522,8 @@ simplex_solver_add_edit_variable (SimplexSolver *solver,
 
   expression_unref (expr);
 
+  g_hash_table_add (solver->constraints, res);
+
   return res;
 }
 
@@ -1536,6 +1548,15 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
 
   if (!solver->initialized)
     return;
+
+  if (!g_hash_table_contains (solver->constraints, constraint))
+    {
+      char *str = constraint_to_string (constraint);
+
+      g_critical ("Unknown constraint '%s', unable to remove it from solver", str);
+
+      g_free (str);
+    }
 
   solver->needs_solving = true;
 
@@ -1721,7 +1742,7 @@ no_columns:
       simplex_solver_set_external_variables (solver);
     }
 
-  constraint_free (constraint);
+  g_hash_table_remove (solver->constraints, constraint);
 }
 
 void
