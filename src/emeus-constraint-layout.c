@@ -390,8 +390,8 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
 
       gtk_widget_get_preferred_size (GTK_WIDGET (child), &minimum, NULL);
 
-      child_alloc.x = floor (variable_get_value (top));
-      child_alloc.y = floor (variable_get_value (left));
+      child_alloc.x = floor (variable_get_value (left));
+      child_alloc.y = floor (variable_get_value (top));
       child_alloc.width = variable_get_value (width) > minimum.width
                         ? ceil (variable_get_value (width))
                         : minimum.width;
