@@ -3,7 +3,7 @@ const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 
 Emeus.ConstraintLayout.prototype.pack = function(child, name=null, constraints=[]) {
-    let layout_child = new Emeus.ConstraintLayoutChild(name);
+    let layout_child = new Emeus.ConstraintLayoutChild({ name: name });
     layout_child.add(child);
     this.add(layout_child);
 
