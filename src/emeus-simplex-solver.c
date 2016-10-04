@@ -163,11 +163,11 @@ variable_set_add_variable (VariableSet *set,
   g_hash_table_add (set->set, variable_ref (variable));
 }
 
-static void
+static bool
 variable_set_remove_variable (VariableSet *set,
                               Variable *variable)
 {
-  g_hash_table_remove (set->set, variable);
+  return g_hash_table_remove (set->set, variable);
 }
 
 static void
@@ -1682,15 +1682,26 @@ no_columns:
     {
       if (error_vars != NULL)
         {
+          GPtrArray *remaining = g_ptr_array_new_with_free_func (variable_pair_free);
           int i = 0;
 
           for (i = 0; i < solver->stay_error_vars->len; i++)
             {
               VariablePair *pair = g_ptr_array_index (solver->stay_error_vars, i);
+              bool found = false;
 
-              variable_set_remove_variable (error_vars, pair->first);
-              variable_set_remove_variable (error_vars, pair->second);
+              if (variable_set_remove_variable (error_vars, pair->first))
+                found = true;
+
+              if (variable_set_remove_variable (error_vars, pair->second))
+                found = true;
+
+              if (!found)
+                g_ptr_array_add (remaining, variable_pair_new (pair->first, pair->second));
             }
+
+          g_clear_pointer (&solver->stay_error_vars, g_ptr_array_unref);
+          solver->stay_error_vars = remaining;
         }
     }
   else if (constraint_is_edit (constraint))
