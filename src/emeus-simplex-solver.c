@@ -1703,6 +1703,8 @@ no_columns:
           g_clear_pointer (&solver->stay_error_vars, g_ptr_array_unref);
           solver->stay_error_vars = remaining;
         }
+
+      g_hash_table_remove (solver->stay_var_map, constraint->variable);
     }
   else if (constraint_is_edit (constraint))
     {
