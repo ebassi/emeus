@@ -117,6 +117,12 @@ expression_new_from_variable (Variable *variable)
 }
 
 Expression *
+expression_new_from_constant (double constant)
+{
+  return expression_new_full (NULL, NULL, 0.0, constant);
+}
+
+Expression *
 expression_clone (Expression *expression)
 {
   Expression *clone = expression_new_full (expression->solver,

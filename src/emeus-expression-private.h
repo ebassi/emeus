@@ -50,6 +50,7 @@ expression_get_constant (const Expression *expression)
 Expression *expression_new (SimplexSolver *solver,
                             double constant);
 
+Expression *expression_new_from_constant (double constant);
 Expression *expression_new_from_variable (Variable *variable);
 
 Expression *expression_clone (Expression *expression);
