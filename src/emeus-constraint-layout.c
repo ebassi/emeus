@@ -50,6 +50,12 @@ G_DEFINE_TYPE (EmeusConstraintLayout, emeus_constraint_layout, GTK_TYPE_CONTAINE
 
 G_DEFINE_TYPE (EmeusConstraintLayoutChild, emeus_constraint_layout_child, GTK_TYPE_BIN)
 
+#ifdef EMEUS_ENABLE_DEBUG
+# define DEBUG(x)       x
+#else
+# define DEBUG(x)
+#endif
+
 static void
 emeus_constraint_layout_finalize (GObject *gobject)
 {
@@ -379,13 +385,13 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
       height = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
 
 #ifdef EMEUS_ENABLE_DEBUG
-      g_print ("child '%s' [%p] = { .top:%g, .left:%g, .width:%g, .height:%g }\n",
-               child->name,
-               child,
-               variable_get_value (top),
-               variable_get_value (left),
-               variable_get_value (width),
-               variable_get_value (height));
+      DEBUG (g_debug ("child '%s' [%p] = { .top:%g, .left:%g, .width:%g, .height:%g }\n",
+                      child->name,
+                      child,
+                      variable_get_value (top),
+                      variable_get_value (left),
+                      variable_get_value (width),
+                      variable_get_value (height)));
 #endif
 
       gtk_widget_get_preferred_size (GTK_WIDGET (child), &minimum, NULL);

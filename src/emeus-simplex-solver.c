@@ -310,7 +310,7 @@ simplex_solver_clear (SimplexSolver *solver)
 
 #ifdef EMEUS_ENABLE_DEBUG
   {
-    g_print ("Solver [%p]:\n"
+    g_debug ("Solver [%p]:\n"
              "- Rows: %d, Columns: %d\n"
              "- Slack variables: %d\n"
              "- Error variables: %d (pairs: %d)\n"
@@ -746,7 +746,7 @@ simplex_solver_optimize (SimplexSolver *solver,
     }
 
 #ifdef EMEUS_ENABLE_DEBUG
-  g_print ("optimize.time := %.3f us (pass:%d)\n",
+  g_debug ("optimize.time := %.3f us (pass:%d)\n",
            (float) (g_get_monotonic_time () - start_time),
            solver->optimize_count);
 #endif
@@ -997,7 +997,7 @@ simplex_solver_dual_optimize (SimplexSolver *solver)
     }
 
 #ifdef EMEUS_ENABLE_DEBUG
-  g_print ("dual_optimize.time := %.3f us\n", (float) (g_get_monotonic_time () - start_time));
+  g_debug ("dual_optimize.time := %.3f us\n", (float) (g_get_monotonic_time () - start_time));
 #endif
 }
 
@@ -1362,7 +1362,7 @@ simplex_solver_add_constraint (SimplexSolver *solver,
     char *str1 = constraint_to_string (res);
     char *str2 = expression_to_string (expr);
 
-    g_print ("Adding constraint: %s (normalized expression: %s)\n", str1, str2);
+    g_debug ("Adding constraint: %s (normalized expression: %s)\n", str1, str2);
 
     g_free (str1);
     g_free (str2);
@@ -1424,7 +1424,7 @@ simplex_solver_add_stay_variable (SimplexSolver *solver,
     char *str1 = variable_to_string (res->variable);
     char *str2 = expression_to_string (expr);
 
-    g_print ("Adding stay variable '%s' = %g (normalized expression: %s)\n",
+    g_debug ("Adding stay variable '%s' = %g (normalized expression: %s)\n",
              str1,
              variable_get_value (res->variable),
              str2);
@@ -1502,7 +1502,7 @@ simplex_solver_add_edit_variable (SimplexSolver *solver,
     char *str1 = constraint_to_string (res);
     char *str2 = expression_to_string (expr);
 
-    g_print ("Adding edit constraint: %s (normalized expression: %s)\n", str1, str2);
+    g_debug ("Adding edit constraint: %s (normalized expression: %s)\n", str1, str2);
 
     g_free (str1);
     g_free (str2);
@@ -1800,7 +1800,7 @@ simplex_solver_resolve (SimplexSolver *solver)
   simplex_solver_reset_stay_constants (solver);
 
 #ifdef EMEUS_ENABLE_DEBUG
-  g_print ("resolve.time := %.3f us\n", (float) g_get_monotonic_time () - start_time);
+  g_debug ("resolve.time := %.3f us\n", (float) g_get_monotonic_time () - start_time);
 #endif
 
   solver->needs_solving = false;
