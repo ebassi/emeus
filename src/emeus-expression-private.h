@@ -86,6 +86,10 @@ Expression *expression_plus (Expression *expression,
                              double constant);
 Expression *expression_times (Expression *expression,
                               double multiplier);
+Expression *expression_minus (Expression *expression,
+                              double constant);
+Expression *expression_divide (Expression *expression,
+                               double constant);
 
 Expression *expression_plus_variable (Expression *expression,
                                       Variable *variable);

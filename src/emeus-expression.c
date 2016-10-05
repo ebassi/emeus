@@ -369,6 +369,13 @@ expression_plus (Expression *expression,
 }
 
 Expression *
+expression_minus (Expression *expression,
+                  double constant)
+{
+  return expression_plus (expression, constant * -1.0);
+}
+
+Expression *
 expression_plus_variable (Expression *expression,
                           Variable *variable)
 {
@@ -402,6 +409,16 @@ expression_times (Expression *expression,
     }
 
   return expression;
+}
+
+Expression *
+expression_divide (Expression *expression,
+                   double factor)
+{
+  if (approx_val (factor, 0.0))
+    return expression;
+
+  return expression_times (expression, 1.0 / factor);
 }
 
 void
