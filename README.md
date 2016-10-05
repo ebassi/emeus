@@ -93,9 +93,33 @@ constraints, and lay out its children according to them.
  * Run ninja:
   * `$ ninja`
 
+## Licensing
+
+Emeus is released under the terms of the GNU Lesser General Public License,
+either version 2.1 or, at your option, any later version.
+
+The Cassowary simplex solving algorithm implementation is largely inspired
+by the equivalent implementations written in various other language,
+including:
+
+ * [Cassowary][cassowary-web] — the original C++ implementation, released
+   under the terms of the GNU Lesser General Public License, version 2.1 or
+   later
+ * [Cassowary.js][cassowary-js-web] — JavaScript implementation, released
+   under the terms of the Apache License, Version 2.0
+ * [Cassowary][cassowary-py-web] — Python implementation, released under the
+   terms of the BSD 3-clause license
+
+You can check on the [Overconstrained][overconstrained-web] website for
+additional implementations in various languages.
+
 [gtk-web]: https://www.gtk.org
-[cassowary-web]: http://overconstrained.io/
+[cassowary-web]: http://constraints.cs.washington.edu/cassowary/
+[overconstrained-web]: http://overconstrained.io/
 [gtk-container-api]: https://developer.gnome.org/gtk3/stable/GtkContainer.html
 [gtk-fixed-api]: https://developer.gnome.org/gtk3/stable/GtkFixed.html
 [gtk-layout-api]: https://developer.gnome.org/gtk3/stable/GtkLayout.html
 [gtk-box-api]: https://developer.gnome.org/gtk3/stable/GtkBox.html
+[cassowary-cpp-web]: https://sourceforge.net/projects/cassowary/
+[cassowary-js-web]: https://github.com/slightlyoff/cassowary.js
+[cassowary-py-web]: https://github.com/pybee/cassowary
