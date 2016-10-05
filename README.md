@@ -110,8 +110,13 @@ including:
  * [Cassowary][cassowary-py-web] — Python implementation, released under the
    terms of the BSD 3-clause license
 
+Additionally, the automatic layout solving is inspired by
+[autolayout.js][autolayou-js-web], a JavaScript automatic constraint-based
+layout, which, in turn, is based on the Apple [autolayout][nsautolayout-web]
+layout manager.
+
 You can check on the [Overconstrained][overconstrained-web] website for
-additional implementations in various languages.
+additional Cassowary implementations in various languages.
 
 [gtk-web]: https://www.gtk.org
 [cassowary-web]: http://constraints.cs.washington.edu/cassowary/
@@ -123,3 +128,5 @@ additional implementations in various languages.
 [cassowary-cpp-web]: https://sourceforge.net/projects/cassowary/
 [cassowary-js-web]: https://github.com/slightlyoff/cassowary.js
 [cassowary-py-web]: https://github.com/pybee/cassowary
+[autolayout-js-web]: https://github.com/IjzerenHein/autolayout.js
+[nsautolayout-web]: https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/AutolayoutPG/index.html
