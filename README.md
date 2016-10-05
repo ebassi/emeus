@@ -111,7 +111,7 @@ including:
    terms of the BSD 3-clause license
 
 Additionally, the automatic layout solving is inspired by
-[autolayout.js][autolayou-js-web], a JavaScript automatic constraint-based
+[autolayout.js][autolayout-js-web], a JavaScript automatic constraint-based
 layout, which, in turn, is based on the Apple [autolayout][nsautolayout-web]
 layout manager.
 
