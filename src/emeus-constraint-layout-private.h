@@ -82,6 +82,8 @@ struct _EmeusConstraintLayout
   /* Internal constraints */
   Constraint *top_constraint;
   Constraint *left_constraint;
+  Constraint *width_constraint;
+  Constraint *height_constraint;
 };
 
 SimplexSolver * emeus_constraint_layout_get_solver      (EmeusConstraintLayout *layout);
