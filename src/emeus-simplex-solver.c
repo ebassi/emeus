@@ -1463,6 +1463,33 @@ simplex_solver_has_stay_variable (SimplexSolver *solver,
   return g_hash_table_contains (solver->stay_var_map, variable);
 }
 
+void
+simplex_solver_remove_stay_variable (SimplexSolver *solver,
+                                     Variable *variable)
+{
+  StayInfo *si;
+
+  if (!solver->initialized)
+    {
+      g_critical ("Solver %p is not initialized.", solver);
+      return;
+    }
+
+  si = g_hash_table_lookup (solver->stay_var_map, variable);
+  if (si == NULL)
+    {
+      char *str = variable_to_string (variable);
+
+      g_critical ("Unknown stay variable '%s'", str);
+
+      g_free (str);
+
+      return;
+    }
+
+  simplex_solver_remove_constraint (solver, si->constraint);
+}
+
 Constraint *
 simplex_solver_add_edit_variable (SimplexSolver *solver,
                                   Variable *variable,
@@ -1497,6 +1524,33 @@ simplex_solver_has_edit_variable (SimplexSolver *solver,
     return false;
 
   return g_hash_table_contains (solver->edit_var_map, variable);
+}
+
+void
+simplex_solver_remove_edit_variable (SimplexSolver *solver,
+                                     Variable *variable)
+{
+  EditInfo *ei;
+
+  if (!solver->initialized)
+    {
+      g_critical ("Solver %p is not initialized.", solver);
+      return;
+    }
+
+  ei = g_hash_table_lookup (solver->edit_var_map, variable);
+  if (ei == NULL)
+    {
+      char *str = variable_to_string (variable);
+
+      g_critical ("Unknown edit variable '%s'", str);
+
+      g_free (str);
+
+      return;
+    }
+
+  simplex_solver_remove_constraint (solver, ei->constraint);
 }
 
 void

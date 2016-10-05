@@ -78,6 +78,12 @@ bool simplex_solver_has_stay_variable (SimplexSolver *solver,
 void simplex_solver_remove_constraint (SimplexSolver *solver,
                                        Constraint *constraint);
 
+void simplex_solver_remove_edit_variable (SimplexSolver *solver,
+                                          Variable *variable);
+
+void simplex_solver_remove_stay_variable (SimplexSolver *solver,
+                                          Variable *variable);
+
 void simplex_solver_suggest_value (SimplexSolver *solver,
                                    Variable *variable,
                                    double value);
