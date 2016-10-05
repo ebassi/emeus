@@ -317,7 +317,7 @@ simplex_solver_clear (SimplexSolver *solver)
              "- Marker variables: %d\n"
              "- Infeasible rows: %d\n"
              "- External rows: %d\n"
-             "- Edit: %d, Stay: %d\n",
+             "- Edit: %d, Stay: %d",
              solver,
              g_hash_table_size (solver->rows),
              g_hash_table_size (solver->columns),
@@ -746,7 +746,7 @@ simplex_solver_optimize (SimplexSolver *solver,
     }
 
 #ifdef EMEUS_ENABLE_DEBUG
-  g_debug ("optimize.time := %.3f us (pass:%d)\n",
+  g_debug ("optimize.time := %.3f us (pass:%d)",
            (float) (g_get_monotonic_time () - start_time),
            solver->optimize_count);
 #endif
@@ -997,7 +997,7 @@ simplex_solver_dual_optimize (SimplexSolver *solver)
     }
 
 #ifdef EMEUS_ENABLE_DEBUG
-  g_debug ("dual_optimize.time := %.3f us\n", (float) (g_get_monotonic_time () - start_time));
+  g_debug ("dual_optimize.time := %.3f us", (float) (g_get_monotonic_time () - start_time));
 #endif
 }
 
@@ -1325,7 +1325,7 @@ simplex_solver_add_constraint_internal (SimplexSolver *solver,
     char *str1 = constraint_to_string (constraint);
     char *str2 = expression_to_string (expr);
 
-    g_debug ("Adding constraint: %s (normalized expression: %s)\n", str1, str2);
+    g_debug ("Adding constraint: %s (normalized expression: %s)", str1, str2);
 
     g_free (str1);
     g_free (str2);
@@ -1762,7 +1762,7 @@ simplex_solver_resolve (SimplexSolver *solver)
   simplex_solver_reset_stay_constants (solver);
 
 #ifdef EMEUS_ENABLE_DEBUG
-  g_debug ("resolve.time := %.3f us\n", (float) g_get_monotonic_time () - start_time);
+  g_debug ("resolve.time := %.3f us", (float) g_get_monotonic_time () - start_time);
 #endif
 
   solver->needs_solving = false;

@@ -385,7 +385,7 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
       height = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
 
 #ifdef EMEUS_ENABLE_DEBUG
-      DEBUG (g_debug ("child '%s' [%p] = { .top:%g, .left:%g, .width:%g, .height:%g }\n",
+      DEBUG (g_debug ("child '%s' [%p] = { .top:%g, .left:%g, .width:%g, .height:%g }",
                       child->name,
                       child,
                       variable_get_value (top),
