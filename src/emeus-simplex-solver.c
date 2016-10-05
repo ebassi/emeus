@@ -746,8 +746,8 @@ simplex_solver_optimize (SimplexSolver *solver,
     }
 
 #ifdef EMEUS_ENABLE_DEBUG
-  g_debug ("optimize.time := %.3f us (pass:%d)",
-           (float) (g_get_monotonic_time () - start_time),
+  g_debug ("optimize.time := %.3f ms (pass:%d)",
+           (float) (g_get_monotonic_time () - start_time) / 1000.f,
            solver->optimize_count);
 #endif
 }
@@ -997,7 +997,8 @@ simplex_solver_dual_optimize (SimplexSolver *solver)
     }
 
 #ifdef EMEUS_ENABLE_DEBUG
-  g_debug ("dual_optimize.time := %.3f us", (float) (g_get_monotonic_time () - start_time));
+  g_debug ("dual_optimize.time := %.3f ms",
+           (float) (g_get_monotonic_time () - start_time) / 1000.f);
 #endif
 }
 
@@ -1816,7 +1817,8 @@ simplex_solver_resolve (SimplexSolver *solver)
   simplex_solver_reset_stay_constants (solver);
 
 #ifdef EMEUS_ENABLE_DEBUG
-  g_debug ("resolve.time := %.3f us", (float) g_get_monotonic_time () - start_time);
+  g_debug ("resolve.time := %.3f ms",
+           (float) (g_get_monotonic_time () - start_time) / 1000.f);
 #endif
 
   solver->needs_solving = false;
