@@ -84,6 +84,9 @@ void simplex_solver_suggest_value (SimplexSolver *solver,
 
 void simplex_solver_resolve (SimplexSolver *solver);
 
+void simplex_solver_begin_edit (SimplexSolver *solver);
+void simplex_solver_end_edit (SimplexSolver *solver);
+
 /* Internal */
 void simplex_solver_note_added_variable (SimplexSolver *solver,
                                          Variable *variable,

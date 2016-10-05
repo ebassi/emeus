@@ -1767,3 +1767,23 @@ simplex_solver_resolve (SimplexSolver *solver)
 
   solver->needs_solving = false;
 }
+
+void
+simplex_solver_begin_edit (SimplexSolver *solver)
+{
+  if (g_hash_table_size (solver->edit_var_map) == 0)
+    {
+      g_critical ("Solver %p does not have editable variables.", solver);
+      return;
+    }
+
+  g_hash_table_remove_all (solver->infeasible_rows);
+  simplex_solver_reset_stay_constants (solver);
+}
+
+
+void
+simplex_solver_end_edit (SimplexSolver *solver)
+{
+  simplex_solver_resolve (solver);
+}
