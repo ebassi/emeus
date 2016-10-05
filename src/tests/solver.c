@@ -202,6 +202,62 @@ emeus_solver_cassowary (void)
   simplex_solver_clear (&solver);
 }
 
+static void
+emeus_solver_edit_var_required (void)
+{
+  SimplexSolver solver = SIMPLEX_SOLVER_INIT;
+
+  simplex_solver_init (&solver);
+
+  Variable *a = simplex_solver_create_variable (&solver, "a", 0.0);
+  simplex_solver_add_stay_variable (&solver, a, STRENGTH_STRONG);
+
+  emeus_assert_fuzzy_equals (variable_get_value (a), 0.0, 1e-8);
+
+  simplex_solver_add_edit_variable (&solver, a, STRENGTH_REQUIRED);
+  simplex_solver_begin_edit (&solver);
+  simplex_solver_suggest_value (&solver, a, 2.0);
+  simplex_solver_end_edit (&solver);
+
+  emeus_assert_fuzzy_equals (variable_get_value (a), 2.0, 1e-8);
+
+  simplex_solver_clear (&solver);
+}
+
+static void
+emeus_solver_edit_var_suggest (void)
+{
+  SimplexSolver solver = SIMPLEX_SOLVER_INIT;
+
+  simplex_solver_init (&solver);
+
+  Variable *a = simplex_solver_create_variable (&solver, "a", 0.0);
+  Variable *b = simplex_solver_create_variable (&solver, "b", 0.0);
+
+  simplex_solver_add_stay_variable (&solver, a, STRENGTH_STRONG);
+  simplex_solver_add_constraint (&solver, a, OPERATOR_TYPE_EQ, expression_new_from_variable (b), STRENGTH_REQUIRED);
+  simplex_solver_resolve (&solver);
+
+  emeus_assert_fuzzy_equals (variable_get_value (a), 0.0, 1e-8);
+  emeus_assert_fuzzy_equals (variable_get_value (b), 0.0, 1e-8);
+
+  simplex_solver_add_edit_variable (&solver, a, STRENGTH_REQUIRED);
+  simplex_solver_begin_edit (&solver);
+  simplex_solver_suggest_value (&solver, a, 2.0);
+  simplex_solver_resolve (&solver);
+
+  emeus_assert_fuzzy_equals (variable_get_value (a), 2.0, 1e-8);
+  emeus_assert_fuzzy_equals (variable_get_value (b), 2.0, 1e-8);
+
+  simplex_solver_suggest_value (&solver, a, 10.0);
+  simplex_solver_resolve (&solver);
+
+  emeus_assert_fuzzy_equals (variable_get_value (a), 10.0, 1e-8);
+  emeus_assert_fuzzy_equals (variable_get_value (b), 10.0, 1e-8);
+
+  simplex_solver_clear (&solver);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -209,6 +265,8 @@ main (int argc, char *argv[])
 
   g_test_add_func ("/emeus/solver/simple", emeus_solver_simple);
   g_test_add_func ("/emeus/solver/stay", emeus_solver_stay);
+  g_test_add_func ("/emeus/solver/edit-var-required", emeus_solver_edit_var_required);
+  g_test_add_func ("/emeus/solver/edit-var-suggest", emeus_solver_edit_var_suggest);
   g_test_add_func ("/emeus/solver/variable-geq-constant", emeus_solver_variable_geq_constant);
   g_test_add_func ("/emeus/solver/variable-leq-constant", emeus_solver_variable_leq_constant);
   g_test_add_func ("/emeus/solver/variable-eq-constant", emeus_solver_variable_eq_constant);
