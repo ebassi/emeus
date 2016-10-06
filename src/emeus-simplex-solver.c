@@ -231,7 +231,7 @@ simplex_solver_init (SimplexSolver *solver)
 {
   if (solver->initialized)
     {
-      g_critical ("The SimplexSolver %p has already been initialized");
+      g_critical ("The SimplexSolver %p has already been initialized", solver);
       return;
     }
 
