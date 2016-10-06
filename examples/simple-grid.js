@@ -6,6 +6,7 @@ Emeus.ConstraintLayout.prototype.pack = function(child, name=null, constraints=[
     let layout_child = new Emeus.ConstraintLayoutChild({ name: name });
     layout_child.add(child);
     this.add(layout_child);
+    layout_child.show();
 
     constraints.forEach(layout_child.add_constraint, layout_child);
 };
