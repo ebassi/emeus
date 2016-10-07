@@ -1250,10 +1250,6 @@ simplex_solver_add_with_artificial_variable (SimplexSolver *solver,
   simplex_solver_add_row (solver, av, expression);
   simplex_solver_optimize (solver, az);
 
-  variable_unref (av);
-  variable_unref (az);
-  expression_unref (az_row);
-
   az_tableau_row = g_hash_table_lookup (solver->rows, az);
   if (!approx_val (expression_get_constant (az_tableau_row), 0.0))
     {
