@@ -3,11 +3,16 @@ const Gtk = imports.gi.Gtk;
 const Lang = imports.lang;
 
 Emeus.ConstraintLayout.prototype.pack = function(child, name=null, constraints=[]) {
-    let layout_child = new Emeus.ConstraintLayoutChild({ name: name });
-    layout_child.add(child);
-    this.add(layout_child);
-    layout_child.show();
+    let layout_child;
 
+    if (child instanceof Emeus.ConstraintLayoutChild) {
+        layout_child = child;
+    } else {
+        layout_child = new Emeus.ConstraintLayoutChild({ name: name });
+        layout_child.show();
+        layout_child.add(child);
+    }
+    this.add(layout_child);
     constraints.forEach(layout_child.add_constraint, layout_child);
 };
 
