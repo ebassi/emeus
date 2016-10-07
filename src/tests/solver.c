@@ -180,7 +180,7 @@ emeus_solver_cassowary (void)
   double y_val = variable_get_value (y);
 
   if (g_test_verbose ())
-    g_print ("x = %g, y = %g\n", x_val, y_val);
+    g_test_message ("x = %g, y = %g", x_val, y_val);
 
   g_assert_true ((emeus_fuzzy_equals (x_val, 10, 1e-8) && emeus_fuzzy_equals (y_val, 13, 1e-8)) ||
                  (emeus_fuzzy_equals (x_val,  7, 1e-8) && emeus_fuzzy_equals (y_val, 10, 1e-9)));
@@ -244,6 +244,64 @@ emeus_solver_edit_var_suggest (void)
   simplex_solver_clear (&solver);
 }
 
+static void
+emeus_solver_paper (void)
+{
+  SimplexSolver solver = SIMPLEX_SOLVER_INIT;
+
+  simplex_solver_init (&solver);
+
+  Variable *left = simplex_solver_create_variable (&solver, "left", 0.0);
+  Variable *middle = simplex_solver_create_variable (&solver, "middle", 0.0);
+  Variable *right = simplex_solver_create_variable (&solver, "right", 0.0);
+
+  Expression *expr;
+
+  expr = expression_divide (expression_plus_variable (expression_new_from_variable (left), right), 2.0);
+  simplex_solver_add_constraint (&solver, middle, OPERATOR_TYPE_EQ, expr, STRENGTH_REQUIRED);
+
+  expr = expression_plus (expression_new_from_variable (left), 10.0);
+  simplex_solver_add_constraint (&solver, right, OPERATOR_TYPE_EQ, expr, STRENGTH_REQUIRED);
+
+  expr = expression_new_from_constant (100.0);
+  simplex_solver_add_constraint (&solver, right, OPERATOR_TYPE_LE, expr, STRENGTH_REQUIRED);
+
+  expr = expression_new_from_constant (0.0);
+  simplex_solver_add_constraint (&solver, left, OPERATOR_TYPE_GE, expr, STRENGTH_REQUIRED);
+
+  if (g_test_verbose ())
+    g_test_message ("Check constraints hold");
+
+  emeus_assert_almost_equals (variable_get_value (middle),
+                              (variable_get_value (left) + variable_get_value (right)) / 2.0);
+  emeus_assert_almost_equals (variable_get_value (right),
+                              variable_get_value (left) + 10.0);
+  g_assert_cmpfloat (variable_get_value (right), <=, 100.0);
+  g_assert_cmpfloat (variable_get_value (left), >=, 0.0);
+
+  variable_set_value (middle, 45.0);
+  simplex_solver_add_stay_variable (&solver, middle, STRENGTH_WEAK);
+
+  if (g_test_verbose ())
+    g_test_message ("Check constraints hold after setting middle");
+
+  emeus_assert_almost_equals (variable_get_value (middle),
+                              (variable_get_value (left) + variable_get_value (right)) / 2.0);
+  emeus_assert_almost_equals (variable_get_value (right),
+                              variable_get_value (left) + 10.0);
+  g_assert_cmpfloat (variable_get_value (right), <=, 100.0);
+  g_assert_cmpfloat (variable_get_value (left), >=, 0.0);
+
+  if (g_test_verbose ())
+    g_test_message ("Check values after setting middle");
+
+  emeus_assert_almost_equals (variable_get_value (left), 40.0);
+  emeus_assert_almost_equals (variable_get_value (middle), 45.0);
+  emeus_assert_almost_equals (variable_get_value (right), 50.0);
+
+  simplex_solver_clear (&solver);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -258,6 +316,7 @@ main (int argc, char *argv[])
   g_test_add_func ("/emeus/solver/variable-eq-constant", emeus_solver_variable_eq_constant);
   g_test_add_func ("/emeus/solver/eq-with-stay", emeus_solver_eq_with_stay);
   g_test_add_func ("/emeus/solver/cassowary", emeus_solver_cassowary);
+  g_test_add_func ("/emeus/solver/paper", emeus_solver_paper);
 
   return g_test_run ();
 }
