@@ -11,6 +11,10 @@ Emeus.ConstraintLayout.prototype.pack = function(child, name=null, constraints=[
     constraints.forEach(layout_child.add_constraint, layout_child);
 };
 
+Emeus.ConstraintLayout.prototype.add_constraints = function(constraints=[]) {
+    constraints.forEach(this.add_constraint, this);
+};
+
 const MyApplicationWindow = new Lang.Class({
     Name: 'MyApplicationWindow',
     Extends: Gtk.ApplicationWindow,
@@ -85,7 +89,7 @@ const MyApplicationWindow = new Lang.Class({
         this._layout.pack(button3, 'child3');
         button3.show();
 
-        [
+        this._layout.add_constraints([
             new Emeus.Constraint({ target_attribute: Emeus.ConstraintAttribute.START,
                                    relation: Emeus.ConstraintRelation.EQ,
                                    source_object: button1,
@@ -154,7 +158,7 @@ const MyApplicationWindow = new Lang.Class({
                                    relation: Emeus.ConstraintRelation.EQ,
                                    source_attribute: Emeus.ConstraintAttribute.BOTTOM,
                                    constant: -8.0 }),
-        ].forEach(this._layout.add_constraint, this._layout);
+        ]);
     },
 });
 
