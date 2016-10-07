@@ -61,9 +61,6 @@ emeus_constraint_layout_finalize (GObject *gobject)
 {
   EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (gobject);
 
-  simplex_solver_remove_constraint (&self->solver, self->top_constraint);
-  simplex_solver_remove_constraint (&self->solver, self->left_constraint);
-
   g_clear_pointer (&self->children, g_sequence_free);
   g_clear_pointer (&self->bound_attributes, g_hash_table_unref);
   g_clear_pointer (&self->constraints, g_hash_table_unref);
@@ -358,6 +355,7 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
   EmeusConstraintLayoutChild *child;
   Variable *layout_width, *layout_height;
   GSequenceIter *iter;
+  Constraint *stay_w, *stay_h;
 
   gtk_widget_set_allocation (widget, allocation);
 
@@ -367,15 +365,11 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
   layout_width = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
   layout_height = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
 
-  if (!simplex_solver_has_edit_variable (&self->solver, layout_width))
-    simplex_solver_add_edit_variable (&self->solver, layout_width, STRENGTH_REQUIRED);
-  if (!simplex_solver_has_edit_variable (&self->solver, layout_height))
-    simplex_solver_add_edit_variable (&self->solver, layout_height, STRENGTH_REQUIRED);
+  variable_set_value (layout_width, allocation->width);
+  stay_w = simplex_solver_add_stay_variable (&self->solver, layout_width, STRENGTH_REQUIRED);
 
-  simplex_solver_begin_edit (&self->solver);
-  simplex_solver_suggest_value (&self->solver, layout_width, allocation->width);
-  simplex_solver_suggest_value (&self->solver, layout_height, allocation->height);
-  simplex_solver_resolve (&self->solver);
+  variable_set_value (layout_height, allocation->height);
+  stay_h = simplex_solver_add_stay_variable (&self->solver, layout_height, STRENGTH_REQUIRED);
 
 #ifdef EMEUS_ENABLE_DEBUG
   DEBUG (g_debug ("layout [%p] = { .width:%g, .height:%g }",
@@ -423,8 +417,8 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
       gtk_widget_size_allocate (GTK_WIDGET (child), &child_alloc);
     }
 
-  simplex_solver_remove_edit_variable (&self->solver, layout_width);
-  simplex_solver_remove_edit_variable (&self->solver, layout_height);
+  simplex_solver_remove_constraint (&self->solver, stay_w);
+  simplex_solver_remove_constraint (&self->solver, stay_h);
 }
 
 static void
@@ -534,32 +528,28 @@ emeus_constraint_layout_init (EmeusConstraintLayout *self)
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_TOP),
                        var);
-  self->top_constraint =
-    simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
+  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
 
   var = simplex_solver_create_variable (&self->solver, "left", 0.0);
   variable_set_prefix (var, "super");
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT),
                        var);
-  self->left_constraint =
-    simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
+  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
 
   var = simplex_solver_create_variable (&self->solver, "width", 0.0);
   variable_set_prefix (var, "super");
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH),
                        var);
-  self->width_constraint =
-    simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_STRONG);
+  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
 
   var = simplex_solver_create_variable (&self->solver, "height", 0.0);
   variable_set_prefix (var, "super");
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT),
                        var);
-  self->height_constraint =
-    simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_STRONG);
+  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
 }
 
 /**
