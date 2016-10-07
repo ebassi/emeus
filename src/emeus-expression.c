@@ -61,15 +61,15 @@ sort_by_variable_id (gconstpointer a,
     return 0;
 
   if (ta == NULL)
-    return -1;
+    return 1;
 
   if (tb == NULL)
-    return 1;
+    return -1;
 
   if (ta->variable == tb->variable)
     return 0;
 
-  return (tb->variable->id_ - ta->variable->id_);
+  return (ta->variable->id_ - tb->variable->id_);
 }
 
 static void
@@ -278,18 +278,13 @@ expression_add_expression (Expression *a,
                            double n,
                            Variable *subject)
 {
-  GHashTableIter iter;
-  gpointer value_p;
+  GList *l;
 
   a->constant += (n * b->constant);
 
-  if (b->terms == NULL)
-    return;
-
-  g_hash_table_iter_init (&iter, b->terms);
-  while (g_hash_table_iter_next (&iter, NULL, &value_p))
+  for (l = b->ordered_terms; l != NULL; l = l->next)
     {
-      Term *t = value_p;
+      Term *t = l->data;
 
       expression_add_variable (a, t->variable, n * t->coefficient, subject);
     }
@@ -314,19 +309,12 @@ expression_get_coefficient (const Expression *expression,
 double
 expression_get_value (const Expression *expression)
 {
-  GHashTableIter iter;
-  gpointer value_p;
-  double res;
+  double res = expression->constant;
+  const GList *l;
 
-  res = expression->constant;
-
-  if (expression->terms == NULL)
-    return res;
-
-  g_hash_table_iter_init (&iter, expression->terms);
-  while (g_hash_table_iter_next (&iter, NULL, &value_p))
+  for (l = expression->ordered_terms; l != NULL; l = l->next)
     {
-      const Term *t = value_p;
+      const Term *t = l->data;
 
       res += (t->coefficient * variable_get_value (t->variable));
     }
@@ -344,7 +332,7 @@ expression_terms_foreach (Expression *expression,
   if (expression->terms == NULL)
     return;
 
-  for (l = g_list_last (expression->ordered_terms); l != NULL; l = l->prev)
+  for (l = expression->ordered_terms; l != NULL; l = l->next)
     {
       Term *t = l->data;
 
