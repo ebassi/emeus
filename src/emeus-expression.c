@@ -377,6 +377,19 @@ expression_plus_variable (Expression *expression,
 }
 
 Expression *
+expression_minus_variable (Expression *expression,
+                           Variable *variable)
+{
+  Expression *e = expression_new_from_variable (variable);
+
+  expression_add_expression (expression, e, -1.0, NULL);
+
+  expression_unref (e);
+
+  return expression;
+}
+
+Expression *
 expression_times (Expression *expression,
                   double multiplier)
 {

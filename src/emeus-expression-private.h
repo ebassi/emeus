@@ -93,6 +93,8 @@ Expression *expression_divide (Expression *expression,
 
 Expression *expression_plus_variable (Expression *expression,
                                       Variable *variable);
+Expression *expression_minus_variable (Expression *expression,
+                                       Variable *variable);
 
 double expression_get_coefficient (const Expression *expression,
                                    Variable *variable);
