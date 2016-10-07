@@ -46,7 +46,14 @@ typedef struct {
 typedef struct {
   /* HashSet<Variable>, owns a reference */
   GHashTable *set;
+  GList *ordered_set;
 } VariableSet;
+
+typedef struct {
+  VariableSet *set;
+  GList *current;
+  GList *next;
+} VariableSetIter;
 
 typedef struct {
   Variable *first;
@@ -139,13 +146,14 @@ stay_info_free (gpointer data)
 static void
 variable_set_free (gpointer data)
 {
-  VariableSet *column_set = data;
+  VariableSet *set = data;
 
   if (data == NULL)
     return;
 
-  g_hash_table_unref (column_set->set);
-  g_slice_free (VariableSet, column_set);
+  g_list_free (set->ordered_set);
+  g_hash_table_unref (set->set);
+  g_slice_free (VariableSet, set);
 }
 
 static VariableSet *
@@ -154,42 +162,70 @@ variable_set_new (void)
   VariableSet *res = g_slice_new (VariableSet);
 
   res->set = g_hash_table_new_full (NULL, NULL, (GDestroyNotify) variable_unref, NULL);
+  res->ordered_set = NULL;
 
   return res;
+}
+
+static int
+sort_by_variable_id (gconstpointer a,
+                     gconstpointer b)
+{
+  const Variable *va = a, *vb = b;
+
+  if (va == vb)
+    return 0;
+
+  return va->id_ - vb->id_;
 }
 
 static void
 variable_set_add_variable (VariableSet *set,
                            Variable *variable)
 {
+  if (g_hash_table_contains (set->set, variable))
+    return;
+
   g_hash_table_add (set->set, variable_ref (variable));
+  set->ordered_set = g_list_insert_sorted (set->ordered_set, variable, sort_by_variable_id);
 }
 
 static bool
 variable_set_remove_variable (VariableSet *set,
                               Variable *variable)
 {
-  return g_hash_table_remove (set->set, variable);
+  if (g_hash_table_contains (set->set, variable))
+    {
+      set->ordered_set = g_list_remove (set->ordered_set, variable);
+      g_hash_table_remove (set->set, variable);
+      return true;
+    }
+
+  return false;
 }
 
 static void
 variable_set_iter_init (VariableSet *set,
-                        GHashTableIter *iter)
+                        VariableSetIter *iter)
 {
-  g_hash_table_iter_init (iter, set->set);
+  iter->set = set;
+  iter->current = NULL;
+  iter->next = NULL;
 }
 
 static bool
-variable_set_iter_next (GHashTableIter *iter,
+variable_set_iter_next (VariableSetIter *iter,
                         Variable **variable_p)
 {
-  gpointer key_p;
-  bool res;
+  if (iter->current == NULL)
+    iter->current = iter->set->ordered_set;
+  else
+    iter->current = iter->current->next;
 
-  res = g_hash_table_iter_next (iter, &key_p, NULL);
-  *variable_p = key_p;
+  if (iter->current != NULL)
+    *variable_p = iter->current->data;
 
-  return res;
+  return iter->current != NULL;
 }
 
 static int
@@ -517,7 +553,7 @@ simplex_solver_remove_column (SimplexSolver *solver,
                               Variable *variable)
 {
   VariableSet *set;
-  GHashTableIter iter;
+  VariableSetIter iter;
   Variable *v;
 
   set = g_hash_table_lookup (solver->columns, variable);
@@ -597,7 +633,7 @@ simplex_solver_substitute_out (SimplexSolver *solver,
   set = g_hash_table_lookup (solver->columns, old_variable);
   if (set != NULL)
     {
-      GHashTableIter iter;
+      VariableSetIter iter;
       Variable *v;
 
       variable_set_iter_init (set, &iter);
@@ -694,7 +730,7 @@ simplex_solver_optimize (SimplexSolver *solver,
     {
       NegativeClosure data;
       VariableSet *column_vars;
-      GHashTableIter iter;
+      VariableSetIter iter;
       Variable *v;
       double min_ratio;
       double r;
@@ -1010,7 +1046,7 @@ simplex_solver_delta_edit_constant (SimplexSolver *solver,
 {
   Expression *plus_expr, *minus_expr;
   VariableSet *column_set;
-  GHashTableIter iter;
+  VariableSetIter iter;
   Variable *basic_var;
 
   if (!solver->initialized)
@@ -1076,15 +1112,16 @@ simplex_solver_choose_subject (SimplexSolver *solver,
   bool found_new_restricted = false;
   bool retval_found = false;
   double coeff = 0.0;
-  GHashTableIter iter;
-  gpointer value_p;
+  GList *iter;
 
-  g_hash_table_iter_init (&iter, expression->terms);
-  while (g_hash_table_iter_next (&iter, NULL, &value_p))
+  iter = expression->ordered_terms;
+  while (iter != NULL)
     {
-      Term *t = value_p;
+      Term *t = iter->data;
       Variable *v = term_get_variable (t);
       double c = term_get_coefficient (t);
+
+      iter = iter->next;
 
       if (found_unrestricted)
         {
@@ -1128,12 +1165,14 @@ simplex_solver_choose_subject (SimplexSolver *solver,
   if (subject != NULL)
     return subject;
 
-  g_hash_table_iter_init (&iter, expression->terms);
-  while (g_hash_table_iter_next (&iter, NULL, &value_p))
+  iter = expression->ordered_terms;
+  while (iter != NULL)
     {
-      Term *t = value_p;
+      Term *t = iter->data;
       Variable *v = term_get_variable (t);
       double c = term_get_coefficient (t);
+
+      iter = iter->next;
 
       if (!variable_is_dummy (v))
         {
@@ -1560,7 +1599,7 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
 {
   Expression *z_row;
   VariableSet *error_vars;
-  GHashTableIter iter;
+  VariableSetIter iter;
   Variable *marker;
 
   if (!solver->initialized)
