@@ -36,7 +36,9 @@
 #include "emeus-utils-private.h"
 #include "emeus-variable-private.h"
 
+#include <errno.h>
 #include <math.h>
+#include <string.h>
 
 enum {
   CHILD_PROP_NAME = 1,
@@ -46,7 +48,15 @@ enum {
 
 static GParamSpec *emeus_constraint_layout_child_properties[CHILD_N_PROPS];
 
-G_DEFINE_TYPE (EmeusConstraintLayout, emeus_constraint_layout, GTK_TYPE_CONTAINER)
+static GtkBuildableIface *parent_buildable_iface;
+
+static GQuark quark_buildable_constraints;
+
+static void emeus_constraint_layout_buildable_iface_init (GtkBuildableIface *iface);
+
+G_DEFINE_TYPE_WITH_CODE (EmeusConstraintLayout, emeus_constraint_layout, GTK_TYPE_CONTAINER,
+                         G_IMPLEMENT_INTERFACE (GTK_TYPE_BUILDABLE, emeus_constraint_layout_buildable_iface_init))
+
 
 G_DEFINE_TYPE (EmeusConstraintLayoutChild, emeus_constraint_layout_child, GTK_TYPE_BIN)
 
@@ -483,12 +493,354 @@ emeus_constraint_layout_child_type (GtkContainer *container)
   return EMEUS_TYPE_CONSTRAINT_LAYOUT_CHILD;
 }
 
+#define TAG_CONSTRAINTS "constraints"
+#define TAG_CONSTRAINT  "constraint"
+
+#define ATTR_SOURCE_OBJECT      "source-object"
+#define ATTR_SOURCE_ATTR        "source-attr"
+#define ATTR_TARGET_OBJECT      "target-object"
+#define ATTR_TARGET_ATTR        "target-attr"
+#define ATTR_RELATION           "relation"
+#define ATTR_CONSTANT           "constant"
+#define ATTR_MULTIPLIER         "multiplier"
+#define ATTR_STRENGTH           "strength"
+
+typedef struct {
+  char *source_name;
+  char *source_attr;
+  char *target_name;
+  char *target_attr;
+  char *relation;
+  char *strength;
+  double constant;
+  double multiplier;
+} ConstraintData;
+
+typedef struct {
+  GObject *object;
+  GtkBuilder *builder;
+  GSList *items;
+} SubParserData;
+
+static void
+constraint_data_free (gpointer _data)
+{
+  ConstraintData *data = _data;
+
+  if (data == NULL)
+    return;
+
+  g_free (data->source_name);
+  g_free (data->source_attr);
+  g_free (data->target_name);
+  g_free (data->target_attr);
+  g_free (data->relation);
+  g_free (data->strength);
+
+  g_slice_free (ConstraintData, data);
+}
+
+/* Taken from gtk+/gtk/gtkbuilder.c */
+static gboolean
+_gtk_builder_enum_from_string (GType         type,
+                               const gchar  *string,
+                               gint         *enum_value,
+                               GError      **error)
+{
+  GEnumClass *eclass;
+  GEnumValue *ev;
+  gchar *endptr;
+  gint value;
+  gboolean ret;
+
+  g_return_val_if_fail (G_TYPE_IS_ENUM (type), FALSE);
+  g_return_val_if_fail (string != NULL, FALSE);
+
+  ret = TRUE;
+
+  endptr = NULL;
+  errno = 0;
+  value = g_ascii_strtoull (string, &endptr, 0);
+  if (errno == 0 && endptr != string) /* parsed a number */
+    *enum_value = value;
+  else
+    {
+      eclass = g_type_class_ref (type);
+      ev = g_enum_get_value_by_name (eclass, string);
+      if (!ev)
+        ev = g_enum_get_value_by_nick (eclass, string);
+
+      if (ev)
+        *enum_value = ev->value;
+      else
+        {
+          g_set_error (error,
+                       GTK_BUILDER_ERROR,
+                       GTK_BUILDER_ERROR_INVALID_VALUE,
+                       "Could not parse enum: '%s'",
+                       string);
+          ret = FALSE;
+        }
+
+      g_type_class_unref (eclass);
+    }
+
+  return ret;
+}
+
+static bool
+parse_double (const char *string,
+              double     *value_p,
+              double      default_value)
+{
+  double value;
+  char *endptr;
+
+  if (string == NULL)
+    {
+      *value_p = default_value;
+      return false;
+    }
+
+  errno = 0;
+  value = g_ascii_strtod (string, &endptr);
+  if (errno == 0 && endptr != string)
+    {
+      *value_p = value;
+      return true;
+    }
+
+  *value_p = default_value;
+
+  return false;
+}
+
+static EmeusConstraint *
+constraint_data_to_constraint (const ConstraintData *data,
+                               GtkBuilder           *builder,
+                               GError              **error)
+{
+  gpointer source, target;
+  int source_attr, target_attr;
+  int relation, strength;
+  gboolean res;
+
+  if (g_strcmp0 (data->source_name, "super") == 0)
+    source = NULL;
+  else
+    source = gtk_builder_get_object (builder, data->source_name);
+
+  if (g_strcmp0 (data->target_name, "super") == 0)
+    target = NULL;
+  else
+    target = gtk_builder_get_object (builder, data->target_name);
+
+  res = _gtk_builder_enum_from_string (EMEUS_TYPE_CONSTRAINT_ATTRIBUTE,
+                                       data->source_attr,
+                                       &source_attr,
+                                       error);
+  if (!res)
+    return NULL;
+
+  res = _gtk_builder_enum_from_string (EMEUS_TYPE_CONSTRAINT_ATTRIBUTE,
+                                       data->target_attr,
+                                       &target_attr,
+                                       error);
+  if (!res)
+    return NULL;
+
+  if (data->relation != NULL)
+    {
+      res = _gtk_builder_enum_from_string (EMEUS_TYPE_CONSTRAINT_RELATION,
+                                           data->relation,
+                                           &relation,
+                                           error);
+      if (!res)
+        return NULL;
+    }
+  else
+    relation = EMEUS_CONSTRAINT_RELATION_EQ;
+
+  if (data->strength != NULL)
+    {
+      res = _gtk_builder_enum_from_string (EMEUS_TYPE_CONSTRAINT_STRENGTH,
+                                           data->strength,
+                                           &strength,
+                                           error);
+    }
+  else
+    strength = EMEUS_CONSTRAINT_STRENGTH_REQUIRED;
+
+  return emeus_constraint_new (target, target_attr,
+                               relation,
+                               source, source_attr,
+                               data->multiplier,
+                               data->constant,
+                               strength);
+}
+
+static void
+constraints_free (gpointer data)
+{
+  g_slist_free_full (data, constraint_data_free);
+}
+
+static void
+constraint_layout_start_element (GMarkupParseContext  *context,
+                                 const gchar          *element_name,
+                                 const gchar         **names,
+                                 const gchar         **values,
+                                 gpointer              user_data,
+                                 GError              **error)
+{
+  SubParserData *data = user_data;
+
+  if (strcmp (element_name, TAG_CONSTRAINT) == 0)
+    {
+      const char *source_name, *source_attr;
+      const char *target_name, *target_attr;
+      const char *relation, *strength;
+      const char *multiplier, *constant;
+      ConstraintData *cdata;
+
+      if (!g_markup_collect_attributes (element_name, names, values, error,
+                                        G_MARKUP_COLLECT_STRING, ATTR_SOURCE_OBJECT, &source_name,
+                                        G_MARKUP_COLLECT_STRING, ATTR_SOURCE_ATTR, &source_attr,
+                                        G_MARKUP_COLLECT_STRING, ATTR_TARGET_OBJECT, &target_name,
+                                        G_MARKUP_COLLECT_STRING, ATTR_TARGET_ATTR, &target_attr,
+                                        G_MARKUP_COLLECT_STRING | G_MARKUP_COLLECT_OPTIONAL, ATTR_RELATION, &relation,
+                                        G_MARKUP_COLLECT_STRING | G_MARKUP_COLLECT_OPTIONAL, ATTR_STRENGTH, &strength,
+                                        G_MARKUP_COLLECT_STRING | G_MARKUP_COLLECT_OPTIONAL, ATTR_MULTIPLIER, &multiplier,
+                                        G_MARKUP_COLLECT_STRING | G_MARKUP_COLLECT_OPTIONAL, ATTR_CONSTANT, &constant,
+                                        G_MARKUP_COLLECT_INVALID))
+        {
+          return;
+        }
+
+      cdata = g_slice_new (ConstraintData);
+      cdata->source_name = g_strdup (source_name);
+      cdata->source_attr = g_strdup (source_attr);
+      cdata->target_name = g_strdup (target_name);
+      cdata->target_attr = g_strdup (target_attr);
+      cdata->relation = g_strdup (relation);
+      cdata->strength = g_strdup (strength);
+      parse_double (multiplier, &cdata->multiplier, 1.0);
+      parse_double (constant, &cdata->constant, 0.0);
+
+      data->items = g_slist_prepend (data->items, cdata);
+    }
+}
+
+static const GMarkupParser constraint_layout_parser = {
+  constraint_layout_start_element
+};
+
+static gboolean
+emeus_constraint_layout_buildable_custom_tag_start (GtkBuildable  *buildable,
+                                                    GtkBuilder    *builder,
+                                                    GObject       *child,
+                                                    const gchar   *tagname,
+                                                    GMarkupParser *parser,
+                                                    gpointer      *parser_data)
+{
+  if (parent_buildable_iface->custom_tag_start (buildable, builder, child, tagname, parser, parser_data))
+    return TRUE;
+
+  if (strcmp (tagname, TAG_CONSTRAINTS) == 0)
+    {
+      SubParserData *data;
+
+      data = g_slice_new0 (SubParserData);
+      data->items = NULL;
+      data->object = G_OBJECT (buildable);
+      data->builder = builder;
+
+      *parser = constraint_layout_parser;
+      *parser_data = data;
+
+      return TRUE;
+    }
+
+  return FALSE;
+}
+
+static void
+emeus_constraint_layout_buildable_custom_finished (GtkBuildable *buildable,
+                                                   GtkBuilder   *builder,
+                                                   GObject      *child,
+                                                   const gchar  *tagname,
+                                                   gpointer      user_data)
+{
+  parent_buildable_iface->custom_finished (buildable, builder, child, tagname, user_data);
+
+  if (strcmp (tagname, TAG_CONSTRAINTS) == 0)
+    {
+      SubParserData *data = user_data;
+
+      g_object_set_qdata_full (G_OBJECT (buildable), quark_buildable_constraints,
+                               data->items,
+                               constraints_free);
+
+      g_slice_free (SubParserData, data);
+    }
+}
+
+static void
+emeus_constraint_layout_buildable_parser_finished (GtkBuildable *buildable,
+                                                   GtkBuilder   *builder)
+{
+  EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (buildable);
+  GSList *constraints, *l;
+  GError *error = NULL;
+
+  /* Maintain the order in which the constraints were defined */
+  constraints = g_object_get_qdata (G_OBJECT (buildable), quark_buildable_constraints);
+  constraints = g_slist_reverse (constraints);
+
+  for (l = constraints; l != NULL; l = l->next)
+    {
+      const ConstraintData *cdata = l->data;
+      EmeusConstraint *c = constraint_data_to_constraint (cdata, builder, &error);
+
+      if (error != NULL)
+        {
+          g_critical ("Unable to parse constraint '%s.%s [%s] %s.%s * %g + %g': %s",
+                      cdata->target_name, cdata->target_attr,
+                      cdata->relation,
+                      cdata->source_name, cdata->source_attr,
+                      cdata->multiplier,
+                      cdata->constant,
+                      error->message);
+          g_clear_error (&error);
+          continue;
+        }
+
+      emeus_constraint_layout_add_constraint (self, c);
+    }
+
+  g_object_set_qdata (G_OBJECT (buildable), quark_buildable_constraints, NULL);
+
+  parent_buildable_iface->parser_finished (buildable, builder);
+}
+
+static void
+emeus_constraint_layout_buildable_iface_init (GtkBuildableIface *iface)
+{
+  parent_buildable_iface = g_type_interface_peek_parent (iface);
+
+  iface->parser_finished = emeus_constraint_layout_buildable_parser_finished;
+  iface->custom_tag_start = emeus_constraint_layout_buildable_custom_tag_start;
+  iface->custom_finished = emeus_constraint_layout_buildable_custom_finished;
+}
+
 static void
 emeus_constraint_layout_class_init (EmeusConstraintLayoutClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
   GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
   GtkContainerClass *container_class = GTK_CONTAINER_CLASS (klass);
+
+  quark_buildable_constraints = g_quark_from_static_string ("-EmeusConstraintLayout-constraints");
 
   gobject_class->finalize = emeus_constraint_layout_finalize;
 
