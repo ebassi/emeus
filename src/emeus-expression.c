@@ -50,28 +50,6 @@ term_free (Term *term)
   g_slice_free (Term, term);
 }
 
-static int
-sort_by_variable_id (gconstpointer a,
-                     gconstpointer b)
-{
-  const Term *ta = a;
-  const Term *tb = b;
-
-  if (ta == tb)
-    return 0;
-
-  if (ta == NULL)
-    return 1;
-
-  if (tb == NULL)
-    return -1;
-
-  if (ta->variable == tb->variable)
-    return 0;
-
-  return (ta->variable->id_ - tb->variable->id_);
-}
-
 static void
 expression_add_term (Expression *expression,
                      Term *term)
