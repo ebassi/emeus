@@ -660,15 +660,17 @@ constraint_data_to_constraint (const ConstraintData *data,
   if (g_strcmp0 (data->target_name, "super") == 0)
     target = NULL;
   else
-    target = gtk_builder_get_object (builder, data->target_name);
-
-  if (target == NULL)
     {
-      g_set_error (error, GTK_BUILDER_ERROR,
-                   GTK_BUILDER_ERROR_INVALID_VALUE,
-                   "Unable to find target '%s' for constraint",
-                   data->target_name);
-      return NULL;
+      target = gtk_builder_get_object (builder, data->target_name);
+
+      if (target == NULL)
+        {
+          g_set_error (error, GTK_BUILDER_ERROR,
+                       GTK_BUILDER_ERROR_INVALID_VALUE,
+                       "Unable to find target '%s' for constraint",
+                       data->target_name);
+          return NULL;
+        }
     }
 
   if (data->source_attr != NULL)
