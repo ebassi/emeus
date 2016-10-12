@@ -404,6 +404,8 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
   while (!g_sequence_iter_is_end (iter))
     {
       Variable *top, *left, *width, *height;
+      Variable *center_x, *center_y;
+      Variable *baseline;
       GtkAllocation child_alloc;
       GtkRequisition minimum;
 
@@ -414,15 +416,23 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
       left = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_LEFT);
       width = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
       height = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
+      center_x = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X);
+      center_y = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y);
+      baseline = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_BASELINE);
 
 #ifdef EMEUS_ENABLE_DEBUG
-      DEBUG (g_debug ("child '%s' [%p] = { .top:%g, .left:%g, .width:%g, .height:%g }",
-                      child->name,
+      DEBUG (g_debug ("child '%s' [%p] = { "
+                      ".top:%g, .left:%g, .width:%g, .height:%g, "
+                      ".center:(%g, %g), .baseline:%g "
+                      "}",
+                      child->name != NULL ? child->name : "<unnamed>",
                       child,
                       variable_get_value (top),
                       variable_get_value (left),
                       variable_get_value (width),
-                      variable_get_value (height)));
+                      variable_get_value (height),
+                      variable_get_value (center_x), variable_get_value (center_y),
+                      variable_get_value (baseline)));
 #endif
 
       gtk_widget_get_preferred_size (GTK_WIDGET (child), &minimum, NULL);
