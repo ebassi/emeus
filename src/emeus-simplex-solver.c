@@ -288,10 +288,8 @@ simplex_solver_init (SimplexSolver *solver)
                                                  (GDestroyNotify) variable_unref,
                                                  NULL);
 
-  /* HashSet<Variable>; owns keys */
-  solver->infeasible_rows = g_hash_table_new_full (NULL, NULL,
-                                                   (GDestroyNotify) variable_unref,
-                                                   NULL);
+  /* Vec<Variable> */
+  solver->infeasible_rows = g_ptr_array_new ();
 
   /* HashSet<Variable>; owns keys */
   solver->external_parametric_vars = g_hash_table_new_full (NULL, NULL,
@@ -361,7 +359,7 @@ simplex_solver_clear (SimplexSolver *solver)
              g_hash_table_size (solver->error_vars),
              solver->stay_error_vars->len,
              g_hash_table_size (solver->marker_vars),
-             g_hash_table_size (solver->infeasible_rows),
+             solver->infeasible_rows->len,
              g_hash_table_size (solver->external_rows),
              g_hash_table_size (solver->edit_var_map),
              g_hash_table_size (solver->stay_var_map));
@@ -378,9 +376,9 @@ simplex_solver_clear (SimplexSolver *solver)
   solver->artificial_counter = 0;
 
   g_clear_pointer (&solver->stay_error_vars, g_ptr_array_unref);
+  g_clear_pointer (&solver->infeasible_rows, g_ptr_array_unref);
 
   g_clear_pointer (&solver->external_rows, g_hash_table_unref);
-  g_clear_pointer (&solver->infeasible_rows, g_hash_table_unref);
   g_clear_pointer (&solver->external_parametric_vars, g_hash_table_unref);
   g_clear_pointer (&solver->error_vars, g_hash_table_unref);
   g_clear_pointer (&solver->marker_vars, g_hash_table_unref);
@@ -610,7 +608,7 @@ simplex_solver_remove_row (SimplexSolver *solver,
                             remove_expression_columns,
                             &data);
 
-  g_hash_table_remove (solver->infeasible_rows, variable);
+  g_ptr_array_remove (solver->infeasible_rows, variable);
 
   if (variable_is_external (variable))
     g_hash_table_remove (solver->external_rows, variable);
@@ -644,7 +642,7 @@ simplex_solver_substitute_out (SimplexSolver *solver,
           expression_substitute_out (row, old_variable, expression, v);
 
           if (variable_is_restricted (v) && expression_get_constant (row) < 0)
-            g_hash_table_add (solver->infeasible_rows, variable_ref (v));
+            g_ptr_array_add (solver->infeasible_rows, v);
         }
     }
 
@@ -681,30 +679,6 @@ simplex_solver_pivot (SimplexSolver *solver,
   expression_unref (expr);
 }
 
-typedef struct {
-  double objective_coefficient;
-  Variable *entry_variable;
-} NegativeClosure;
-
-static bool
-find_negative_coefficient (Term *term,
-                           gpointer data_)
-{
-  Variable *variable = term_get_variable (term);
-  double coefficient = term_get_coefficient (term);
-  NegativeClosure *data = data_;
-
-  if (variable_is_pivotable (variable) && coefficient < data->objective_coefficient)
-    {
-      /* Stop at the first negative coefficient */
-      data->objective_coefficient = coefficient;
-      data->entry_variable = variable;
-      return false;
-    }
-
-  return true;
-}
-
 static void
 simplex_solver_optimize (SimplexSolver *solver,
                          Variable *z)
@@ -728,30 +702,33 @@ simplex_solver_optimize (SimplexSolver *solver,
 
   while (true)
     {
-      NegativeClosure data;
+      GList *l;
       VariableSet *column_vars;
       VariableSetIter iter;
       Variable *v;
+      double objective_coefficient = 0.0;
       double min_ratio;
       double r;
 
-      data.objective_coefficient = 0.0;
-      data.entry_variable = NULL;
+      for (l = z_row->ordered_terms; l != NULL; l = l->next)
+        {
+          const Term *t = l->data;
 
-      expression_terms_foreach (z_row, find_negative_coefficient, &data);
+          if (variable_is_pivotable (t->variable) && t->coefficient < objective_coefficient)
+            {
+              entry = t->variable;
+              objective_coefficient = t->coefficient;
+              break;
+            }
+        }
 
-      if (data.objective_coefficient >= -DBL_EPSILON || data.entry_variable == NULL)
+      if (objective_coefficient >= -DBL_EPSILON)
         break;
-
-      entry = data.entry_variable;
 
       min_ratio = DBL_MAX;
       r = 0;
 
       column_vars = simplex_solver_get_column_set (solver, entry);
-      if (column_vars == NULL)
-        break;
-
       variable_set_iter_init (column_vars, &iter);
       while (variable_set_iter_next (&iter, &v))
         {
@@ -958,77 +935,63 @@ simplex_solver_new_expression (SimplexSolver *solver,
   return expr;
 }
 
-typedef struct {
-  Variable *entry;
-  double ratio;
-  Expression *z_row;
-} RatioClosure;
-
-static bool
-find_ratio (Term *term,
-            gpointer data_)
-{
-  Variable *v = term_get_variable (term);
-  double cd = term_get_coefficient (term);
-  RatioClosure *data = data_;
-
-  if (cd > 0.0 && variable_is_pivotable (v))
-    {
-      double zc = expression_get_coefficient (data->z_row, v);
-      double r = zc / cd;
-
-      if (r < data->ratio)
-        {
-          data->entry = v;
-          data->ratio = r;
-        }
-    }
-
-  return true;
-}
-
 static void
 simplex_solver_dual_optimize (SimplexSolver *solver)
 {
   Expression *z_row = g_hash_table_lookup (solver->rows, solver->objective);
-  GHashTableIter iter;
-  gpointer key_p, value_p;
 
 #ifdef EMEUS_ENABLE_DEBUG
   gint64 start_time = g_get_monotonic_time ();
 #endif
 
-  g_hash_table_iter_init (&iter, solver->infeasible_rows);
-  while (g_hash_table_iter_next (&iter, &key_p, &value_p))
+  /* We iterate until we don't have any more infeasible rows; the pivot()
+   * at the end of the loop iteration may add or remove infeasible rows
+   * as well
+   */
+  while (solver->infeasible_rows->len != 0)
     {
       Variable *entry_var, *exit_var;
       Expression *expr;
-      RatioClosure data;
+      double ratio;
+      GList *l;
 
-      exit_var = variable_ref (key_p);
-      g_hash_table_iter_remove (&iter);
+      /* Pop the last element of the array */
+      exit_var =
+        g_ptr_array_index (solver->infeasible_rows, solver->infeasible_rows->len - 1);
+      g_ptr_array_set_size (solver->infeasible_rows, solver->infeasible_rows->len - 1);
 
       expr = g_hash_table_lookup (solver->rows, exit_var);
       if (expr == NULL)
-        {
-          variable_unref (exit_var);
-          continue;
-        }
+        continue;
 
       if (expression_get_constant (expr) >= 0.0)
+        continue;
+
+      ratio = DBL_MAX;
+      entry_var = NULL;
+      for (l = expr->ordered_terms; l != NULL; l = l->next)
         {
-          variable_unref (exit_var);
-          continue;
+          Term *term = l->data;
+          Variable *v = term_get_variable (term);
+          double cd = term_get_coefficient (term);
+
+          if (cd > 0.0 && variable_is_pivotable (v))
+            {
+              double zc = expression_get_coefficient (z_row, v);
+              double r = zc / cd;
+
+              if (r < ratio)
+                {
+                  entry_var = v;
+                  ratio = r;
+                }
+            }
         }
 
-      data.ratio = DBL_MAX;
-      data.entry = NULL;
-      data.z_row = z_row;
-      expression_terms_foreach (expr, find_ratio, &data);
+      if (ratio == DBL_MAX)
+        g_critical ("INTERNAL: ratio == DBL_MAX in dual_optimize");
 
-      entry_var = data.entry;
-
-      if (entry_var != NULL && !approx_val (data.ratio, DBL_MAX))
+      if (entry_var != NULL)
         simplex_solver_pivot (solver, entry_var, exit_var);
     }
 
@@ -1060,7 +1023,7 @@ simplex_solver_delta_edit_constant (SimplexSolver *solver,
       expression_set_constant (plus_expr, new_constant);
 
       if (new_constant < 0.0)
-        g_hash_table_add (solver->infeasible_rows, variable_ref (plus_error_var));
+        g_ptr_array_add (solver->infeasible_rows, plus_error_var);
 
       return;
     }
@@ -1073,7 +1036,7 @@ simplex_solver_delta_edit_constant (SimplexSolver *solver,
       expression_set_constant (minus_expr, new_constant);
 
       if (new_constant < 0.0)
-        g_hash_table_add (solver->infeasible_rows, variable_ref (minus_error_var));
+        g_ptr_array_add (solver->infeasible_rows, minus_error_var);
 
       return;
     }
@@ -1098,7 +1061,7 @@ simplex_solver_delta_edit_constant (SimplexSolver *solver,
       expression_set_constant (expr, new_constant);
 
       if (variable_is_restricted (basic_var) && new_constant < 0.0)
-        g_hash_table_add (solver->infeasible_rows, variable_ref (basic_var));
+        g_ptr_array_add (solver->infeasible_rows, basic_var);
     }
 }
 
@@ -1253,10 +1216,15 @@ simplex_solver_add_with_artificial_variable (SimplexSolver *solver,
   az_tableau_row = g_hash_table_lookup (solver->rows, az);
   if (!approx_val (expression_get_constant (az_tableau_row), 0.0))
     {
-      simplex_solver_remove_row (solver, az);
-      simplex_solver_remove_column (solver, av);
+      char *str = expression_to_string (expression);
 
-      g_critical ("Unable to satisfy a required constraint");
+      simplex_solver_remove_column (solver, av);
+      simplex_solver_remove_row (solver, az);
+
+      g_critical ("Unable to satisfy a required constraint (add): %s", str);
+
+      g_free (str);
+
       return;
     }
 
@@ -1847,7 +1815,7 @@ simplex_solver_resolve (SimplexSolver *solver)
   simplex_solver_dual_optimize (solver);
   simplex_solver_set_external_variables (solver);
 
-  g_hash_table_remove_all (solver->infeasible_rows);
+  g_ptr_array_set_size (solver->infeasible_rows, 0);
 
   simplex_solver_reset_stay_constants (solver);
 
@@ -1868,7 +1836,7 @@ simplex_solver_begin_edit (SimplexSolver *solver)
       return;
     }
 
-  g_hash_table_remove_all (solver->infeasible_rows);
+  g_ptr_array_set_size (solver->infeasible_rows, 0);
   simplex_solver_reset_stay_constants (solver);
 }
 
