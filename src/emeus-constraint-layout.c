@@ -641,6 +641,19 @@ constraint_data_to_constraint (const ConstraintData *data,
 
   if (g_strcmp0 (data->source_name, "super") == 0)
     source = NULL;
+  else if (data->source_name == NULL)
+    {
+      if (data->source_attr != NULL)
+        {
+          g_set_error (error, GTK_BUILDER_ERROR,
+                       GTK_BUILDER_ERROR_INVALID_VALUE,
+                       "Constraints without 'source-object' must also not "
+                       "have a 'source-attr' attribute");
+          return NULL;
+        }
+
+      source = NULL;
+    }
   else
     source = gtk_builder_get_object (builder, data->source_name);
 
@@ -649,12 +662,26 @@ constraint_data_to_constraint (const ConstraintData *data,
   else
     target = gtk_builder_get_object (builder, data->target_name);
 
-  res = _gtk_builder_enum_from_string (EMEUS_TYPE_CONSTRAINT_ATTRIBUTE,
-                                       data->source_attr,
-                                       &source_attr,
-                                       error);
-  if (!res)
-    return NULL;
+  if (target == NULL)
+    {
+      g_set_error (error, GTK_BUILDER_ERROR,
+                   GTK_BUILDER_ERROR_INVALID_VALUE,
+                   "Unable to find target '%s' for constraint",
+                   data->target_name);
+      return NULL;
+    }
+
+  if (data->source_attr != NULL)
+    {
+      res = _gtk_builder_enum_from_string (EMEUS_TYPE_CONSTRAINT_ATTRIBUTE,
+                                           data->source_attr,
+                                           &source_attr,
+                                           error);
+      if (!res)
+        return NULL;
+    }
+  else
+    source_attr = EMEUS_CONSTRAINT_ATTRIBUTE_INVALID;
 
   res = _gtk_builder_enum_from_string (EMEUS_TYPE_CONSTRAINT_ATTRIBUTE,
                                        data->target_attr,
@@ -718,8 +745,8 @@ constraint_layout_start_element (GMarkupParseContext  *context,
       ConstraintData *cdata;
 
       if (!g_markup_collect_attributes (element_name, names, values, error,
-                                        G_MARKUP_COLLECT_STRING, ATTR_SOURCE_OBJECT, &source_name,
-                                        G_MARKUP_COLLECT_STRING, ATTR_SOURCE_ATTR, &source_attr,
+                                        G_MARKUP_COLLECT_STRING | G_MARKUP_COLLECT_OPTIONAL, ATTR_SOURCE_OBJECT, &source_name,
+                                        G_MARKUP_COLLECT_STRING | G_MARKUP_COLLECT_OPTIONAL, ATTR_SOURCE_ATTR, &source_attr,
                                         G_MARKUP_COLLECT_STRING, ATTR_TARGET_OBJECT, &target_name,
                                         G_MARKUP_COLLECT_STRING, ATTR_TARGET_ATTR, &target_attr,
                                         G_MARKUP_COLLECT_STRING | G_MARKUP_COLLECT_OPTIONAL, ATTR_RELATION, &relation,
@@ -829,6 +856,7 @@ emeus_constraint_layout_buildable_parser_finished (GtkBuildable *buildable,
           continue;
         }
 
+      DEBUG (g_debug ("Adding constraint [%p] from GtkBuilder definition", c));
       emeus_constraint_layout_add_constraint (self, c);
     }
 
