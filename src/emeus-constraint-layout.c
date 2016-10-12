@@ -150,31 +150,31 @@ get_layout_attribute (EmeusConstraintLayout   *layout,
       }
       break;
 
-    /* centerX = (left + width) / 2.0 */
+    /* centerX = left + (width / 2.0) */
     case EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X:
       {
         Variable *left = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_LEFT);
         Variable *width = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
         Expression *expr =
-          expression_divide (expression_plus_variable (expression_new_from_variable (left), width), 2.0);
+          expression_plus_variable (expression_divide (expression_new_from_variable (width), 2.0), left);
 
         simplex_solver_add_constraint (&layout->solver,
                                        res, OPERATOR_TYPE_EQ, expr,
-                                       STRENGTH_MEDIUM);
+                                       STRENGTH_REQUIRED);
       }
       break;
 
-    /* centerY = (top + height) / 2.0 */
+    /* centerY = top + (height / 2.0) */
     case EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y:
       {
         Variable *top = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_TOP);
         Variable *height = get_layout_attribute (layout, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
         Expression *expr =
-          expression_divide (expression_plus_variable (expression_new_from_variable (top), height), 2.0);
+          expression_plus_variable (expression_divide (expression_new_from_variable (height), 2.0), top);
 
         simplex_solver_add_constraint (&layout->solver,
                                        res, OPERATOR_TYPE_EQ, expr,
-                                       STRENGTH_MEDIUM);
+                                       STRENGTH_REQUIRED);
       }
       break;
 
@@ -257,33 +257,33 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
       }
       break;
 
-    /* centerX = (left + width) / 2.0 */
+    /* centerX = left + (width / 2.0) */
     case EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X:
       {
         Variable *left = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_LEFT);
         Variable *width = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
         Expression *expr =
-          expression_divide (expression_plus_variable (expression_new_from_variable (left), width), 2.0);
+          expression_plus_variable (expression_divide (expression_new_from_variable (width), 2.0), left);
 
         child->center_x_constraint =
           simplex_solver_add_constraint (child->solver,
                                          res, OPERATOR_TYPE_EQ, expr,
-                                         STRENGTH_MEDIUM);
+                                         STRENGTH_REQUIRED);
       }
       break;
 
-    /* centerY = (top + height) / 2.0 */
+    /* centerY = top + (height / 2.0) */
     case EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y:
       {
         Variable *top = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_TOP);
         Variable *height = get_child_attribute (child, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
         Expression *expr =
-          expression_divide (expression_plus_variable (expression_new_from_variable (top), height), 2.0);
+          expression_plus_variable (expression_divide (expression_new_from_variable (height), 2.0), top);
 
         child->center_y_constraint =
           simplex_solver_add_constraint (child->solver,
                                          res, OPERATOR_TYPE_EQ, expr,
-                                         STRENGTH_MEDIUM);
+                                         STRENGTH_REQUIRED);
       }
       break;
 
