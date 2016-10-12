@@ -363,8 +363,10 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
 {
   EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (widget);
   EmeusConstraintLayoutChild *child;
+  Variable *layout_top, *layout_left;
   Variable *layout_width, *layout_height;
   GSequenceIter *iter;
+  Constraint *stay_x, *stay_y;
   Constraint *stay_w, *stay_h;
 
   gtk_widget_set_allocation (widget, allocation);
@@ -372,8 +374,16 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
   if (g_sequence_is_empty (self->children))
     return;
 
+  layout_top = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_TOP);
+  layout_left = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_LEFT);
   layout_width = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
   layout_height = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
+
+  variable_set_value (layout_left, allocation->x);
+  stay_x = simplex_solver_add_stay_variable (&self->solver, layout_left, STRENGTH_REQUIRED);
+
+  variable_set_value (layout_top, allocation->y);
+  stay_y = simplex_solver_add_stay_variable (&self->solver, layout_top, STRENGTH_REQUIRED);
 
   variable_set_value (layout_width, allocation->width);
   stay_w = simplex_solver_add_stay_variable (&self->solver, layout_width, STRENGTH_REQUIRED);
@@ -382,8 +392,10 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
   stay_h = simplex_solver_add_stay_variable (&self->solver, layout_height, STRENGTH_REQUIRED);
 
 #ifdef EMEUS_ENABLE_DEBUG
-  DEBUG (g_debug ("layout [%p] = { .width:%g, .height:%g }",
+  DEBUG (g_debug ("layout [%p] = { .top:%g, .left:%g, .width:%g, .height:%g }",
                   self,
+                  variable_get_value (layout_top),
+                  variable_get_value (layout_left),
                   variable_get_value (layout_width),
                   variable_get_value (layout_height)));
 #endif
@@ -427,6 +439,8 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
       gtk_widget_size_allocate (GTK_WIDGET (child), &child_alloc);
     }
 
+  simplex_solver_remove_constraint (&self->solver, stay_x);
+  simplex_solver_remove_constraint (&self->solver, stay_y);
   simplex_solver_remove_constraint (&self->solver, stay_w);
   simplex_solver_remove_constraint (&self->solver, stay_h);
 }
