@@ -30,6 +30,7 @@ const MyApplicationWindow = new Lang.Class({
     _init: function(props={}) {
         this.parent(props);
         this.set_default_size(400, 500);
+        this.set_title('Grid layout');
 
         let box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, spacing: 6 });
         this.add(box);
