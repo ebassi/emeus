@@ -10,6 +10,13 @@ const template = ' \
     <property name="visible">True</property> \
     <property name="default-width">400</property> \
     <property name="default-height">500</property> \
+    <child type="titlebar"> \
+      <object class="GtkHeaderBar" id="headerbar"> \
+        <property name="visible">True</property> \
+        <property name="show-close-button">True</property> \
+        <property name="title">Centered button</property> \
+      </object> \
+    </child> \
     <child> \
       <object class="GtkBox" id="box"> \
         <property name="visible">True</property> \
@@ -30,7 +37,7 @@ const template = ' \
                           relation="eq" \
                           source-object="super" source-attr="center-x" \
                           strength="required"/> \
-              <constraint target-object="button_child" target-attr="center-y" \
+              <constraint target-object="button_child" target-attr="EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y" \
                           relation="eq" \
                           source-object="super" source-attr="center-y"/> \
               <constraint target-object="button_child" target-attr="width" \
