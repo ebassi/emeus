@@ -107,6 +107,8 @@ void expression_terms_foreach (Expression *expression,
                                ExpressionForeachTermFunc func,
                                gpointer data);
 
+GList *expression_get_terms (Expression *expression);
+
 void expression_change_subject (Expression *expression,
                                 Variable *old_subject,
                                 Variable *new_subject);

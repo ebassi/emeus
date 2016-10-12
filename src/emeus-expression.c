@@ -79,7 +79,7 @@ expression_add_term (Expression *expression,
   if (expression->terms == NULL)
     expression->terms = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) term_free);
 
-  expression->ordered_terms = g_list_insert_sorted (expression->ordered_terms, term, sort_by_variable_id);
+  expression->ordered_terms = g_list_append (expression->ordered_terms, term);
   g_hash_table_insert (expression->terms, term->variable, term);
 }
 
@@ -320,6 +320,15 @@ expression_get_value (const Expression *expression)
     }
 
   return res;
+}
+
+GList *
+expression_get_terms (Expression *expression)
+{
+  if (expression->terms == NULL)
+    return NULL;
+
+  return g_list_copy (expression->ordered_terms);
 }
 
 void
