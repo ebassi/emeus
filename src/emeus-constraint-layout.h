@@ -44,6 +44,9 @@ void            emeus_constraint_layout_add_constraints         (EmeusConstraint
                                                                  EmeusConstraint       *first_constraint,
                                                                  ...) G_GNUC_NULL_TERMINATED;
 
+EMEUS_AVAILABLE_IN_1_0
+GList *         emeus_constraint_layout_get_constraints         (EmeusConstraintLayout *layout);
+
 #define EMEUS_TYPE_CONSTRAINT_LAYOUT_CHILD (emeus_constraint_layout_child_get_type())
 
 EMEUS_AVAILABLE_IN_1_0

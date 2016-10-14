@@ -1310,6 +1310,42 @@ emeus_constraint_layout_pack (EmeusConstraintLayout *layout,
   va_end (args);
 }
 
+/**
+ * emeus_constraint_layout_get_constraints:
+ * @layout: a #EmeusConstraintLayout
+ *
+ * Retrieves all the constraints used by the @layout.
+ *
+ * Returns: (transfer container) (element-type EmeusConstraint): a list of
+ *   #EmeusConstraint instances, owned by the #EmeusConstraintLayout
+ *
+ * Since: 1.0
+ */
+GList *
+emeus_constraint_layout_get_constraints (EmeusConstraintLayout *layout)
+{
+  EmeusConstraintLayoutChild *child;
+  GSequenceIter *iter;
+  GList *res;
+
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT (layout), NULL);
+
+  /* First, add all the constraints attached to the layout */
+  res = g_hash_table_get_keys (layout->constraints);
+
+  /* Then, iterate over each child, and add the constraints attach to it */
+  iter = g_sequence_get_begin_iter (layout->children);
+  while (!g_sequence_iter_is_end (iter))
+    {
+      child = g_sequence_get (iter);
+      iter = g_sequence_iter_next (iter);
+
+      res = g_list_concat (res, g_hash_table_get_keys (child->constraints));
+    }
+
+  return res;
+}
+
 static void
 emeus_constraint_layout_child_finalize (GObject *gobject)
 {
