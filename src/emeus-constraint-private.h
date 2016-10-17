@@ -41,9 +41,12 @@ struct _EmeusConstraint
 
   EmeusConstraintStrength strength;
 
+  gboolean is_active;
+
   char *description;
   SimplexSolver *solver;
   Constraint *constraint;
+  EmeusConstraintLayout *layout;
 };
 
 gboolean        emeus_constraint_attach                 (EmeusConstraint       *constraint,

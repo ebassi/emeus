@@ -974,16 +974,11 @@ emeus_constraint_layout_new (void)
 }
 
 static void
-add_layout_constraint (EmeusConstraintLayout *layout,
-                       EmeusConstraint       *constraint)
+create_layout_constraint (EmeusConstraintLayout *layout,
+                          EmeusConstraint       *constraint)
 {
   Variable *attr1, *attr2;
   Expression *expr;
-
-  if (!emeus_constraint_attach (constraint, layout, layout))
-    return;
-
-  g_hash_table_add (layout->constraints, g_object_ref_sink (constraint));
 
   attr1 = get_layout_attribute (layout, constraint->target_attribute);
   if (constraint->source_attribute == EMEUS_CONSTRAINT_ATTRIBUTE_INVALID)
@@ -1034,28 +1029,25 @@ add_layout_constraint (EmeusConstraintLayout *layout,
 }
 
 static void
-add_child_constraint (EmeusConstraintLayout      *layout,
-                      EmeusConstraintLayoutChild *child,
-                      EmeusConstraint            *constraint)
+add_layout_constraint (EmeusConstraintLayout *layout,
+                       EmeusConstraint       *constraint)
+{
+  if (!emeus_constraint_attach (constraint, layout, layout))
+    return;
+
+  g_hash_table_add (layout->constraints, g_object_ref_sink (constraint));
+
+  if (constraint->is_active)
+    create_layout_constraint (layout, constraint);
+}
+
+static void
+create_child_constraint (EmeusConstraintLayout      *layout,
+                         EmeusConstraintLayoutChild *child,
+                         EmeusConstraint            *constraint)
 {
   Variable *attr1, *attr2;
   Expression *expr;
-
-  if (emeus_constraint_is_attached (constraint))
-    {
-      const char *constraint_description = emeus_constraint_to_string (constraint);
-
-      g_critical ("Constraint '%s' cannot be attached to more than "
-                  "one child.",
-                  constraint_description);
-
-      return;
-    }
-
-  if (!emeus_constraint_attach (constraint, layout, child))
-    return;
-
-  g_hash_table_add (child->constraints, g_object_ref_sink (constraint));
 
   /* attr1 is the LHS of the linear equation */
   attr1 = get_child_attribute (constraint->target_object,
@@ -1120,6 +1112,31 @@ add_child_constraint (EmeusConstraintLayout      *layout,
                                    strength_to_value (constraint->strength));
 }
 
+static void
+add_child_constraint (EmeusConstraintLayout      *layout,
+                      EmeusConstraintLayoutChild *child,
+                      EmeusConstraint            *constraint)
+{
+  if (emeus_constraint_is_attached (constraint))
+    {
+      const char *constraint_description = emeus_constraint_to_string (constraint);
+
+      g_critical ("Constraint '%s' cannot be attached to more than "
+                  "one child.",
+                  constraint_description);
+
+      return;
+    }
+
+  if (!emeus_constraint_attach (constraint, layout, child))
+    return;
+
+  g_hash_table_add (child->constraints, g_object_ref_sink (constraint));
+
+  if (constraint->is_active)
+    create_child_constraint (layout, child, constraint);
+}
+
 static gboolean
 remove_child_constraint (EmeusConstraintLayout      *layout,
                          EmeusConstraintLayoutChild *child,
@@ -1136,6 +1153,34 @@ remove_child_constraint (EmeusConstraintLayout      *layout,
   g_hash_table_remove (child->constraints, constraint);
 
   return TRUE;
+}
+
+void
+emeus_constraint_layout_activate_constraint (EmeusConstraintLayout *layout,
+                                             EmeusConstraint       *constraint)
+{
+  g_assert (constraint->solver == &layout->solver);
+
+  if (constraint->constraint == NULL)
+    return;
+
+  if (constraint->target_object == layout)
+    create_layout_constraint (layout, constraint);
+  else
+    create_child_constraint (layout, constraint->target_object, constraint);
+}
+
+void
+emeus_constraint_layout_deactivate_constraint (EmeusConstraintLayout *layout,
+                                               EmeusConstraint       *constraint)
+{
+  g_assert (constraint->solver == &layout->solver);
+
+  if (constraint->constraint == NULL)
+    return;
+
+  simplex_solver_remove_constraint (constraint->solver, constraint->constraint);
+  constraint->constraint = NULL;
 }
 
 SimplexSolver *

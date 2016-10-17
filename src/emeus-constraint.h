@@ -65,4 +65,10 @@ gboolean                        emeus_constraint_is_required            (EmeusCo
 EMEUS_AVAILABLE_IN_1_0
 gboolean                        emeus_constraint_is_attached            (EmeusConstraint         *constraint);
 
+EMEUS_AVAILABLE_IN_1_0
+void                            emeus_constraint_set_active             (EmeusConstraint         *constraint,
+                                                                         gboolean                 is_active);
+EMEUS_AVAILABLE_IN_1_0
+gboolean                        emeus_constraint_get_activa             (EmeusConstraint         *constraint);
+
 G_END_DECLS
