@@ -41,7 +41,6 @@ conf.set('EMEUS_VERSION', meson.project_version())
 # Compiler flags
 test_cflags = [
   '-fstrict-aliasing',
-  '-Wall',
   '-Wpointer-arith',
   '-Wmissing-declarations',
   '-Wformat=2',
