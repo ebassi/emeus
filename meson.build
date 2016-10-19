@@ -134,7 +134,7 @@ endif
 # Required dependencies
 mathlib_dep = cc.find_library('m', required: false)
 
-glib_dep = dependency('glib-2.0', version: '>= 2.46', required: true)
+glib_dep = dependency('glib-2.0', version: '>= 2.46')
 
 gtk_version_req_major = 3
 gtk_version_req_minor = 20
@@ -152,7 +152,7 @@ if gtk_version_is_development
   ]
 endif
 
-gtk_dep = dependency('gtk+-3.0', version: '>= ' + gtk_version_required, required: true)
+gtk_dep = dependency('gtk+-3.0', version: '>= ' + gtk_version_required)
 
 gnome = import('gnome')
 
