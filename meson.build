@@ -132,7 +132,7 @@ if get_option('default_library') != 'static'
 endif
 
 # Required dependencies
-mathlib_dep = cc.find_library('m', required: true)
+mathlib_dep = cc.find_library('m', required: false)
 
 glib_dep = dependency('glib-2.0', version: '>= 2.46', required: true)
 
