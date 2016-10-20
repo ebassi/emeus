@@ -91,4 +91,9 @@ SimplexSolver * emeus_constraint_layout_get_solver      (EmeusConstraintLayout *
 gboolean        emeus_constraint_layout_has_child_data  (EmeusConstraintLayout *layout,
                                                          GtkWidget             *widget);
 
+void            emeus_constraint_layout_activate_constraint     (EmeusConstraintLayout *layout,
+                                                                 EmeusConstraint       *constraint);
+void            emeus_constraint_layout_deactivate_constraint   (EmeusConstraintLayout *layout,
+                                                                 EmeusConstraint       *constraint);
+
 G_END_DECLS

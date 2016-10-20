@@ -79,6 +79,7 @@ enum {
   PROP_MULTIPLIER,
   PROP_CONSTANT,
   PROP_STRENGTH,
+  PROP_ACTIVE,
 
   N_PROPERTIES
 };
@@ -139,6 +140,10 @@ emeus_constraint_set_property (GObject      *gobject,
       self->strength = g_value_get_enum (value);
       break;
 
+    case PROP_ACTIVE:
+      emeus_constraint_set_active (self, g_value_get_boolean (value));
+      break;
+
     default:
       G_OBJECT_WARN_INVALID_PROPERTY_ID (gobject, prop_id, pspec);
     }
@@ -184,6 +189,10 @@ emeus_constraint_get_property (GObject    *gobject,
 
     case PROP_STRENGTH:
       g_value_set_enum (value, self->strength);
+      break;
+
+    case PROP_ACTIVE:
+      g_value_set_boolean (value, self->is_active);
       break;
 
     default:
@@ -262,6 +271,13 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
                        G_PARAM_READWRITE |
                        G_PARAM_STATIC_STRINGS);
 
+  emeus_constraint_properties[PROP_ACTIVE] =
+    g_param_spec_boolean ("active", "Active", NULL,
+                          TRUE,
+                          G_PARAM_READWRITE |
+                          G_PARAM_STATIC_STRINGS |
+                          G_PARAM_EXPLICIT_NOTIFY);
+
   g_object_class_install_properties (gobject_class, N_PROPERTIES, emeus_constraint_properties);
 }
 
@@ -274,6 +290,7 @@ emeus_constraint_init (EmeusConstraint *self)
   self->multiplier = 1.0;
   self->constant = 0.0;
   self->strength = EMEUS_CONSTRAINT_STRENGTH_REQUIRED;
+  self->is_active = TRUE;
 }
 
 /**
@@ -577,6 +594,7 @@ emeus_constraint_attach (EmeusConstraint       *constraint,
                          EmeusConstraintLayout *layout,
                          gpointer               target_object)
 {
+  constraint->layout = layout;
   constraint->target_object = target_object;
   constraint->solver = emeus_constraint_layout_get_solver (layout);
 
@@ -591,6 +609,7 @@ emeus_constraint_detach (EmeusConstraint *constraint)
 
   constraint->constraint = NULL;
   constraint->target_object = NULL;
+  constraint->layout = NULL;
   constraint->solver = NULL;
 }
 
@@ -611,4 +630,36 @@ emeus_constraint_is_attached (EmeusConstraint *constraint)
   g_return_val_if_fail (EMEUS_IS_CONSTRAINT (constraint), FALSE);
 
   return constraint->solver != NULL;
+}
+
+void
+emeus_constraint_set_active (EmeusConstraint *constraint,
+                             gboolean         active)
+{
+  g_return_if_fail (EMEUS_IS_CONSTRAINT (constraint));
+
+  active = !!active;
+
+  if (constraint->is_active == active)
+    return;
+
+  constraint->is_active = active;
+
+  if (constraint->layout != NULL)
+    {
+      if (constraint->is_active)
+        emeus_constraint_layout_activate_constraint (constraint->layout, constraint);
+      else
+        emeus_constraint_layout_deactivate_constraint (constraint->layout, constraint);
+    }
+
+  g_object_notify_by_pspec (G_OBJECT (constraint), emeus_constraint_properties[PROP_ACTIVE]);
+}
+
+gboolean
+emeus_constraint_get_active (EmeusConstraint *constraint)
+{
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT (constraint), FALSE);
+
+  return constraint->is_active;
 }
