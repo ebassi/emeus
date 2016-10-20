@@ -657,7 +657,7 @@ emeus_constraint_set_active (EmeusConstraint *constraint,
 }
 
 gboolean
-emeus_constraint_get_activa (EmeusConstraint *constraint)
+emeus_constraint_get_active (EmeusConstraint *constraint)
 {
   g_return_val_if_fail (EMEUS_IS_CONSTRAINT (constraint), FALSE);
 

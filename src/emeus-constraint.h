@@ -69,6 +69,6 @@ EMEUS_AVAILABLE_IN_1_0
 void                            emeus_constraint_set_active             (EmeusConstraint         *constraint,
                                                                          gboolean                 is_active);
 EMEUS_AVAILABLE_IN_1_0
-gboolean                        emeus_constraint_get_activa             (EmeusConstraint         *constraint);
+gboolean                        emeus_constraint_get_active             (EmeusConstraint         *constraint);
 
 G_END_DECLS
