@@ -15,6 +15,7 @@ private_headers = [
   'emeus-types-private.h',
   'emeus-utils-private.h',
   'emeus-variable-private.h',
+  'emeus-vfl-parser-private.h',
 ]
 
 sources = [
@@ -25,6 +26,7 @@ sources = [
   'emeus-types.c',
   'emeus-utils.c',
   'emeus-variable.c',
+  'emeus-vfl-parser.c',
 ]
 
 # Generated headers
