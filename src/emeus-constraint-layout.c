@@ -1161,7 +1161,7 @@ emeus_constraint_layout_activate_constraint (EmeusConstraintLayout *layout,
 {
   g_assert (constraint->solver == &layout->solver);
 
-  if (constraint->constraint == NULL)
+  if (constraint->constraint != NULL)
     return;
 
   if (constraint->target_object == layout)
