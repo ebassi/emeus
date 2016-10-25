@@ -52,7 +52,7 @@ libemeus = shared_library('emeus-@0@'.format(emeus_api_version),
   link_args: [ '-Wl,-Bsymbolic-functions' ])
 
 # Internal dependency, for tests
-emeus_inc = include_directories([ meson.source_root() + '/src', meson.build_root() + '/src' ])
+emeus_inc = include_directories('.')
 emeus_dep = declare_dependency(link_with: libemeus,
                                include_directories: [ emeus_inc ],
                                dependencies: [ gtk_dep, mathlib_dep ])
