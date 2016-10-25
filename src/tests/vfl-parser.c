@@ -23,6 +23,7 @@ static struct {
   { "grid-1", "H:|-8-[view1(==view2)]-12-[view2]-8-|", },
   { "grid-2", "H:|-8-[view3]-8-|", },
   { "grid-3", "V:|-8-[view1]-12-[view3(==view1,view2)]-8-|", },
+  { "predicate-spacing-1", "|-(>=0)-[view]-(>=0)-|", },
 };
 
 static struct {

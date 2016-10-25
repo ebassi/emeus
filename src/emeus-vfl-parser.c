@@ -23,6 +23,8 @@ typedef struct {
   double size;
   bool is_set;
   bool is_default;
+  bool is_predicate;
+  VflPredicate predicate;
 } VflSpacing;
 
 typedef struct _VflView VflView;
@@ -200,6 +202,155 @@ out:
 }
 
 static bool
+parse_predicate (VflParser *parser,
+                 const char *cursor,
+                 VflPredicate *predicate,
+                 char **endptr,
+                 GError **error)
+{
+  VflOrientation orientation = parser->orientation;
+  const char *end = cursor;
+  char *object = NULL;
+
+  /*         <predicate> = (<relation>)? (<objectOfPredicate>) ('@'<priority>)?
+   *          <relation> = '==' | '<=' | '>='
+   * <objectOfPredicate> = <constant> | <metric>
+   *          <constant> = <number>
+   *            <metric> = <attrName> | <viewName> ('.'<attrName>)?
+   *          <attrName> = [A-Za-z_]([A-Za-z0-9_]+)
+   *          <priority> = 'weak' | 'medium' | 'strong' | 'required'
+   */
+
+  /* Parse relation */
+  if (*end == '=' || *end == '>' || *end == '<')
+    {
+      OperatorType relation;
+      char *tmp;
+
+      if (!parse_relation (end, &relation, &tmp, error))
+        return false;
+
+      predicate->relation = relation;
+
+      end = tmp;
+    }
+  else
+    predicate->relation = OPERATOR_TYPE_EQ;
+
+  /* Parse object of predicate */
+  if (g_ascii_isdigit (*end))
+    {
+      char *tmp;
+
+      /* <constant> */
+      predicate->object = NULL;
+      predicate->attr = default_attribute[orientation];
+      predicate->constant = g_ascii_strtod (end, &tmp);
+
+      end = tmp;
+    }
+  else if (g_ascii_isalpha (*end) || *end == '_')
+    {
+      const char *attr;
+      char *tmp;
+
+      /* <attrName> */
+      if (is_valid_attribute (orientation, end, &attr, &tmp))
+        end = tmp;
+      else
+        {
+          char *dot = strchr (end, '.');
+
+          if (dot != NULL)
+            {
+              /* <viewName>.<attrName> */
+              object = g_strndup (end, dot - end);
+              end = dot + 1;
+
+              if (is_valid_attribute (orientation, end, &attr, &tmp))
+                end = tmp;
+              else
+                {
+                  g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_ATTRIBUTE,
+                               "Unexpected attribute after dot notation");
+                  g_free (object);
+                  return false;
+                }
+            }
+          else
+            {
+              tmp = (char *) end;
+
+              /* <viewName> */
+              while (g_ascii_isalnum (*tmp) || *tmp == '_')
+                tmp += 1;
+
+              object = g_strndup (end, tmp - end);
+
+              attr = default_attribute[orientation];
+
+              end = tmp;
+            }
+        }
+
+      predicate->attr = attr;
+      predicate->constant = 0.0;
+    }
+  else
+    {
+      g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
+                   "Expected constant, view name, or attribute");
+      return false;
+    }
+
+  /* Parse priority */
+  if (*end == '@')
+    {
+      StrengthType priority;
+      end += 1;
+
+      if (strncmp (end, "weak", 4) == 0)
+        {
+          priority = STRENGTH_WEAK;
+          end += 4;
+        }
+      else if (strncmp (end, "medium", 6) == 0)
+        {
+          priority = STRENGTH_MEDIUM;
+          end += 6;
+        }
+      else if (strncmp (end, "strong", 6) == 0)
+        {
+          priority = STRENGTH_STRONG;
+          end += 6;
+        }
+      else if (strncmp (end, "required", 8) == 0)
+        {
+          priority = STRENGTH_REQUIRED;
+          end += 8;
+        }
+      else
+        {
+          g_free (object);
+          g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_PRIORITY,
+                       "Priority must be one of 'weak', 'medium', 'strong', and 'required'");
+          return false;
+        }
+
+      predicate->priority = priority;
+    }
+  else
+    predicate->priority = STRENGTH_REQUIRED;
+
+  predicate->object = object;
+
+  if (endptr != NULL)
+    *endptr = (char *) end;
+
+  return true;
+}
+
+static bool
 parse_view (VflParser *parser,
             const char *cursor,
             VflView *view,
@@ -258,148 +409,19 @@ parse_view (VflParser *parser,
   while (*end != '\0')
     {
       VflPredicate cur_predicate;
-      char *object = NULL;
+      char *tmp;
 
       if (*end == ']' || *end == '\0')
         {
           g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
-                       "A predicate on a view must end with ')'");
+                   "A predicate on a view must end with ')'");
           return false;
         }
 
-      /*         <predicate> = (<relation>)? (<objectOfPredicate>) ('@'<priority>)?
-       *          <relation> = '==' | '<=' | '>='
-       * <objectOfPredicate> = <constant> | <metric>
-       *          <constant> = <number>
-       *            <metric> = <attrName> | <viewName> ('.'<attrName>)?
-       *          <attrName> = [A-Za-z_]([A-Za-z0-9_]+)
-       *          <priority> = 'weak' | 'medium' | 'strong' | 'required'
-       */
+      if (!parse_predicate (parser, end, &cur_predicate, &tmp, error))
+        return false;
 
-      /* Parse relation */
-      if (*end == '=' || *end == '>' || *end == '<')
-        {
-          char *tmp;
-
-          if (!parse_relation (end, &(cur_predicate.relation), &tmp, error))
-            return false;
-
-          end = tmp;
-        }
-      else
-        cur_predicate.relation = OPERATOR_TYPE_EQ;
-
-      /* Parse object of predicate */
-      if (g_ascii_isdigit (*end))
-        {
-          char *tmp;
-
-          /* <constant> */
-          cur_predicate.object = NULL;
-          cur_predicate.attr = default_attribute[view->orientation];
-          cur_predicate.constant = g_ascii_strtod (end, &tmp);
-
-          end = tmp;
-        }
-      else if (g_ascii_isalpha (*end) || *end == '_')
-        {
-          char *tmp;
-
-          /* <attrName> */
-          if (is_valid_attribute (view->orientation, end, &(cur_predicate.attr), &tmp))
-            end = tmp;
-          else
-            {
-              char *dot = strchr (end, '.');
-
-              if (dot != NULL)
-                {
-                  /* <viewName>.<attrName> */
-                  object = g_strndup (end, dot - end);
-                  end = dot + 1;
-
-                  if (is_valid_attribute (view->orientation, end, &(cur_predicate.attr), &tmp))
-                    end = tmp;
-                  else
-                    {
-                      g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_ATTRIBUTE,
-                                   "Unexpected attribute after dot notation");
-                      g_free (object);
-                      return false;
-                    }
-                }
-              else
-                {
-                  tmp = (char *) end;
-
-                  /* <viewName> */
-                  while (g_ascii_isalnum (*tmp) || *tmp == '_')
-                    tmp += 1;
-
-                  object = g_strndup (end, tmp - end);
-
-                  cur_predicate.attr = default_attribute[view->orientation];
-
-                  end = tmp;
-                }
-            }
-
-          cur_predicate.constant = 0.0;
-        }
-      else
-        {
-          g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
-                       "Expected constant, view name, or attribute");
-          return false;
-        }
-
-      /* Parse priority */
-      if (*end == '@')
-        {
-          end += 1;
-
-          if (strncmp (end, "weak", 4) == 0)
-            {
-              cur_predicate.priority = STRENGTH_WEAK;
-              end += 4;
-            }
-          else if (strncmp (end, "medium", 6) == 0)
-            {
-              cur_predicate.priority = STRENGTH_MEDIUM;
-              end += 6;
-            }
-          else if (strncmp (end, "strong", 6) == 0)
-            {
-              cur_predicate.priority = STRENGTH_STRONG;
-              end += 6;
-            }
-          else if (strncmp (end, "required", 8) == 0)
-            {
-              cur_predicate.priority = STRENGTH_REQUIRED;
-              end += 8;
-            }
-          else
-            {
-              g_free (object);
-              g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_PRIORITY,
-                           "Priority must be one of 'weak', 'medium', 'strong', and 'required'");
-              return false;
-            }
-
-          if (!(*end == ',' || *end == ')'))
-            {
-              g_free (object);
-              g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
-                           "Priority must be the last element of a predicate");
-              return false;
-            }
-        }
-      else
-        cur_predicate.priority = STRENGTH_REQUIRED;
-
-      cur_predicate.object = object;
-
-      g_array_append_val (view->predicates, cur_predicate);
+      end = tmp;
 
 #if 0
       g_print ("*** Found predicate: %s.%s %s %g %s\n",
@@ -416,6 +438,8 @@ parse_view (VflParser *parser,
                cur_predicate.priority == STRENGTH_REQUIRED ? "required" :
                "unknown strength");
 #endif
+
+      g_array_append_val (view->predicates, cur_predicate);
 
       /* If the predicate is a list, iterate again */
       if (*end == ',')
@@ -631,7 +655,47 @@ vfl_parser_parse_line (VflParser *parser,
               /* Default spacer */
               spacing->is_set = true;
               spacing->is_default = true;
-              spacing->size = get_default_spacing (parser);
+              spacing->is_predicate = false;
+              spacing->size = 0;
+
+              cur += 1;
+
+              continue;
+            }
+          else if (*(cur + 1) == '(')
+            {
+              VflPredicate *predicate;
+              VflSpacing *spacing;
+              char *tmp;
+
+              /* Predicate */
+              cur += 1;
+
+              spacing = &(parser->current_view->spacing);
+              spacing->is_set = true;
+              spacing->is_default = false;
+              spacing->is_predicate = true;
+              spacing->size = 0;
+              predicate = &(spacing->predicate);
+
+              cur += 1;
+              if (!parse_predicate (parser, cur, predicate, &tmp, error))
+                return false;
+
+              if (*tmp != ')')
+                {
+                  g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
+                                "Expected ')' at the end of a predicate, not '%c'", *tmp);
+                  return false;
+                }
+
+              cur = tmp + 1;
+              if (*cur != '-')
+                {
+                  g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
+                               "Explicit spacing must be followed by '-'");
+                  return false;
+                }
 
               cur += 1;
 
@@ -642,11 +706,13 @@ vfl_parser_parse_line (VflParser *parser,
               VflSpacing *spacing;
               char *tmp;
 
+              /* Explicit spacing */
               cur += 1;
 
               spacing = &(parser->current_view->spacing);
               spacing->is_set = true;
               spacing->is_default = false;
+              spacing->is_predicate = false;
               spacing->size = g_ascii_strtod (cur, &tmp);
 
               if (tmp == cur)
@@ -760,8 +826,6 @@ vfl_parser_get_constraints (VflParser *parser,
           else
             c.attr1 = iter->orientation == VFL_HORIZONTAL ? "end" : "bottom";
 
-          c.relation = OPERATOR_TYPE_EQ;
-
           c.view2 = iter->next_view != NULL ? iter->next_view->name : "super";
 
           if (iter == parser->trailing_super || iter->next_view == parser->trailing_super)
@@ -769,14 +833,35 @@ vfl_parser_get_constraints (VflParser *parser,
           else
             c.attr2 = iter->orientation == VFL_HORIZONTAL ? "start" : "top";
 
-          c.constant = iter->spacing.size * -1.0;
+          if (iter->spacing.is_predicate)
+            {
+              const VflPredicate *p = &(iter->spacing.predicate);
+
+              c.constant = p->constant;
+              c.relation = p->relation;
+              c.strength = p->priority;
+            }
+          else if (iter->spacing.is_default)
+            {
+              c.constant = get_default_spacing (parser);
+              c.relation = OPERATOR_TYPE_EQ;
+              c.strength = STRENGTH_REQUIRED;
+            }
+          else
+            {
+              c.constant = iter->spacing.size * -1.0;
+              c.relation = OPERATOR_TYPE_EQ;
+              c.strength = STRENGTH_REQUIRED;
+            }
+
           c.multiplier = 1.0;
-          c.strength = STRENGTH_REQUIRED;
 
           g_array_append_val (constraints, c);
         }
       else if (iter->next_view != NULL)
         {
+          c.view1 = iter->name;
+
           /* If this is the first view, we need to anchor the leading edge */
           if (iter == parser->leading_super)
             c.attr1 = iter->orientation == VFL_HORIZONTAL ? "start" : "top";
