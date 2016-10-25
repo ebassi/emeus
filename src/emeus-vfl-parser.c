@@ -52,6 +52,9 @@ struct _VflParser
   char *buffer;
   gsize buffer_len;
 
+  int error_offset;
+  int error_range;
+
   int default_spacing[2];
 
   const char *cursor;
@@ -228,7 +231,11 @@ parse_predicate (VflParser *parser,
       char *tmp;
 
       if (!parse_relation (end, &relation, &tmp, error))
-        return false;
+        {
+          parser->error_offset = end - parser->cursor;
+          parser->error_range = 2;
+          return false;
+        }
 
       predicate->relation = relation;
 
@@ -271,6 +278,8 @@ parse_predicate (VflParser *parser,
                 end = tmp;
               else
                 {
+                  parser->error_offset = end - parser->cursor;
+                  parser->error_range = strchr (end, ')') - end - 1;
                   g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_ATTRIBUTE,
                                "Unexpected attribute after dot notation");
                   g_free (object);
@@ -331,6 +340,8 @@ parse_predicate (VflParser *parser,
         }
       else
         {
+          parser->error_offset = end - parser->cursor;
+          parser->error_range = strchr (end, ')') - end - 1;
           g_free (object);
           g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_PRIORITY,
                        "Priority must be one of 'weak', 'medium', 'strong', and 'required'");
@@ -370,6 +381,7 @@ parse_view (VflParser *parser,
 
   if (!(g_ascii_isalpha (*end) || *end == '_'))
     {
+      parser->error_offset = end - parser->cursor;
       g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_VIEW,
                    "View identifiers must be valid C identifiers");
       return false;
@@ -380,6 +392,7 @@ parse_view (VflParser *parser,
 
   if (*end == '\0')
     {
+      parser->error_offset = end - parser->cursor;
       g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                    "A view must end with ']'");
       return false;
@@ -399,6 +412,7 @@ parse_view (VflParser *parser,
   /* <predicateListWithParens> = '(' <predicate> (',' <predicate>)* ')' */
   if (*end != '(')
     {
+      parser->error_offset = end - parser->cursor;
       g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                    "A predicate must follow a view name");
       return false;
@@ -413,6 +427,7 @@ parse_view (VflParser *parser,
 
       if (*end == ']' || *end == '\0')
         {
+          parser->error_offset = end - parser->cursor;
           g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                    "A predicate on a view must end with ')'");
           return false;
@@ -455,6 +470,7 @@ parse_view (VflParser *parser,
           break;
         }
 
+      parser->error_offset = end - parser->cursor;
       g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                    "Expected ')' at the end of a predicate, not '%c'", *end);
       return false;
@@ -462,6 +478,7 @@ parse_view (VflParser *parser,
 
   if (*end != ']')
     {
+      parser->error_offset = end - parser->cursor;
       g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                    "Expected ']' at the end of a view, not '%c'", *end);
       return false;
@@ -529,6 +546,9 @@ vfl_parser_parse_line (VflParser *parser,
 {
   g_free (parser->buffer);
 
+  parser->error_offset = 0;
+  parser->error_range = 0;
+
   if (len > 0)
     {
       parser->buffer = g_strndup (buffer, len);
@@ -556,6 +576,7 @@ vfl_parser_parse_line (VflParser *parser,
 
       if (*cur != ':')
         {
+          parser->error_offset = cur - parser->cursor;
           g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                        "Expected ':' after horizontal orientation");
           return false;
@@ -570,6 +591,7 @@ vfl_parser_parse_line (VflParser *parser,
 
       if (*cur != ':')
         {
+          parser->error_offset = cur - parser->cursor;
           g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                        "Expected ':' after vertical orientation");
           return false;
@@ -586,6 +608,7 @@ vfl_parser_parse_line (VflParser *parser,
         {
           if (parser->current_view != NULL && parser->leading_super == NULL)
             {
+              parser->error_offset = cur - parser->cursor;
               g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                            "Super view definitions cannot follow child views");
               return false;
@@ -620,6 +643,7 @@ vfl_parser_parse_line (VflParser *parser,
             }
           else
             {
+              parser->error_offset = cur - parser->cursor;
               g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                            "Super views can only appear at the beginning "
                            "and end of the layout, and not multiple times");
@@ -636,6 +660,7 @@ vfl_parser_parse_line (VflParser *parser,
         {
           if (*(cur + 1) == '\0')
             {
+              parser->error_offset = cur - parser->cursor;
               g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                            "Unterminated spacing");
               return false;
@@ -643,6 +668,7 @@ vfl_parser_parse_line (VflParser *parser,
 
           if (parser->current_view == NULL)
             {
+              parser->error_offset = cur - parser->cursor;
               g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                            "Spacing cannot be set without a view");
               return false;
@@ -717,6 +743,7 @@ vfl_parser_parse_line (VflParser *parser,
 
               if (tmp == cur)
                 {
+                  parser->error_offset = cur - parser->cursor;
                   g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                                "Spacing must be a number");
                   return false;
@@ -724,6 +751,8 @@ vfl_parser_parse_line (VflParser *parser,
 
               if (*tmp != '-')
                 {
+                  parser->error_offset = cur - parser->cursor;
+                  parser->error_range = tmp - cur;
                   g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                                "Explicit spacing must be followed by '-'");
                   return false;
@@ -735,6 +764,7 @@ vfl_parser_parse_line (VflParser *parser,
             }
           else
             {
+              parser->error_offset = cur - parser->cursor;
               g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                            "Spacing can either be '-' or a number");
               return false;
@@ -915,4 +945,16 @@ vfl_parser_get_constraints (VflParser *parser,
 #endif
 
   return (VflConstraint *) g_array_free (constraints, FALSE);
+}
+
+int
+vfl_parser_get_error_offset (VflParser *parser)
+{
+  return parser->error_offset;
+}
+
+int
+vfl_parser_get_error_range (VflParser *parser)
+{
+  return parser->error_range;
 }

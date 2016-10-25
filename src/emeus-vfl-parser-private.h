@@ -42,6 +42,9 @@ bool vfl_parser_parse_line (VflParser *parser,
                             gssize len,
                             GError **error);
 
+int vfl_parser_get_error_offset (VflParser *parser);
+int vfl_parser_get_error_range (VflParser *parser);
+
 VflConstraint *vfl_parser_get_constraints (VflParser *parser,
                                            int *n_constraints);
 

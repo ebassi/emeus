@@ -18,15 +18,18 @@ private_headers = [
   'emeus-vfl-parser-private.h',
 ]
 
-sources = [
-  'emeus-constraint.c',
-  'emeus-constraint-layout.c',
+solver_sources = [
   'emeus-expression.c',
   'emeus-simplex-solver.c',
-  'emeus-types.c',
   'emeus-utils.c',
   'emeus-variable.c',
   'emeus-vfl-parser.c',
+]
+
+sources = [
+  'emeus-constraint.c',
+  'emeus-constraint-layout.c',
+  'emeus-types.c',
 ]
 
 # Generated headers
@@ -42,7 +45,7 @@ configure_file(input: 'emeus-version.h.meson',
 install_headers(public_headers + [ 'emeus.h' ], subdir: 'emeus-1.0')
 
 libemeus = shared_library('emeus-@0@'.format(emeus_api_version),
-  sources: sources + private_headers,
+  sources: sources + solver_sources + private_headers,
   version: '@0@.@1@.@2@'.format(emeus_major_version, emeus_minor_version, emeus_micro_version),
   install: true,
   dependencies: [ gtk_dep, mathlib_dep ],
@@ -88,5 +91,13 @@ if get_option('enable-introspection')
                      install: true,
                      extra_args: gir_extra_args)
 endif
+
+solver_objects = libemeus.extract_objects(solver_sources)
+
+gen_constraints = executable('emeus-gen-constraints', 'emeus-gen-constraints.c',
+                             include_directories: emeus_inc,
+                             dependencies: [ glib_dep, mathlib_dep ],
+                             objects: solver_objects,
+                             install: true)
 
 subdir('tests')
