@@ -26,8 +26,13 @@ G_BEGIN_DECLS
 const char *get_attribute_name (EmeusConstraintAttribute attr);
 const char *get_relation_symbol (EmeusConstraintRelation rel);
 
+EmeusConstraintAttribute attribute_from_name (const char *name);
+
 OperatorType relation_to_operator (EmeusConstraintRelation rel);
 StrengthType strength_to_value (EmeusConstraintStrength strength);
+
+EmeusConstraintRelation operator_to_relation (OperatorType op);
+EmeusConstraintStrength value_to_strength (StrengthType strength);
 
 const char *operator_to_string (OperatorType op);
 const char *strength_to_string (StrengthType strength);

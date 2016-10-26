@@ -35,6 +35,7 @@
 #include "emeus-simplex-solver-private.h"
 #include "emeus-utils-private.h"
 #include "emeus-variable-private.h"
+#include "emeus-vfl-parser-private.h"
 
 #include <errno.h>
 #include <math.h>
@@ -1389,6 +1390,121 @@ emeus_constraint_layout_get_constraints (EmeusConstraintLayout *layout)
     }
 
   return res;
+}
+
+static GtkWidget *
+find_child_by_name (EmeusConstraintLayout *layout,
+                    const char            *name)
+{
+  GtkWidget *child = NULL;
+  GSequenceIter *iter;
+
+  iter = g_sequence_get_begin_iter (layout->children);
+  while (!g_sequence_iter_is_end (iter))
+    {
+      child = g_sequence_get (iter);
+      iter = g_sequence_iter_next (iter);
+
+      if (g_strcmp0 (EMEUS_CONSTRAINT_LAYOUT_CHILD (child)->name, name) == 0)
+        return child;
+    }
+
+  return NULL;
+}
+
+void
+emeus_constraint_layout_add_constraints_from_description (EmeusConstraintLayout *layout,
+                                                          const char            *str)
+{
+  g_return_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT (layout));
+  g_return_if_fail (str != NULL && *str != '\0');
+
+  VflParser *parser = vfl_parser_new ();
+  GError *error = NULL;
+
+  vfl_parser_parse_line (parser, str, -1, &error);
+  if (error != NULL)
+    {
+      int offset = vfl_parser_get_error_offset (parser);
+      int range = vfl_parser_get_error_range (parser);
+      char *squiggly = NULL;
+
+      if (range > 0)
+        {
+          squiggly = g_new (char, range + 1);
+
+          for (int i = 0; i < range; i++)
+            squiggly[i] = '~';
+
+          squiggly[range] = '\0';
+        }
+
+      g_critical ("VFL parsing error: %s\n"
+                  "%s\n"
+                  "%*s^%s",
+                  error->message,
+                  str,
+                  offset, " ", squiggly != NULL ? squiggly : "");
+
+      g_free (squiggly);
+      g_error_free (error);
+      vfl_parser_free (parser);
+      return;
+    }
+
+  int n_constraints = 0;
+  VflConstraint *constraints = vfl_parser_get_constraints (parser, &n_constraints);
+  for (int i = 0; i < n_constraints; i++)
+    {
+      const VflConstraint *c = &constraints[i];
+      GtkWidget *source, *target;
+      EmeusConstraintAttribute source_attr, target_attr;
+      EmeusConstraintRelation relation;
+      EmeusConstraintStrength strength;
+
+      target = find_child_by_name (layout, c->view1);
+      if (target == NULL)
+        {
+          target = emeus_constraint_layout_child_new (c->view1);
+          gtk_widget_show (target);
+          gtk_container_add (GTK_CONTAINER (layout), target);
+        }
+
+      if (c->view2 != NULL)
+        {
+          source = find_child_by_name (layout, c->view2);
+          if (source == NULL)
+            {
+              source = emeus_constraint_layout_child_new (c->view2);
+              gtk_widget_show (source);
+              gtk_container_add (GTK_CONTAINER (layout), source);
+            }
+        }
+      else
+        source = NULL;
+
+      target_attr = attribute_from_name (c->attr1);
+
+      if (c->attr2 != NULL)
+        source_attr = attribute_from_name (c->attr2);
+      else
+        source_attr = EMEUS_CONSTRAINT_ATTRIBUTE_INVALID;
+
+      relation = operator_to_relation (c->relation);
+      strength = value_to_strength (c->strength);
+
+      EmeusConstraint *constraint =
+        emeus_constraint_new (target, target_attr,
+                              relation,
+                              source, source_attr,
+                              c->multiplier,
+                              c->constant,
+                              strength);
+
+      emeus_constraint_layout_add_constraint (layout, constraint);
+    }
+
+  g_free (constraints);
 }
 
 static void
