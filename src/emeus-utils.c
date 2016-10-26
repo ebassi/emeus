@@ -90,6 +90,33 @@ strength_to_value (EmeusConstraintStrength strength)
   return STRENGTH_REQUIRED;
 }
 
+static const char *operators[] = {
+  "<=",
+  "==",
+  ">=",
+};
+
+const char *
+operator_to_string (OperatorType o)
+{
+  return operators[o + 1];
+}
+
+const char *
+strength_to_string (StrengthType s)
+{
+  if (s >= STRENGTH_REQUIRED)
+    return "required";
+
+  if (s >= STRENGTH_STRONG)
+    return "strong";
+
+  if (s >= STRENGTH_MEDIUM)
+    return "medium";
+
+  return "weak";
+}
+
 bool
 approx_val (double v1,
             double v2)

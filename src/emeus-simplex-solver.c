@@ -60,33 +60,6 @@ typedef struct {
   Variable *second;
 } VariablePair;
 
-static const char *operators[] = {
-  "<=",
-  "==",
-  ">=",
-};
-
-static const char *
-operator_to_string (OperatorType o)
-{
-  return operators[o + 1];
-}
-
-static const char *
-strength_to_string (StrengthType s)
-{
-  if (s >= STRENGTH_REQUIRED)
-    return "required";
-
-  if (s >= STRENGTH_STRONG)
-    return "strong";
-
-  if (s >= STRENGTH_MEDIUM)
-    return "medium";
-
-  return "weak";
-}
-
 static void
 constraint_free (gpointer data)
 {
