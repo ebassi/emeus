@@ -18,6 +18,7 @@
 
 #pragma once
 
+#include <gtk/gtk.h>
 #include <emeus-types.h>
 #include <emeus-constraint.h>
 
