@@ -13,6 +13,7 @@ typedef struct {
   OperatorType relation;
 
   double constant;
+  const char *subject;
   char *object;
   const char *attr;
 
@@ -57,6 +58,11 @@ struct _VflParser
 
   int default_spacing[2];
 
+  /* Set<name, widget> */
+  GHashTable *metrics_set;
+  /* Set<name, double> */
+  GHashTable *views_set;
+
   const char *cursor;
 
   /* Decides which attributes are admissible */
@@ -97,58 +103,31 @@ vfl_parser_set_default_spacing (VflParser *parser,
   parser->default_spacing[VFL_VERTICAL] = vspacing;
 }
 
+void
+vfl_parser_set_metrics (VflParser *parser,
+                        GHashTable *metrics)
+{
+  parser->metrics_set = metrics;
+}
+
+void
+vfl_parser_set_views (VflParser *parser,
+                      GHashTable *views)
+{
+  parser->views_set = views;
+}
+
 static int
 get_default_spacing (VflParser *parser)
 {
   return parser->default_spacing[parser->orientation];
 }
 
-/* Valid attribute names, depending on the orientation */
-static const struct {
-  const char *attributes[8];
-} valid_attributes[2] = {
-  [VFL_HORIZONTAL] = {
-    { "width", "centerX", "left", "right", "start", "end", NULL, },
-  },
-
-  [VFL_VERTICAL] = {
-    { "height", "centerY", "top", "bottom", "baseline", "start", "end", NULL, },
-  },
-};
-
 /* Default attributes, if unnamed, depending on the orientation */
 static const char *default_attribute[2] = {
   [VFL_HORIZONTAL] = "width",
   [VFL_VERTICAL] = "height",
 };
-
-static bool
-is_valid_attribute (VflOrientation orientation,
-                    const char *str,
-                    const char **attrptr,
-                    char **endptr)
-{
-  const char * const *attributes = valid_attributes[orientation].attributes;
-  const char *attr;
-  int i = 0;
-
-  attr = attributes[0];
-  while (attr != NULL)
-    {
-      int len = strlen (attr);
-
-      if (g_ascii_strncasecmp (attr, str, len) == 0)
-        {
-          *attrptr = attr;
-          *endptr = (char *) str + len;
-          return true;
-        }
-
-      attr = attributes[++i];
-    }
-
-  return false;
-}
 
 static bool
 parse_relation (const char *str,
@@ -205,6 +184,26 @@ out:
 }
 
 static bool
+has_metric (VflParser *parser,
+            const char *name)
+{
+  if (parser->metrics_set == NULL)
+    return false;
+
+  return g_hash_table_contains (parser->metrics_set, name);
+}
+
+static bool
+has_view (VflParser *parser,
+          const char *name)
+{
+  if (parser->views_set == NULL)
+    return false;
+
+  return g_hash_table_contains (parser->views_set, name);
+}
+
+static bool
 parse_predicate (VflParser *parser,
                  const char *cursor,
                  VflPredicate *predicate,
@@ -213,14 +212,15 @@ parse_predicate (VflParser *parser,
 {
   VflOrientation orientation = parser->orientation;
   const char *end = cursor;
-  char *object = NULL;
+
+  predicate->object = NULL;
 
   /*         <predicate> = (<relation>)? (<objectOfPredicate>) ('@'<priority>)?
    *          <relation> = '==' | '<=' | '>='
-   * <objectOfPredicate> = <constant> | <metric>
-   *          <constant> = <number>
-   *            <metric> = <attrName> | <viewName> ('.'<attrName>)?
-   *          <attrName> = [A-Za-z_]([A-Za-z0-9_]+)
+   * <objectOfPredicate> = <constant> | <viewName>
+   *          <constant> = <number> | <metricName>
+   *          <viewName> = [A-Za-z_]([A-Za-z0-9_]*)
+   *        <metricName> = [A-Za-z_]([A-Za-z0-9_]*)
    *          <priority> = 'weak' | 'medium' | 'strong' | 'required'
    */
 
@@ -233,7 +233,7 @@ parse_predicate (VflParser *parser,
       if (!parse_relation (end, &relation, &tmp, error))
         {
           parser->error_offset = end - parser->cursor;
-          parser->error_range = 2;
+          parser->error_range = 0;
           return false;
         }
 
@@ -258,60 +258,80 @@ parse_predicate (VflParser *parser,
     }
   else if (g_ascii_isalpha (*end) || *end == '_')
     {
-      const char *attr;
-      char *tmp;
+      const char *name_start = end;
 
-      /* <attrName> */
-      if (is_valid_attribute (orientation, end, &attr, &tmp))
-        end = tmp;
-      else
+      while (g_ascii_isalnum (*end) || *end == '_')
+        end += 1;
+
+      char *name = g_strndup (name_start, end - name_start);
+
+      /* We only accept view names if the subject of the predicate
+       * is a view, i.e. we do not allow view names inside a spacing
+       * predicate
+       */
+      if (predicate->subject == NULL)
         {
-          char *dot = strchr (end, '.');
-
-          if (dot != NULL)
+          if (parser->metrics_set == NULL || !has_metric (parser, name))
             {
-              /* <viewName>.<attrName> */
-              object = g_strndup (end, dot - end);
-              end = dot + 1;
-
-              if (is_valid_attribute (orientation, end, &attr, &tmp))
-                end = tmp;
-              else
-                {
-                  parser->error_offset = end - parser->cursor;
-                  parser->error_range = strchr (end, ')') - end - 1;
-                  g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_ATTRIBUTE,
-                               "Unexpected attribute after dot notation");
-                  g_free (object);
-                  return false;
-                }
+              parser->error_offset = name_start - parser->cursor;
+              parser->error_range = end - name_start;
+              g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_METRIC,
+                           "Unable to find metric with name '%s'", name);
+              g_free (name);
+              return false;
             }
-          else
-            {
-              tmp = (char *) end;
 
-              /* <viewName> */
-              while (g_ascii_isalnum (*tmp) || *tmp == '_')
-                tmp += 1;
+          double *val = g_hash_table_lookup (parser->metrics_set, name);
 
-              object = g_strndup (end, tmp - end);
+          predicate->object = NULL;
+          predicate->attr = default_attribute[orientation];
+          predicate->constant = *val;
 
-              attr = default_attribute[orientation];
+          g_free (name);
 
-              end = tmp;
-            }
+          goto parse_priority;
         }
 
-      predicate->attr = attr;
-      predicate->constant = 0.0;
+      if (has_metric (parser, name))
+        {
+          double *val = g_hash_table_lookup (parser->metrics_set, name);
+
+          predicate->object = NULL;
+          predicate->attr = default_attribute[orientation];
+          predicate->constant = *val;
+
+          g_free (name);
+
+          goto parse_priority;
+        }
+
+      if (has_view (parser, name))
+        {
+          /* Transfer name's ownership to the predicate */
+          predicate->object = name;
+          predicate->attr = default_attribute[orientation];
+          predicate->constant = 0;
+
+          goto parse_priority;
+        }
+
+      parser->error_offset = name_start - parser->cursor;
+      parser->error_range = end - name_start;
+      g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_VIEW,
+                   "Unable to find view with name '%s'", name);
+      g_free (name);
+      return false;
     }
   else
     {
+      parser->error_offset = end - parser->cursor;
+      parser->error_range = 0;
       g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
-                   "Expected constant, view name, or attribute");
+                   "Expected constant, view name, or metric");
       return false;
     }
 
+parse_priority:
   /* Parse priority */
   if (*end == '@')
     {
@@ -340,9 +360,16 @@ parse_predicate (VflParser *parser,
         }
       else
         {
+          char *range_end = strchr (end, ')');
+
+          g_free (predicate->object);
+
+          if (range_end != NULL)
+            parser->error_range = range_end - end - 1;
+          else
+            parser->error_range = 0;
+
           parser->error_offset = end - parser->cursor;
-          parser->error_range = strchr (end, ')') - end - 1;
-          g_free (object);
           g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_PRIORITY,
                        "Priority must be one of 'weak', 'medium', 'strong', and 'required'");
           return false;
@@ -352,8 +379,6 @@ parse_predicate (VflParser *parser,
     }
   else
     predicate->priority = STRENGTH_REQUIRED;
-
-  predicate->object = object;
 
   if (endptr != NULL)
     *endptr = (char *) end;
@@ -382,6 +407,7 @@ parse_view (VflParser *parser,
   if (!(g_ascii_isalpha (*end) || *end == '_'))
     {
       parser->error_offset = end - parser->cursor;
+      parser->error_range = 0;
       g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_VIEW,
                    "View identifiers must be valid C identifiers");
       return false;
@@ -398,7 +424,18 @@ parse_view (VflParser *parser,
       return false;
     }
 
-  view->name = g_strndup (cursor + 1, end - cursor - 1);
+  char *name = g_strndup (cursor + 1, end - cursor - 1);
+  if (!has_view (parser, name))
+    {
+      parser->error_offset = (cursor + 1) - parser->cursor;
+      parser->error_range = end - cursor - 1;
+      g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_VIEW,
+                   "Unable to find view with name '%s'", name);
+      g_free (name);
+      return false;
+    }
+
+  view->name = name;
   view->predicates = g_array_new (FALSE, FALSE, sizeof (VflPredicate));
 
   if (*end == ']')
@@ -433,13 +470,14 @@ parse_view (VflParser *parser,
           return false;
         }
 
+      cur_predicate.subject = view->name;
       if (!parse_predicate (parser, end, &cur_predicate, &tmp, error))
         return false;
 
       end = tmp;
 
-#if 0
-      g_print ("*** Found predicate: %s.%s %s %g %s\n",
+#ifdef EMEUS_ENABLE_DEBUG
+      g_debug ("*** Found predicate: %s.%s %s %g %s\n",
                cur_predicate.object != NULL ? cur_predicate.object : view->name,
                cur_predicate.attr,
                cur_predicate.relation == OPERATOR_TYPE_EQ ? "==" :
@@ -606,15 +644,7 @@ vfl_parser_parse_line (VflParser *parser,
       /* Super-view */
       if (*cur == '|')
         {
-          if (parser->current_view != NULL && parser->leading_super == NULL)
-            {
-              parser->error_offset = cur - parser->cursor;
-              g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
-                           "Super view definitions cannot follow child views");
-              return false;
-            }
-
-          if (parser->leading_super == NULL)
+          if (parser->views == NULL && parser->leading_super == NULL)
             {
               parser->leading_super = g_slice_new0 (VflView);
 
@@ -702,7 +732,10 @@ vfl_parser_parse_line (VflParser *parser,
               spacing->is_default = false;
               spacing->is_predicate = true;
               spacing->size = 0;
+
+              /* Spacing predicates have no subject */
               predicate = &(spacing->predicate);
+              predicate->subject = NULL;
 
               cur += 1;
               if (!parse_predicate (parser, cur, predicate, &tmp, error))
@@ -920,12 +953,12 @@ vfl_parser_get_constraints (VflParser *parser,
   if (n_constraints != NULL)
     *n_constraints = constraints->len;
 
-#if 0
+#ifdef EMEUS_ENABLE_DEBUG
   for (int i = 0; i < constraints->len; i++)
     {
       const VflConstraint *c = &g_array_index (constraints, VflConstraint, i);
 
-      g_print ("{\n"
+      g_debug ("{\n"
                "  .view1: '%s',\n"
                "  .attr1: '%s',\n"
                "  .relation: '%d',\n"

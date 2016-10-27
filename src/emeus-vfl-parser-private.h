@@ -11,6 +11,7 @@ typedef enum {
   VFL_ERROR_INVALID_SYMBOL,
   VFL_ERROR_INVALID_ATTRIBUTE,
   VFL_ERROR_INVALID_VIEW,
+  VFL_ERROR_INVALID_METRIC,
   VFL_ERROR_INVALID_PRIORITY,
   VFL_ERROR_INVALID_RELATION
 } VflError;
@@ -36,6 +37,11 @@ void vfl_parser_free (VflParser *parser);
 void vfl_parser_set_default_spacing (VflParser *parser,
                                      int hspacing,
                                      int vspacing);
+
+void vfl_parser_set_metrics (VflParser *parser,
+                             GHashTable *metrics);
+void vfl_parser_set_views (VflParser *parser,
+                           GHashTable *views);
 
 bool vfl_parser_parse_line (VflParser *parser,
                             const char *line,

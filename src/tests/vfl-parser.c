@@ -9,40 +9,43 @@
 static struct {
   const char *id;
   const char *expression;
+  const char *views[5];
+  const char *metrics[5];
 } vfl_valid[] = {
-  { "standard-space", "[button]-[textField]", },
-  { "width-constraint", "[button(>=50)]", },
-  { "connection-superview", "|-50-[purpleBox]-50-|", },
-  { "vertical-layout", "V:[topField]-10-[bottomField]", },
-  { "flush-views", "[maroonView][blueView]", },
-  { "priority", "[button(100@strong)]", },
-  { "equal-widths", "[button1(==button2)]", },
-  { "multiple-predicates", "[flexibleButton(>=70,<=100)]", },
-  { "complete-line", "|-[find]-[findNext]-[findField(>=20)]-|", },
-  { "dot-name", "[button1(==button2.width)]", },
-  { "grid-1", "H:|-8-[view1(==view2)]-12-[view2]-8-|", },
-  { "grid-2", "H:|-8-[view3]-8-|", },
-  { "grid-3", "V:|-8-[view1]-12-[view3(==view1,view2)]-8-|", },
-  { "predicate-spacing-1", "|-(>=0)-[view]-(>=0)-|", },
+  { "standard-space", "[button]-[textField]", { "button", "textField", NULL, }, { NULL, } },
+  { "width-constraint", "[button(>=50)]", { "button", NULL, }, { NULL } },
+  { "connection-superview", "|-50-[purpleBox]-50-|", { "purpleBox", NULL, }, { NULL, } },
+  { "leading-superview", "|-[view]", { "view", NULL, }, { NULL, } },
+  { "trailing-superview", "[view]|", { "view", NULL, }, { NULL, } },
+  { "vertical-layout", "V:[topField]-10-[bottomField]", { "topField", "bottomField", NULL, }, { NULL, } },
+  { "flush-views", "[maroonView][blueView]", { "maroonView", "blueView", NULL, }, { NULL, } },
+  { "priority", "[button(100@strong)]", { "button", NULL, }, { NULL, } },
+  { "equal-widths", "[button1(==button2)]", { "button1", "button2", NULL, }, { NULL, } },
+  { "multiple-predicates", "[flexibleButton(>=70,<=100)]", { "flexibleButton", NULL, }, { NULL, } },
+  { "complete-line", "|-[find]-[findNext]-[findField(>=20)]-|", { "find", "findNext", "findField", NULL, }, { NULL, } },
+  { "grid-1", "H:|-8-[view1(==view2)]-12-[view2]-8-|", { "view1", "view2", NULL, }, { NULL, } },
+  { "grid-2", "H:|-8-[view3]-8-|", { "view3", NULL, }, { NULL, } },
+  { "grid-3", "V:|-8-[view1]-12-[view3(==view1,view2)]-8-|", { "view1", "view2", "view3", NULL, }, { NULL, } },
+  { "predicate-spacing-1", "|-(>=0)-[view]-(>=0)-|", { "view", NULL, }, { NULL, } },
 };
 
 static struct {
   const char *id;
   const char *expression;
+  const char *views[5];
   VflError error_id;
 } vfl_invalid[] = {
-  { "orientation-invalid", "V|[backgroundBox]|", VFL_ERROR_INVALID_SYMBOL, },
-  { "missing-view-terminator", "[backgroundBox)", VFL_ERROR_INVALID_SYMBOL, },
-  { "invalid-predicate", "[backgroundBox(]", VFL_ERROR_INVALID_SYMBOL, },
-  { "invalid-view", "[[", VFL_ERROR_INVALID_VIEW, },
-  { "invalid-super-view", "[view]|", VFL_ERROR_INVALID_SYMBOL, },
-  { "trailing-spacing", "[view]-", VFL_ERROR_INVALID_SYMBOL, },
-  { "leading-spacing", "-[view]", VFL_ERROR_INVALID_SYMBOL, },
-  { "view-invalid-identifier-1", "[9ab]", VFL_ERROR_INVALID_VIEW, },
-  { "view-invalid-identifier-2", "[-a]", VFL_ERROR_INVALID_VIEW, },
-  { "predicate-wrong-relation", "[view(>30)]", VFL_ERROR_INVALID_RELATION, },
-  { "predicate-wrong-priority", "[view(>=30@foo)]", VFL_ERROR_INVALID_PRIORITY, },
-  { "predicate-wrong-attribute", "[view1(==view2.height)]", VFL_ERROR_INVALID_ATTRIBUTE, },
+  { "orientation-invalid", "V|[backgroundBox]|", { "backgroundBox", NULL, }, VFL_ERROR_INVALID_SYMBOL, },
+  { "missing-view-terminator", "[backgroundBox)", { "backgroundBox", NULL, }, VFL_ERROR_INVALID_SYMBOL, },
+  { "invalid-predicate", "[backgroundBox(]", { "backgroundBox", NULL, }, VFL_ERROR_INVALID_SYMBOL, },
+  { "view-not-found", "[view]", { NULL, }, VFL_ERROR_INVALID_VIEW, },
+  { "trailing-spacing", "[view]-", { "view", NULL, }, VFL_ERROR_INVALID_SYMBOL, },
+  { "leading-spacing", "-[view]", { "view", NULL, }, VFL_ERROR_INVALID_SYMBOL, },
+  { "view-invalid-identifier-1", "[[", { NULL, }, VFL_ERROR_INVALID_VIEW, },
+  { "view-invalid-identifier-2", "[9ab]", { NULL, }, VFL_ERROR_INVALID_VIEW, },
+  { "view-invalid-identifier-3", "[-a]", { NULL, }, VFL_ERROR_INVALID_VIEW, },
+  { "predicate-wrong-relation", "[view(>30)]", { "view", NULL, }, VFL_ERROR_INVALID_RELATION, },
+  { "predicate-wrong-priority", "[view(>=30@foo)]", { "view", NULL, }, VFL_ERROR_INVALID_PRIORITY, },
 };
 
 static void
@@ -53,8 +56,25 @@ vfl_parser_valid (gconstpointer data)
   GError *error = NULL;
   VflConstraint *constraints;
   int n_constraints = 0;
+  GHashTable *views, *metrics;
 
   g_test_message ("Parsing [valid]: '%s'", vfl_valid[idx].expression);
+
+  views = g_hash_table_new (g_str_hash, g_str_equal);
+  for (int i = 0; vfl_valid[idx].views[i] != NULL; i++)
+    g_hash_table_add (views, (char *) vfl_valid[idx].views[i]);
+
+  vfl_parser_set_views (parser, views);
+
+  metrics = g_hash_table_new_full (g_str_hash, g_str_equal, NULL, g_free);
+  for (int i = 0; vfl_valid[idx].metrics[i] != NULL; i++)
+    {
+      double *v = g_new (double, 1);
+      *v = g_random_double_range (0, 10);
+      g_hash_table_insert (metrics, (char *) vfl_valid[idx].metrics[i], v);
+    }
+
+  vfl_parser_set_metrics (parser, metrics);
 
   vfl_parser_parse_line (parser, vfl_valid[idx].expression, -1, &error);
   g_assert_no_error (error);
@@ -66,6 +86,9 @@ vfl_parser_valid (gconstpointer data)
   g_free (constraints);
 
   vfl_parser_free (parser);
+
+  g_hash_table_unref (metrics);
+  g_hash_table_unref (views);
 }
 
 static void
@@ -74,16 +97,26 @@ vfl_parser_invalid (gconstpointer data)
   int idx = GPOINTER_TO_INT (data);
   VflParser *parser = vfl_parser_new ();
   GError *error = NULL;
+  GHashTable *views;
 
   g_test_message ("Parsing [invalid]: '%s'", vfl_invalid[idx].expression);
 
-  vfl_parser_parse_line (parser, vfl_invalid[idx].expression, -1, &error);
-  g_assert_error (error, VFL_ERROR, vfl_invalid[idx].error_id);
+  views = g_hash_table_new (g_str_hash, g_str_equal);
+  for (int i = 0; vfl_invalid[idx].views[i] != NULL; i++)
+    g_hash_table_add (views, (char *) vfl_invalid[idx].views[i]);
 
+  vfl_parser_set_views (parser, views);
+
+  vfl_parser_parse_line (parser, vfl_invalid[idx].expression, -1, &error);
+
+  g_assert_nonnull (error);
   g_test_message ("Error: %s", error->message);
+
+  g_assert_error (error, VFL_ERROR, vfl_invalid[idx].error_id);
 
   g_error_free (error);
   vfl_parser_free (parser);
+  g_hash_table_unref (views);
 }
 
 int
