@@ -1489,33 +1489,53 @@ emeus_constraint_layout_child_get_preferred_size (EmeusConstraintLayoutChild *se
     {
     case GTK_ORIENTATION_HORIZONTAL:
       attr = get_child_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
-      if (gtk_widget_get_visible (child))
-        gtk_widget_get_preferred_width (child, &child_min, &child_nat);
-
-      if (self->width_constraint == NULL)
+      if (child != NULL && gtk_widget_get_visible (child))
         {
-          Expression *e = expression_new_from_constant (child_min);
+          gtk_widget_get_preferred_width (child, &child_min, &child_nat);
 
-          self->width_constraint =
-            simplex_solver_add_constraint (self->solver,
-                                           attr, OPERATOR_TYPE_GE, e,
-                                           STRENGTH_MEDIUM);
+          if (self->width_constraint == NULL)
+            {
+              Expression *e = expression_new_from_constant (child_min);
+
+              self->width_constraint =
+                simplex_solver_add_constraint (self->solver,
+                                               attr, OPERATOR_TYPE_GE, e,
+                                               STRENGTH_MEDIUM);
+            }
+        }
+      else
+        {
+          if (self->width_constraint != NULL)
+            {
+              simplex_solver_remove_constraint (self->solver, self->width_constraint);
+              self->width_constraint = NULL;
+            }
         }
       break;
 
     case GTK_ORIENTATION_VERTICAL:
       attr = get_child_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
-      if (gtk_widget_get_visible (child))
-        gtk_widget_get_preferred_height (child, &child_min, &child_nat);
-
-      if (self->height_constraint == NULL)
+      if (child != NULL && gtk_widget_get_visible (child))
         {
-          Expression *e = expression_new_from_constant (child_min);
+          gtk_widget_get_preferred_height (child, &child_min, &child_nat);
 
-          self->height_constraint =
-            simplex_solver_add_constraint (self->solver,
-                                           attr, OPERATOR_TYPE_GE, e,
-                                           STRENGTH_MEDIUM);
+          if (self->height_constraint == NULL)
+            {
+              Expression *e = expression_new_from_constant (child_min);
+
+              self->height_constraint =
+                simplex_solver_add_constraint (self->solver,
+                                               attr, OPERATOR_TYPE_GE, e,
+                                               STRENGTH_MEDIUM);
+            }
+        }
+      else
+        {
+          if (self->height_constraint != NULL)
+            {
+              simplex_solver_remove_constraint (self->solver, self->height_constraint);
+              self->height_constraint = NULL;
+            }
         }
       break;
     }
