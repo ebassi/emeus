@@ -455,6 +455,20 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
   simplex_solver_remove_constraint (&self->solver, stay_h);
 }
 
+static gboolean
+emeus_constraint_layout_draw (GtkWidget *widget,
+                              cairo_t   *cr)
+{
+  GtkStyleContext *context = gtk_widget_get_style_context (widget);
+  int width = gtk_widget_get_allocated_width (widget);
+  int height = gtk_widget_get_allocated_height (widget);
+
+  gtk_render_background (context, cr, 0, 0, width, height);
+  gtk_render_frame (context, cr, 0, 0, width, height);
+
+  return GTK_WIDGET_CLASS (emeus_constraint_layout_parent_class)->draw (widget, cr);
+}
+
 static void
 emeus_constraint_layout_add (GtkContainer *container,
                              GtkWidget    *widget)
@@ -901,12 +915,15 @@ emeus_constraint_layout_class_init (EmeusConstraintLayoutClass *klass)
   widget_class->get_preferred_width = emeus_constraint_layout_get_preferred_width;
   widget_class->get_preferred_height = emeus_constraint_layout_get_preferred_height;
   widget_class->size_allocate = emeus_constraint_layout_size_allocate;
+  widget_class->draw = emeus_constraint_layout_draw;
 
   container_class->add = emeus_constraint_layout_add;
   container_class->remove = emeus_constraint_layout_remove;
   container_class->forall = emeus_constraint_layout_forall;
   container_class->child_type = emeus_constraint_layout_child_type;
   gtk_container_class_handle_border_width (container_class);
+
+  gtk_widget_class_set_css_name (widget_class, "constraintlayout");
 }
 
 static void
@@ -1569,6 +1586,20 @@ emeus_constraint_layout_child_get_preferred_height (GtkWidget *widget,
                                                     natural_p);
 }
 
+static gboolean
+emeus_constraint_layout_child_draw (GtkWidget *widget,
+                                    cairo_t   *cr)
+{
+  GtkStyleContext *context = gtk_widget_get_style_context (widget);
+  int width = gtk_widget_get_allocated_width (widget);
+  int height = gtk_widget_get_allocated_height (widget);
+
+  gtk_render_background (context, cr, 0, 0, width, height);
+  gtk_render_frame (context, cr, 0, 0, width, height);
+
+  return GTK_WIDGET_CLASS (emeus_constraint_layout_child_parent_class)->draw (widget, cr);
+}
+
 static void
 emeus_constraint_layout_child_class_init (EmeusConstraintLayoutChildClass *klass)
 {
@@ -1583,6 +1614,7 @@ emeus_constraint_layout_child_class_init (EmeusConstraintLayoutChildClass *klass
 
   widget_class->get_preferred_width = emeus_constraint_layout_child_get_preferred_width;
   widget_class->get_preferred_height = emeus_constraint_layout_child_get_preferred_height;
+  widget_class->draw = emeus_constraint_layout_child_draw;
 
   gtk_container_class_handle_border_width (container_class);
 
@@ -1595,6 +1627,8 @@ emeus_constraint_layout_child_class_init (EmeusConstraintLayoutChildClass *klass
 
   g_object_class_install_properties (gobject_class, CHILD_N_PROPS,
                                      emeus_constraint_layout_child_properties);
+
+  gtk_widget_class_set_css_name (widget_class, "constraintlayoutchild");
 }
 
 static void
