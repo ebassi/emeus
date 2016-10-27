@@ -1392,26 +1392,6 @@ emeus_constraint_layout_get_constraints (EmeusConstraintLayout *layout)
   return res;
 }
 
-static GtkWidget *
-find_child_by_name (EmeusConstraintLayout *layout,
-                    const char            *name)
-{
-  GtkWidget *child = NULL;
-  GSequenceIter *iter;
-
-  iter = g_sequence_get_begin_iter (layout->children);
-  while (!g_sequence_iter_is_end (iter))
-    {
-      child = g_sequence_get (iter);
-      iter = g_sequence_iter_next (iter);
-
-      if (g_strcmp0 (EMEUS_CONSTRAINT_LAYOUT_CHILD (child)->name, name) == 0)
-        return child;
-    }
-
-  return NULL;
-}
-
 static void
 emeus_constraint_layout_child_finalize (GObject *gobject)
 {
