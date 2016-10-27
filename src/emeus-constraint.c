@@ -63,8 +63,10 @@
 
 #include "emeus-expression-private.h"
 #include "emeus-simplex-solver-private.h"
-#include "emeus-variable-private.h"
 #include "emeus-utils-private.h"
+#include "emeus-utils.h"
+#include "emeus-variable-private.h"
+#include "emeus-vfl-parser-private.h"
 
 #include <math.h>
 #include <float.h>
@@ -662,4 +664,189 @@ emeus_constraint_get_active (EmeusConstraint *constraint)
   g_return_val_if_fail (EMEUS_IS_CONSTRAINT (constraint), FALSE);
 
   return constraint->is_active;
+}
+
+/**
+ * emeus_create_constraints_from_description:
+ * @lines: (array length=n_lines): an array of Visual Format Language lines
+ *   defining a set of constraints
+ * @n_lines: the number of lines
+ * @hspacing: default horizontal spacing value
+ * @vspacing: default vertical spacing value
+ * @views: (element-type utf8 Gtk.Widget): a dictionary of [ name, widget ]
+ *   pairs; the `name` keys map to the view names in the VFL lines, while
+ *   the `widget` values map to the children of a #EmeusConstraintLayout
+ * @metrics: (element-type utf8 double) (nullable): a dictionary of
+ *   [ name, value ] pairs; the `name` keys map to the metric names in the
+ *   VFL lines, while the `value` values maps to its numeric value
+ *
+ * Creates a list of constraints they formal description using the
+ * [Visual Format Language](https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/AutolayoutPG/VisualFormatLanguage.html)
+ * syntax.
+ *
+ * The @views dictionary is used to match widgets to the symbolic view name
+ * inside the VFL; the @metrics dictionary is used to substitute symbolic
+ * names with numeric values, to avoid hard coding constants inside the
+ * VFL strings.
+ *
+ * The VFL grammar is:
+ *
+ * |[<!-- language="plain" -->
+ *        <visualFormatString> = (<orientation>)?
+ *                               (<superview><connection>)?
+ *                               <view>(<connection><view>)*
+ *                               (<connection><superview>)?
+ *               <orientation> = 'H' | 'V'
+ *                 <superview> = '|'
+ *                <connection> = '' | '-' <predicateList> '-' | '-'
+ *             <predicateList> = <simplePredicate> | <predicateListWithParens>
+ *           <simplePredicate> = <metricName> | <positiveNumber>
+ *   <predicateListWithParens> = '(' <predicate> (',' <predicate>)* ')'
+ *                 <predicate> = (<relation>)? <objectOfPredicate> ('@' <priority>)?
+ *                  <relation> = '==' | '<=' | '>='
+ *         <objectOfPredicate> = <constant> | <viewName> | <metricName>
+ *                  <priority> = 'required' | 'strong' | 'medium' | 'weak'
+ *                  <constant> = <number>
+ *                  <viewName> = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
+ *                <metricName> = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
+ *            <positiveNumber> // A positive real number parseable by g_ascii_strtod()
+ *                    <number> // A real number parseable by g_ascii_strtod()
+ * ]|
+ *
+ * **Note**: The VFL grammar is slightly different than the one defined by Apple,
+ * as it uses symbolic values for the constraint's priority instead of numeric
+ * values.
+ *
+ * Examples of VFL descriptions are:
+ *
+ * |[<!-- language="plain" -->
+ *   // Default spacing
+ *   [button]-[textField]
+ *
+ *   // Width constraint
+ *   [button(>=50)]
+ *
+ *   // Connection to super view
+ *   |-50-[purpleBox]-50-|
+ *
+ *   // Vertical layout
+ *   V:[topField]-10-[bottomField]
+ *
+ *   // Flush views
+ *   [maroonView][blueView]
+ *
+ *   // Priority
+ *   [button(100@strong)]
+ *
+ *   // Equal widths
+ *   [button1(==button2)]
+ *
+ *   // Multiple predicates
+ *   [flexibleButton(>=70,<=100)]
+ *
+ *   // A complete line of layout
+ *   |-[find]-[findNext]-[findField(>=20)]-|
+ * ]|
+ *
+ * Returns: (transfer full) (element-type Emeus.Constraint): a list of #EmeusConstraint
+ *   instances, to be used with an #EmeusConstraintLayout
+ *
+ * Since: 1.0
+ */
+GList *
+emeus_create_constraints_from_description (const char * const  lines[],
+                                           int                 n_lines,
+                                           int                 hspacing,
+                                           int                 vspacing,
+                                           GHashTable         *views,
+                                           GHashTable         *metrics)
+{
+  g_return_val_if_fail (lines != NULL && n_lines != 0, NULL);
+
+  VflParser *parser = vfl_parser_new ();
+
+  /* Configure the parser */
+  vfl_parser_set_default_spacing (parser, hspacing, vspacing);
+  vfl_parser_set_views (parser, views);
+  vfl_parser_set_metrics (parser, metrics);
+
+  GList *res = NULL;
+
+  for (int i = 0; i < n_lines; i++)
+    {
+      const char *line = lines[i];
+      GError *error = NULL;
+
+      vfl_parser_parse_line (parser, line, -1, &error);
+      if (error != NULL)
+        {
+          int offset = vfl_parser_get_error_offset (parser);
+          int range = vfl_parser_get_error_range (parser);
+          char *squiggly = NULL;
+
+          if (range > 0)
+            {
+              squiggly = g_new (char, range + 1);
+
+              for (int r = 0; r < range; i++)
+                squiggly[r] = '~';
+
+              squiggly[range] = '\0';
+            }
+
+          g_critical ("VFL parsing error:%d:%d: %s\n"
+                      "%s\n"
+                      "%*s^%s",
+                      i, offset,
+                      error->message,
+                      line,
+                      offset, " ", squiggly != NULL ? squiggly : "");
+
+          g_free (squiggly);
+          g_error_free (error);
+          vfl_parser_free (parser);
+          continue;
+        }
+
+      int n_constraints = 0;
+      VflConstraint *constraints = vfl_parser_get_constraints (parser, &n_constraints);
+      for (int j = 0; j < n_constraints; j++)
+        {
+          const VflConstraint *c = &constraints[j];
+          gpointer source, target;
+          EmeusConstraintAttribute source_attr, target_attr;
+          EmeusConstraintRelation relation;
+          EmeusConstraintStrength strength;
+
+          target = g_hash_table_lookup (views, c->view1);
+          target_attr = attribute_from_name (c->attr1);
+
+          if (c->view2 != NULL)
+            source = g_hash_table_lookup (views, c->view2);
+          else
+            source = NULL;
+
+          if (c->attr2 != NULL)
+            source_attr = attribute_from_name (c->attr2);
+          else
+            source_attr = EMEUS_CONSTRAINT_ATTRIBUTE_INVALID;
+
+          relation = operator_to_relation (c->relation);
+          strength = value_to_strength (c->strength);
+
+          EmeusConstraint *constraint =
+            emeus_constraint_new (target, target_attr,
+                                  relation,
+                                  source, source_attr,
+                                  c->multiplier,
+                                  c->constant,
+                                  strength);
+
+          res = g_list_prepend (res, constraint);
+        }
+
+      g_free (constraints);
+    }
+
+  return g_list_reverse (res);
 }

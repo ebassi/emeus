@@ -48,10 +48,6 @@ void            emeus_constraint_layout_add_constraints         (EmeusConstraint
 EMEUS_AVAILABLE_IN_1_0
 GList *         emeus_constraint_layout_get_constraints         (EmeusConstraintLayout *layout);
 
-EMEUS_AVAILABLE_IN_1_0
-void            emeus_constraint_layout_add_constraints_from_description        (EmeusConstraintLayout *layout,
-                                                                                 const char            *str);
-
 #define EMEUS_TYPE_CONSTRAINT_LAYOUT_CHILD (emeus_constraint_layout_child_get_type())
 
 EMEUS_AVAILABLE_IN_1_0

@@ -4,6 +4,7 @@ public_headers = [
 
   'emeus-version-macros.h',
   'emeus-types.h',
+  'emeus-utils.h',
 ]
 
 private_headers = [

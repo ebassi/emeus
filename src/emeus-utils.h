@@ -1,4 +1,4 @@
-/* emeus.h
+/* emeus-utils.h: Utility functions
  *
  * Copyright 2016  Endless
  *
@@ -18,15 +18,17 @@
 
 #pragma once
 
-#define EMEUS_H_INSIDE
-
 #include "emeus-types.h"
-
-#include "emeus-version.h"
-#include "emeus-version-macros.h"
-
 #include "emeus-constraint.h"
-#include "emeus-constraint-layout.h"
-#include "emeus-utils.h"
 
-#undef EMEUS_H_INSIDE
+G_BEGIN_DECLS
+
+EMEUS_AVAILABLE_IN_1_0
+GList * emeus_create_constraints_from_description       (const char * const  lines[],
+                                                         int                 n_lines,
+                                                         int                 hspacing,
+                                                         int                 vspacing,
+                                                         GHashTable         *views,
+                                                         GHashTable         *metrics);
+
+G_END_DECLS
