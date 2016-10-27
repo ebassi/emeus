@@ -60,8 +60,8 @@ vfl_parser_valid (gconstpointer data)
   g_assert_no_error (error);
 
   constraints = vfl_parser_get_constraints (parser, &n_constraints);
-  g_assert (constraints != NULL);
-  g_assert (n_constraints != 0);
+  g_assert_nonnull (constraints);
+  g_assert_cmpint (n_constraints, !=, 0);
 
   g_free (constraints);
 
