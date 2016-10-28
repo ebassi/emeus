@@ -555,11 +555,11 @@ vfl_view_free (VflView *view)
   g_slice_free (VflView, view);
 }
 
-void
-vfl_parser_free (VflParser *parser)
+static void
+vfl_parser_clear (VflParser *parser)
 {
-  if (parser == NULL)
-    return;
+  parser->error_offset = 0;
+  parser->error_range = 0;
 
   VflView *iter = parser->views; 
   while (iter != NULL)
@@ -571,7 +571,24 @@ vfl_parser_free (VflParser *parser)
       iter = next;
     }
 
+  parser->views = NULL;
+  parser->current_view = NULL;
+  parser->leading_super = NULL;
+  parser->trailing_super = NULL;
+
+  parser->cursor = NULL;
+
   g_free (parser->buffer);
+  parser->buffer_len = 0;
+}
+
+void
+vfl_parser_free (VflParser *parser)
+{
+  if (parser == NULL)
+    return;
+
+  vfl_parser_clear (parser);
 
   g_slice_free (VflParser, parser);
 }
@@ -582,10 +599,7 @@ vfl_parser_parse_line (VflParser *parser,
                        gssize len,
                        GError **error)
 {
-  g_free (parser->buffer);
-
-  parser->error_offset = 0;
-  parser->error_range = 0;
+  vfl_parser_clear (parser);
 
   if (len > 0)
     {
