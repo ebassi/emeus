@@ -797,7 +797,7 @@ emeus_create_constraints_from_description (const char * const  lines[],
           g_critical ("VFL parsing error:%d:%d: %s\n"
                       "%s\n"
                       "%*s^%s",
-                      i, offset,
+                      i, offset + 1,
                       error->message,
                       line,
                       offset, " ", squiggly != NULL ? squiggly : "");
