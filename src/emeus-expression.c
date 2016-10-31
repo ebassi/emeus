@@ -173,7 +173,12 @@ expression_add_variable (Expression *expression,
           double new_coefficient = term_get_coefficient (t) + coefficient;
 
           if (approx_val (new_coefficient, 0.0))
-            expression_remove_variable (expression, variable, subject);
+            {
+              if (expression->solver != NULL)
+                simplex_solver_note_removed_variable (expression->solver, variable, subject);
+
+              expression_remove_variable (expression, variable, subject);
+            }
           else
             t->coefficient = new_coefficient;
 
@@ -208,9 +213,6 @@ expression_remove_variable (Expression *expression,
 
   if (subject != NULL)
     variable_ref (subject);
-
-  if (expression->solver != NULL)
-    simplex_solver_note_removed_variable (expression->solver, variable, subject);
 
   expression->ordered_terms = g_list_remove (expression->ordered_terms, term);
   g_hash_table_remove (expression->terms, variable);
@@ -472,14 +474,14 @@ expression_substitute_out (Expression *expression,
           double new_coefficient = old_coefficient + multiplier * coeff;
 
           if (approx_val (new_coefficient, 0.0))
-            expression_remove_variable (expression, clv, subject);
-          else
             {
-              expression_set_variable (expression, clv, new_coefficient);
-
               if (expression->solver)
-                simplex_solver_note_added_variable (expression->solver, clv, subject);
+                simplex_solver_note_removed_variable (expression->solver, clv, subject);
+
+              expression_remove_variable (expression, clv, subject);
             }
+          else
+            expression_set_variable (expression, clv, new_coefficient);
         }
       else
         {
