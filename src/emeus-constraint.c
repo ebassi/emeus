@@ -671,8 +671,8 @@ emeus_constraint_get_active (EmeusConstraint *constraint)
  * @lines: (array length=n_lines): an array of Visual Format Language lines
  *   defining a set of constraints
  * @n_lines: the number of lines
- * @hspacing: default horizontal spacing value
- * @vspacing: default vertical spacing value
+ * @hspacing: default horizontal spacing value, or -1 for the fallback value
+ * @vspacing: default vertical spacing value, or -1 for the fallback value
  * @views: (element-type utf8 Gtk.Widget): a dictionary of [ name, widget ]
  *   pairs; the `name` keys map to the view names in the VFL lines, while
  *   the `widget` values map to the children of a #EmeusConstraintLayout
@@ -755,7 +755,7 @@ emeus_constraint_get_active (EmeusConstraint *constraint)
  */
 GList *
 emeus_create_constraints_from_description (const char * const  lines[],
-                                           int                 n_lines,
+                                           guint               n_lines,
                                            int                 hspacing,
                                            int                 vspacing,
                                            GHashTable         *views,
@@ -767,7 +767,7 @@ emeus_create_constraints_from_description (const char * const  lines[],
 
   GList *res = NULL;
 
-  for (int i = 0; i < n_lines; i++)
+  for (guint i = 0; i < n_lines; i++)
     {
       const char *line = lines[i];
       GError *error = NULL;

@@ -25,7 +25,7 @@ G_BEGIN_DECLS
 
 EMEUS_AVAILABLE_IN_1_0
 GList * emeus_create_constraints_from_description       (const char * const  lines[],
-                                                         int                 n_lines,
+                                                         guint               n_lines,
                                                          int                 hspacing,
                                                          int                 vspacing,
                                                          GHashTable         *views,
