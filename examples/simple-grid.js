@@ -100,10 +100,10 @@ const MyApplicationWindow = new Lang.Class({
         button3.show();
 
         let constraints = Emeus.create_constraints_from_description([
-                'H:|-8-[child1(==child2)]-12-[child2]-8-|',
-                'H:|-8-[child3]-8-|',
-                'V:|-8-[child1]-12-[child3(==child1)]-8-|',
-                'V:|-8-[child2]-12-[child3(==child2)]-8-|',
+                'H:|-[child1(==child2)]-12-[child2]-|',
+                'H:|-[child3]-|',
+                'V:|-[child1]-12-[child3(==child1)]-|',
+                'V:|-[child2]-12-[child3(==child2)]-|',
             ], 8, 8, {
                 child1: button1,
                 child2: button2,
