@@ -748,7 +748,7 @@ emeus_constraint_get_active (EmeusConstraint *constraint)
  *   |-[find]-[findNext]-[findField(>=20)]-|
  * ]|
  *
- * Returns: (transfer full) (element-type Emeus.Constraint): a list of #EmeusConstraint
+ * Returns: (transfer container) (element-type Emeus.Constraint): a list of #EmeusConstraint
  *   instances, to be used with an #EmeusConstraintLayout
  *
  * Since: 1.0
