@@ -204,7 +204,6 @@ emeus_test_application_window_init (EmeusTestApplicationWindow *self)
 {
   GtkWidget *box, *layout, *button;
 
-  gtk_window_set_default_size (GTK_WINDOW (self), 400, 500);
   gtk_window_set_title (GTK_WINDOW (self), "Grid layout");
 
   box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 6);
