@@ -1,11 +1,12 @@
-e = executable('solver', 'solver.c',
-               include_directories: emeus_inc,
-               dependencies: [ glib_dep, mathlib_dep ],
-               objects: solver_objects)
-test('Solver', e)
+tests = [
+  [ 'solver', 'solver.c' ],
+  [ 'vfl-parser', 'vfl-parser.c' ],
+]
 
-e = executable('vfl-parser', 'vfl-parser.c',
-               include_directories: emeus_inc,
-               dependencies: [ glib_dep, mathlib_dep ],
-               objects: solver_objects)
-test('VflParser', e)
+foreach t: tests
+  e = executable(t[0], t[1],
+                 include_directories: emeus_inc,
+                 dependencies: [ glib_dep, mathlib_dep ],
+                 objects: solver_objects)
+  test(t[0], e)
+endforeach
