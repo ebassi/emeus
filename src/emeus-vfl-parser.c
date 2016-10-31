@@ -920,13 +920,13 @@ vfl_parser_get_constraints (VflParser *parser,
             {
               const VflPredicate *p = &(iter->spacing.predicate);
 
-              c.constant = p->constant;
+              c.constant = p->constant * -1.0;
               c.relation = p->relation;
               c.strength = p->priority;
             }
           else if (iter->spacing.is_default)
             {
-              c.constant = get_default_spacing (parser);
+              c.constant = get_default_spacing (parser) * -1.0;
               c.relation = OPERATOR_TYPE_EQ;
               c.strength = STRENGTH_REQUIRED;
             }
