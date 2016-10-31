@@ -1701,7 +1701,7 @@ simplex_solver_remove_constraint (SimplexSolver *solver,
     }
 
 no_columns:
-  if (g_hash_table_lookup (solver->rows, marker) == NULL)
+  if (g_hash_table_lookup (solver->rows, marker) != NULL)
     simplex_solver_remove_row (solver, marker);
 
   if (error_vars != NULL)
