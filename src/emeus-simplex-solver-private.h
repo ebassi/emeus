@@ -48,6 +48,10 @@ constraint_is_edit (const Constraint *constraint)
 
 void simplex_solver_init (SimplexSolver *solver);
 void simplex_solver_clear (SimplexSolver *solver);
+void simplex_solver_reset (SimplexSolver *solver);
+
+void simplex_solver_freeze (SimplexSolver *solver);
+void simplex_solver_thaw (SimplexSolver *solver);
 
 Variable *simplex_solver_create_variable (SimplexSolver *solver,
                                           const char *name,

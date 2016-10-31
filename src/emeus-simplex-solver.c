@@ -328,10 +328,47 @@ simplex_solver_init (SimplexSolver *solver)
   solver->slack_counter = 0;
   solver->dummy_counter = 0;
   solver->artificial_counter = 0;
+  solver->freeze_count = 0;
 
   solver->needs_solving = false;
   solver->auto_solve = true;
   solver->initialized = true;
+}
+
+void
+simplex_solver_reset (SimplexSolver *solver)
+{
+  if (!solver->initialized)
+    {
+      g_critical ("SimplexSolver %p is not initialized.", solver);
+      return;
+    }
+
+  solver->needs_solving = false;
+  solver->auto_solve = true;
+
+  solver->freeze_count = 0;
+  solver->slack_counter = 0;
+  solver->dummy_counter = 0;
+  solver->artificial_counter = 0;
+
+  g_ptr_array_set_size (solver->stay_error_vars, 0);
+  g_ptr_array_set_size (solver->infeasible_rows, 0);
+
+  g_hash_table_remove_all (solver->external_rows);
+  g_hash_table_remove_all (solver->external_parametric_vars);
+  g_hash_table_remove_all (solver->error_vars);
+  g_hash_table_remove_all (solver->marker_vars);
+  g_hash_table_remove_all (solver->edit_var_map);
+  g_hash_table_remove_all (solver->stay_var_map);
+  g_hash_table_remove_all (solver->constraints);
+
+  g_hash_table_remove_all (solver->rows);
+  g_hash_table_remove_all (solver->columns);
+
+  solver->objective = variable_new (solver, VARIABLE_OBJECTIVE);
+  variable_set_name (solver->objective, "Z");
+  g_hash_table_insert (solver->rows, solver->objective, expression_new (solver, 0.0));
 }
 
 void
@@ -371,6 +408,7 @@ simplex_solver_clear (SimplexSolver *solver)
   solver->needs_solving = false;
   solver->auto_solve = true;
 
+  solver->freeze_count = 0;
   solver->slack_counter = 0;
   solver->dummy_counter = 0;
   solver->artificial_counter = 0;
@@ -389,6 +427,104 @@ simplex_solver_clear (SimplexSolver *solver)
   /* The columns need to be deleted last, for reference counting */
   g_clear_pointer (&solver->rows, g_hash_table_unref);
   g_clear_pointer (&solver->columns, g_hash_table_unref);
+}
+
+void
+simplex_solver_freeze (SimplexSolver *solver)
+{
+  solver->freeze_count += 1;
+
+  if (solver->freeze_count > 0)
+    solver->auto_solve = false;
+}
+
+void
+simplex_solver_thaw (SimplexSolver *solver)
+{
+  if (solver->freeze_count == 0)
+    {
+      g_critical ("Unbalanced thaw; did you forger to call simplex_solver_freeze()?");
+      return;
+    }
+
+  solver->freeze_count -= 1;
+
+  if (solver->freeze_count == 0)
+    solver->auto_solve = true;
+}
+
+static char *
+simplex_solver_to_string (SimplexSolver *solver)
+{
+  GString *buf = g_string_new (NULL);
+
+#if 0
+  parts.append('Tableau info:')
+  parts.append('Rows: %s (= %s constraints)' % (len(self.rows), len(self.rows) - 1))
+  parts.append('Columns: %s' % len(self.columns))
+  parts.append('Infeasible rows: %s' % len(self.infeasible_rows))
+  parts.append('External basic variables: %s' % len(self.external_rows))
+  parts.append('External parametric variables: %s' % len(self.external_parametric_vars))
+#endif
+
+  g_string_append (buf, "Tableau info:\n");
+  g_string_append_printf (buf, "Rows: %d (= %d constraints)\n",
+                          g_hash_table_size (solver->rows),
+                          g_hash_table_size (solver->rows) - 1);
+  g_string_append_printf (buf, "Columns: %d\n",
+                          g_hash_table_size (solver->columns));
+  g_string_append_printf (buf, "Infeasible rows: %d\n",
+                          solver->infeasible_rows->len);
+  g_string_append_printf (buf, "External basic variables: %d\n",
+                          g_hash_table_size (solver->external_rows));
+  g_string_append_printf (buf, "External parametric variables: %d\n",
+                          g_hash_table_size (solver->external_parametric_vars));
+
+  g_string_append (buf, "Stay error vars:");
+  if (solver->stay_error_vars->len == 0)
+    g_string_append (buf, " <empty>\n");
+  else
+    {
+      g_string_append (buf, "\n");
+
+      for (int i = 0; i < solver->stay_error_vars->len; i++)
+        {
+          const VariablePair *pair = g_ptr_array_index (solver->stay_error_vars, i);
+          char *first_s = variable_to_string (pair->first);
+          char *second_s = variable_to_string (pair->second);
+
+          g_string_append_printf (buf, "  (%s, %s)\n", first_s, second_s);
+
+          g_free (first_s);
+          g_free (second_s);
+        }
+    }
+
+  g_string_append (buf, "Edit var map:");
+  if (g_hash_table_size (solver->edit_var_map) == 0)
+    g_string_append (buf, " <empty>\n");
+  else
+    {
+      GHashTableIter iter;
+      gpointer key_p, value_p;
+
+      g_string_append (buf, "\n");
+
+      g_hash_table_iter_init (&iter, solver->edit_var_map);
+      while (g_hash_table_iter_next (&iter, &key_p, &value_p))
+        {
+          char *var = variable_to_string (key_p);
+          const EditInfo *ei = value_p;
+          char *c = constraint_to_string (ei->constraint);
+
+          g_string_append_printf (buf, "  %s => %s\n", var, c);
+
+          g_free (var);
+          g_free (c);
+        }
+    }
+
+  return g_string_free (buf, FALSE);
 }
 
 static VariableSet *
@@ -700,6 +836,20 @@ simplex_solver_optimize (SimplexSolver *solver,
   gint64 start_time = g_get_monotonic_time ();
 #endif
 
+#ifdef EMEUS_ENABLE_DEBUG
+  {
+    char *str;
+
+    str = variable_to_string (z);
+    g_debug ("optimize: %s\n", str);
+    g_free (str);
+
+    str = simplex_solver_to_string (solver);
+    g_debug ("%s", str);
+    g_free (str);
+  }
+#endif
+
   while (true)
     {
       GList *l;
@@ -756,6 +906,14 @@ simplex_solver_optimize (SimplexSolver *solver,
         }
 
       simplex_solver_pivot (solver, entry, exit);
+
+#ifdef EMEUS_ENABLE_DEBUG
+      {
+        char *str = simplex_solver_to_string (solver);
+        g_debug ("%s", str);
+        g_free (str);
+      }
+#endif
     }
 
 #ifdef EMEUS_ENABLE_DEBUG

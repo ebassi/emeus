@@ -118,7 +118,7 @@ typedef struct {
     NULL, NULL, \
     NULL, \
     NULL, \
-    0, 0, 0, 0, \
+    0, 0, 0, 0, 0, \
     false, false, \
   }
 
@@ -152,6 +152,7 @@ struct _SimplexSolver {
   int artificial_counter;
   int dummy_counter;
   int optimize_count;
+  int freeze_count;
 
   bool auto_solve;
   bool needs_solving;
