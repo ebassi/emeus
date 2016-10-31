@@ -702,6 +702,8 @@ simplex_solver_remove_column (SimplexSolver *solver,
       expression_remove_variable (e, variable, NULL);
     }
 
+  g_hash_table_remove (solver->columns, variable);
+
 out:
   if (variable_is_external (variable))
     {
