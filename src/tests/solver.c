@@ -420,9 +420,9 @@ emeus_solver_buttons (void)
   }
 
   emeus_assert_almost_equals (variable_get_value (b1.left), 50.0);
-  emeus_assert_almost_equals (variable_get_value (b1.width), 150.0);
-  emeus_assert_almost_equals (variable_get_value (b2.left), 300.0);
-  emeus_assert_almost_equals (variable_get_value (b2.width), 150.0);
+  emeus_assert_almost_equals (variable_get_value (b1.width), 113.0);
+  emeus_assert_almost_equals (variable_get_value (b2.left), 337.0);
+  emeus_assert_almost_equals (variable_get_value (b2.width), 113.0);
   emeus_assert_almost_equals (variable_get_value (right_limit), 500.0);
 
   simplex_solver_remove_constraint (&solver, stay);
@@ -446,14 +446,13 @@ emeus_solver_buttons (void)
   }
 
   emeus_assert_almost_equals (variable_get_value (b1.left), 50.0);
-  emeus_assert_almost_equals (variable_get_value (b1.width), 250.0);
-  emeus_assert_almost_equals (variable_get_value (b2.left), 400.0);
-  emeus_assert_almost_equals (variable_get_value (b2.width), 250.0);
+  emeus_assert_almost_equals (variable_get_value (b1.width), 113.0);
+  emeus_assert_almost_equals (variable_get_value (b2.left), 537.0);
+  emeus_assert_almost_equals (variable_get_value (b2.width), 113.0);
   emeus_assert_almost_equals (variable_get_value (right_limit), 700.0);
 
   simplex_solver_remove_constraint (&solver, stay);
 
-#if 0
   /* FIXME: Making the right limit smaller fails */
   g_test_message ("right_limit := 600");
   variable_set_value (right_limit, 600.0);
@@ -474,13 +473,12 @@ emeus_solver_buttons (void)
   }
 
   emeus_assert_almost_equals (variable_get_value (b1.left), 50.0);
-  emeus_assert_almost_equals (variable_get_value (b1.width), 250.0);
-  emeus_assert_almost_equals (variable_get_value (b2.left), 400.0);
-  emeus_assert_almost_equals (variable_get_value (b2.width), 250.0);
+  emeus_assert_almost_equals (variable_get_value (b1.width), 113.0);
+  emeus_assert_almost_equals (variable_get_value (b2.left), 437.0);
+  emeus_assert_almost_equals (variable_get_value (b2.width), 113.0);
   emeus_assert_almost_equals (variable_get_value (right_limit), 600.0);
 
   simplex_solver_remove_constraint (&solver, stay);
-#endif
 
   simplex_solver_clear (&solver);
 }
