@@ -96,7 +96,7 @@ main (int argc, char *argv[])
 
   VflParser *parser = vfl_parser_new (opt_hspacing, opt_vspacing, NULL, views);
 
-  fprintf (stdout, "<constraints>\n");
+  GString *buffer = g_string_new ("<constraints>\n");
 
   for (int i = 0; opt_vfl[i] != NULL; i++)
     {
@@ -112,14 +112,14 @@ main (int argc, char *argv[])
 
           if (range > 0)
             {
-              squiggly = g_new (char, range + 1);
-              for (int s = 0; s < range; s++)
+              squiggly = g_new (char, range);
+              for (int s = 0; s < range - 1; s++)
                 squiggly[s] = '~';
               squiggly[range] = '\0';
             }
 
           fprintf (stderr, "%s: error: %s\n", argv[0], error->message);
-          fprintf (stderr, "%s\n", argv[1]);
+          fprintf (stderr, "%s\n", opt_vfl[i]);
           fprintf (stderr, "%*s^%s\n", offset, " ", squiggly != NULL ? squiggly : "");
 
           g_free (squiggly);
@@ -134,20 +134,24 @@ main (int argc, char *argv[])
         {
           VflConstraint *c = &constraints[j];
 
-          fprintf (stdout, "  <constraint target-object=\"%s\" target-attr=\"%s\"\n", c->view1, c->attr1);
-          fprintf (stdout, "              relation=\"%s\"\n", relation_to_string (c->relation));
+          g_string_append_printf (buffer, "  <constraint target-object=\"%s\" target-attr=\"%s\"\n", c->view1, c->attr1);
+          g_string_append_printf (buffer, "              relation=\"%s\"\n", relation_to_string (c->relation));
 
           if (c->view2 != NULL)
-            fprintf (stdout, "              source-object=\"%s\" source-attr=\"%s\"\n", c->view2, c->attr2);
+            g_string_append_printf (buffer, "              source-object=\"%s\" source-attr=\"%s\"\n", c->view2, c->attr2);
 
-          fprintf (stdout, "              constant=\"%g\" multiplier=\"%g\"\n", c->constant, c->multiplier);
-          fprintf (stdout, "              strength=\"%s\"/>\n", strength_to_string (c->strength));
+          g_string_append_printf (buffer, "              constant=\"%g\" multiplier=\"%g\"\n", c->constant, c->multiplier);
+          g_string_append_printf (buffer, "              strength=\"%s\"/>\n", strength_to_string (c->strength));
         }
 
       g_free (constraints);
     }
 
-  fprintf (stdout, "</constraints>\n");
+  g_string_append (buffer, "</constraints>\n");
+
+  fprintf (stdout, "%s", buffer->str);
+
+  g_string_free (buffer, TRUE);
 
   vfl_parser_free (parser);
 }
