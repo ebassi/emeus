@@ -955,7 +955,7 @@ vfl_parser_get_constraints (VflParser *parser,
 
           c.view2 = iter->next_view->name;
 
-          if (iter == parser->trailing_super || iter->next_view == parser->trailing_super)
+          if (iter->next_view == parser->trailing_super)
             c.attr2 = iter->orientation == VFL_HORIZONTAL ? "end" : "bottom";
           else
             c.attr2 = iter->orientation == VFL_HORIZONTAL ? "start" : "top";
