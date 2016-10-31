@@ -80,6 +80,16 @@ emeus_constraint_layout_finalize (GObject *gobject)
   G_OBJECT_CLASS (emeus_constraint_layout_parent_class)->finalize (gobject);
 }
 
+static void
+emeus_constraint_layout_destroy (GtkWidget *widget)
+{
+  EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (widget);
+
+  simplex_solver_freeze (&self->solver);
+
+  GTK_WIDGET_CLASS (emeus_constraint_layout_parent_class)->destroy (widget);
+}
+
 static Variable *
 get_layout_attribute (EmeusConstraintLayout   *layout,
                       EmeusConstraintAttribute attr)
@@ -916,6 +926,7 @@ emeus_constraint_layout_class_init (EmeusConstraintLayoutClass *klass)
   widget_class->get_preferred_height = emeus_constraint_layout_get_preferred_height;
   widget_class->size_allocate = emeus_constraint_layout_size_allocate;
   widget_class->draw = emeus_constraint_layout_draw;
+  widget_class->destroy = emeus_constraint_layout_destroy;
 
   container_class->add = emeus_constraint_layout_add;
   container_class->remove = emeus_constraint_layout_remove;
