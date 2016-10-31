@@ -453,7 +453,6 @@ emeus_solver_buttons (void)
 
   simplex_solver_remove_constraint (&solver, stay);
 
-  /* FIXME: Making the right limit smaller fails */
   g_test_message ("right_limit := 600");
   variable_set_value (right_limit, 600.0);
   stay = simplex_solver_add_stay_variable (&solver, right_limit, STRENGTH_REQUIRED);
