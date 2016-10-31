@@ -763,12 +763,7 @@ emeus_create_constraints_from_description (const char * const  lines[],
 {
   g_return_val_if_fail (lines != NULL && n_lines != 0, NULL);
 
-  VflParser *parser = vfl_parser_new ();
-
-  /* Configure the parser */
-  vfl_parser_set_default_spacing (parser, hspacing, vspacing);
-  vfl_parser_set_views (parser, views);
-  vfl_parser_set_metrics (parser, metrics);
+  VflParser *parser = vfl_parser_new (hspacing, vspacing, metrics, views);
 
   GList *res = NULL;
 

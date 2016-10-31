@@ -94,11 +94,7 @@ main (int argc, char *argv[])
   for (int i = 0; opt_views[i] != NULL; i++)
     g_hash_table_add (views, opt_views[i]);
 
-  VflParser *parser = vfl_parser_new ();
-
-  vfl_parser_set_default_spacing (parser, opt_hspacing, opt_vspacing);
-  vfl_parser_set_metrics (parser, NULL);
-  vfl_parser_set_views (parser, views);
+  VflParser *parser = vfl_parser_new (opt_hspacing, opt_vspacing, NULL, views);
 
   fprintf (stdout, "<constraints>\n");
 

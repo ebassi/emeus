@@ -82,14 +82,20 @@ vfl_error_quark (void)
 }
 
 VflParser *
-vfl_parser_new (void)
+vfl_parser_new (int hspacing,
+                int vspacing,
+                GHashTable *metrics,
+                GHashTable *views)
 {
   VflParser *res = g_slice_new0 (VflParser);
 
-  res->default_spacing[VFL_HORIZONTAL] = 8;
-  res->default_spacing[VFL_VERTICAL] = 8;
+  res->default_spacing[VFL_HORIZONTAL] = hspacing < 0 ? 8 : hspacing;
+  res->default_spacing[VFL_VERTICAL] = vspacing < 0 ? 8 : vspacing;
 
   res->orientation = VFL_HORIZONTAL;
+
+  res->metrics_set = metrics;
+  res->views_set = views;
 
   return res;
 }

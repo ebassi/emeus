@@ -31,7 +31,10 @@ typedef struct {
 
 GQuark vfl_error_quark (void);
 
-VflParser *vfl_parser_new (void);
+VflParser *vfl_parser_new (int hspacing,
+                           int vspacing,
+                           GHashTable *metrics,
+                           GHashTable *views);
 void vfl_parser_free (VflParser *parser);
 
 void vfl_parser_set_default_spacing (VflParser *parser,

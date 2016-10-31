@@ -52,7 +52,7 @@ static void
 vfl_parser_valid (gconstpointer data)
 {
   int idx = GPOINTER_TO_INT (data);
-  VflParser *parser = vfl_parser_new ();
+  VflParser *parser = vfl_parser_new (-1, -1, NULL, NULL);
   GError *error = NULL;
   VflConstraint *constraints;
   int n_constraints = 0;
@@ -95,7 +95,7 @@ static void
 vfl_parser_invalid (gconstpointer data)
 {
   int idx = GPOINTER_TO_INT (data);
-  VflParser *parser = vfl_parser_new ();
+  VflParser *parser = vfl_parser_new (-1, -1, NULL, NULL);
   GError *error = NULL;
   GHashTable *views;
 
