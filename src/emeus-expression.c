@@ -467,14 +467,19 @@ expression_substitute_out (Expression *expression,
 
       double old_coefficient = expression_get_coefficient (expression, clv);
 
-      if (old_coefficient > 0.0)
+      if (expression_has_variable (expression, clv))
         {
           double new_coefficient = old_coefficient + multiplier * coeff;
 
           if (approx_val (new_coefficient, 0.0))
             expression_remove_variable (expression, clv, subject);
           else
-            expression_set_variable (expression, clv, new_coefficient);
+            {
+              expression_set_variable (expression, clv, new_coefficient);
+
+              if (expression->solver)
+                simplex_solver_note_added_variable (expression->solver, clv, subject);
+            }
         }
       else
         {
