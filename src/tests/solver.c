@@ -302,6 +302,189 @@ emeus_solver_paper (void)
   simplex_solver_clear (&solver);
 }
 
+typedef struct {
+  Variable *left;
+  Variable *width;
+} Button;
+
+static char *
+button_to_string (const Button *button)
+{
+  char *left_s = variable_to_string (button->left);
+  char *width_s = variable_to_string (button->width);
+  char *res = g_strdup_printf ("%s:%s", left_s, width_s);
+
+  g_free (left_s);
+  g_free (width_s);
+
+  return res;
+}
+
+static void
+button_init (Button *b,
+             const char *prefix,
+             SimplexSolver *solver)
+{
+  b->left = simplex_solver_create_variable (solver, "left", 0);
+  variable_set_prefix (b->left, prefix);
+
+  b->width = simplex_solver_create_variable (solver, "width", 0);
+  variable_set_prefix (b->width, prefix);
+}
+
+static void
+emeus_solver_buttons (void)
+{
+  SimplexSolver solver = SIMPLEX_SOLVER_INIT;
+
+  simplex_solver_init (&solver);
+
+  Button b1, b2;
+  button_init (&b1, "b1", &solver);
+  button_init (&b2, "b2", &solver);
+
+  Variable *left_limit = simplex_solver_create_variable (&solver, "left", 0);
+  Variable *right_limit = simplex_solver_create_variable (&solver, "width", 0);
+
+  variable_set_prefix (left_limit, "super");
+  variable_set_prefix (right_limit, "super");
+
+  simplex_solver_add_stay_variable (&solver, left_limit, STRENGTH_REQUIRED);
+  simplex_solver_add_stay_variable (&solver, right_limit, STRENGTH_WEAK);
+
+  simplex_solver_add_constraint (&solver,
+                                 b1.width, OPERATOR_TYPE_EQ, expression_new_from_variable (b2.width),
+                                 STRENGTH_REQUIRED);
+  simplex_solver_add_constraint (&solver,
+                                 b1.left, OPERATOR_TYPE_EQ, expression_plus (expression_new_from_variable (left_limit), 50),
+                                 STRENGTH_REQUIRED);
+  simplex_solver_add_constraint (&solver,
+                                 right_limit, OPERATOR_TYPE_EQ,
+                                 expression_plus (expression_plus_variable (expression_new_from_variable (b2.left), b2.width), 50),
+                                 STRENGTH_REQUIRED);
+  simplex_solver_add_constraint (&solver,
+                                 b2.left, OPERATOR_TYPE_GE,
+                                 expression_plus (expression_plus_variable (expression_new_from_variable (b1.left), b1.width), 100),
+                                 STRENGTH_REQUIRED);
+  simplex_solver_add_constraint (&solver,
+                                 b1.width, OPERATOR_TYPE_GE, expression_new_from_constant (87.0),
+                                 STRENGTH_REQUIRED);
+  simplex_solver_add_constraint (&solver,
+                                 b1.width, OPERATOR_TYPE_EQ, expression_new_from_constant (87.0),
+                                 STRENGTH_STRONG);
+  simplex_solver_add_constraint (&solver,
+                                 b2.width, OPERATOR_TYPE_GE, expression_new_from_constant (113.0),
+                                 STRENGTH_REQUIRED);
+  simplex_solver_add_constraint (&solver,
+                                 b2.width, OPERATOR_TYPE_EQ, expression_new_from_constant (113.0),
+                                 STRENGTH_STRONG);
+
+  {
+    char *b1_s = button_to_string (&b1);
+    char *b2_s = button_to_string (&b2);
+    char *l_s = variable_to_string (left_limit);
+    char *r_s = variable_to_string (right_limit);
+
+    g_test_message ("b1 := %s, b2 := %s, left := %s, right := %s", b1_s, b2_s, l_s, r_s);
+
+    g_free (b1_s);
+    g_free (b2_s);
+    g_free (l_s);
+    g_free (r_s);
+  }
+
+  emeus_assert_almost_equals (variable_get_value (b1.left), 50.0);
+  emeus_assert_almost_equals (variable_get_value (b1.width), 113.0);
+  emeus_assert_almost_equals (variable_get_value (b2.left), 263.0);
+  emeus_assert_almost_equals (variable_get_value (b2.width), 113.0);
+  emeus_assert_almost_equals (variable_get_value (right_limit), 426.0);
+
+  Constraint *stay;
+
+  g_test_message ("right_limit := 500");
+  variable_set_value (right_limit, 500.0);
+  stay = simplex_solver_add_stay_variable (&solver, right_limit, STRENGTH_REQUIRED);
+
+  {
+    char *b1_s = button_to_string (&b1);
+    char *b2_s = button_to_string (&b2);
+    char *l_s = variable_to_string (left_limit);
+    char *r_s = variable_to_string (right_limit);
+
+    g_test_message ("b1 := %s, b2 := %s, left := %s, right := %s", b1_s, b2_s, l_s, r_s);
+
+    g_free (b1_s);
+    g_free (b2_s);
+    g_free (l_s);
+    g_free (r_s);
+  }
+
+  emeus_assert_almost_equals (variable_get_value (b1.left), 50.0);
+  emeus_assert_almost_equals (variable_get_value (b1.width), 150.0);
+  emeus_assert_almost_equals (variable_get_value (b2.left), 300.0);
+  emeus_assert_almost_equals (variable_get_value (b2.width), 150.0);
+  emeus_assert_almost_equals (variable_get_value (right_limit), 500.0);
+
+  simplex_solver_remove_constraint (&solver, stay);
+
+  g_test_message ("right_limit := 700");
+  variable_set_value (right_limit, 700.0);
+  stay = simplex_solver_add_stay_variable (&solver, right_limit, STRENGTH_REQUIRED);
+
+  {
+    char *b1_s = button_to_string (&b1);
+    char *b2_s = button_to_string (&b2);
+    char *l_s = variable_to_string (left_limit);
+    char *r_s = variable_to_string (right_limit);
+
+    g_test_message ("b1 := %s, b2 := %s, left := %s, right := %s", b1_s, b2_s, l_s, r_s);
+
+    g_free (b1_s);
+    g_free (b2_s);
+    g_free (l_s);
+    g_free (r_s);
+  }
+
+  emeus_assert_almost_equals (variable_get_value (b1.left), 50.0);
+  emeus_assert_almost_equals (variable_get_value (b1.width), 250.0);
+  emeus_assert_almost_equals (variable_get_value (b2.left), 400.0);
+  emeus_assert_almost_equals (variable_get_value (b2.width), 250.0);
+  emeus_assert_almost_equals (variable_get_value (right_limit), 700.0);
+
+  simplex_solver_remove_constraint (&solver, stay);
+
+#if 0
+  /* FIXME: Making the right limit smaller fails */
+  g_test_message ("right_limit := 600");
+  variable_set_value (right_limit, 600.0);
+  stay = simplex_solver_add_stay_variable (&solver, right_limit, STRENGTH_REQUIRED);
+
+  {
+    char *b1_s = button_to_string (&b1);
+    char *b2_s = button_to_string (&b2);
+    char *l_s = variable_to_string (left_limit);
+    char *r_s = variable_to_string (right_limit);
+
+    g_test_message ("b1 := %s, b2 := %s, left := %s, right := %s", b1_s, b2_s, l_s, r_s);
+
+    g_free (b1_s);
+    g_free (b2_s);
+    g_free (l_s);
+    g_free (r_s);
+  }
+
+  emeus_assert_almost_equals (variable_get_value (b1.left), 50.0);
+  emeus_assert_almost_equals (variable_get_value (b1.width), 250.0);
+  emeus_assert_almost_equals (variable_get_value (b2.left), 400.0);
+  emeus_assert_almost_equals (variable_get_value (b2.width), 250.0);
+  emeus_assert_almost_equals (variable_get_value (right_limit), 600.0);
+
+  simplex_solver_remove_constraint (&solver, stay);
+#endif
+
+  simplex_solver_clear (&solver);
+}
+
 int
 main (int argc, char *argv[])
 {
@@ -317,6 +500,7 @@ main (int argc, char *argv[])
   g_test_add_func ("/emeus/solver/eq-with-stay", emeus_solver_eq_with_stay);
   g_test_add_func ("/emeus/solver/cassowary", emeus_solver_cassowary);
   g_test_add_func ("/emeus/solver/paper", emeus_solver_paper);
+  g_test_add_func ("/emeus/solver/buttons", emeus_solver_buttons);
 
   return g_test_run ();
 }
