@@ -20,6 +20,7 @@
 
 #include "emeus-utils-private.h"
 
+#include <string.h>
 #include <math.h>
 #include <float.h>
 
@@ -56,6 +57,30 @@ get_relation_symbol (EmeusConstraintRelation rel)
   return relation_symbols[rel];
 }
 
+EmeusConstraintAttribute
+attribute_from_name (const char *name)
+{
+  if (name == NULL || *name == '\0')
+    return EMEUS_CONSTRAINT_ATTRIBUTE_INVALID;
+
+  /* We sadly need to special case these two because the name does
+   * not match the VFL grammar rules
+   */
+  if (strcmp (name, "centerX") == 0)
+    return EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X;
+
+  if (strcmp (name, "centerY") == 0)
+    return EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y;
+
+  for (int i = 0; i < G_N_ELEMENTS (attribute_names); i++)
+    {
+      if (strcmp (attribute_names[i], name) == 0)
+        return i;
+    }
+
+  return EMEUS_CONSTRAINT_ATTRIBUTE_INVALID;
+}
+
 OperatorType
 relation_to_operator (EmeusConstraintRelation rel)
 {
@@ -70,6 +95,22 @@ relation_to_operator (EmeusConstraintRelation rel)
     }
 
   return OPERATOR_TYPE_EQ;
+}
+
+EmeusConstraintRelation
+operator_to_relation (OperatorType op)
+{
+  switch (op)
+    {
+    case OPERATOR_TYPE_EQ:
+      return EMEUS_CONSTRAINT_RELATION_EQ;
+    case OPERATOR_TYPE_LE:
+      return EMEUS_CONSTRAINT_RELATION_LE;
+    case OPERATOR_TYPE_GE:
+      return EMEUS_CONSTRAINT_RELATION_GE;
+    }
+
+  return EMEUS_CONSTRAINT_RELATION_EQ;
 }
 
 StrengthType
@@ -88,6 +129,48 @@ strength_to_value (EmeusConstraintStrength strength)
     }
 
   return STRENGTH_REQUIRED;
+}
+
+EmeusConstraintStrength
+value_to_strength (StrengthType strength)
+{
+  if (strength >= STRENGTH_REQUIRED)
+    return EMEUS_CONSTRAINT_STRENGTH_REQUIRED;
+
+  if (strength >= STRENGTH_STRONG)
+    return EMEUS_CONSTRAINT_STRENGTH_STRONG;
+
+  if (strength >= STRENGTH_MEDIUM)
+    return EMEUS_CONSTRAINT_STRENGTH_MEDIUM;
+
+  return EMEUS_CONSTRAINT_STRENGTH_WEAK;
+}
+
+static const char *operators[] = {
+  "<=",
+  "==",
+  ">=",
+};
+
+const char *
+operator_to_string (OperatorType o)
+{
+  return operators[o + 1];
+}
+
+const char *
+strength_to_string (StrengthType s)
+{
+  if (s >= STRENGTH_REQUIRED)
+    return "required";
+
+  if (s >= STRENGTH_STRONG)
+    return "strong";
+
+  if (s >= STRENGTH_MEDIUM)
+    return "medium";
+
+  return "weak";
 }
 
 bool

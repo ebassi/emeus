@@ -1,4 +1,4 @@
-/* emeus-utils-private.h: Internal utility functions
+/* emeus-utils.h: Utility functions
  *
  * Copyright 2016  Endless
  *
@@ -19,24 +19,16 @@
 #pragma once
 
 #include "emeus-types.h"
-#include "emeus-types-private.h"
+#include "emeus-constraint.h"
 
 G_BEGIN_DECLS
 
-const char *get_attribute_name (EmeusConstraintAttribute attr);
-const char *get_relation_symbol (EmeusConstraintRelation rel);
-
-EmeusConstraintAttribute attribute_from_name (const char *name);
-
-OperatorType relation_to_operator (EmeusConstraintRelation rel);
-StrengthType strength_to_value (EmeusConstraintStrength strength);
-
-EmeusConstraintRelation operator_to_relation (OperatorType op);
-EmeusConstraintStrength value_to_strength (StrengthType strength);
-
-const char *operator_to_string (OperatorType op);
-const char *strength_to_string (StrengthType strength);
-
-bool approx_val (double v1, double v2);
+EMEUS_AVAILABLE_IN_1_0
+GList * emeus_create_constraints_from_description       (const char * const  lines[],
+                                                         guint               n_lines,
+                                                         int                 hspacing,
+                                                         int                 vspacing,
+                                                         GHashTable         *views,
+                                                         GHashTable         *metrics);
 
 G_END_DECLS

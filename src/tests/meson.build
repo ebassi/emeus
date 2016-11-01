@@ -1,14 +1,12 @@
-solver_sources = [
-  'emeus-expression.c',
-  'emeus-simplex-solver.c',
-  'emeus-utils.c',
-  'emeus-variable.c',
+tests = [
+  [ 'solver', 'solver.c' ],
+  [ 'vfl-parser', 'vfl-parser.c' ],
 ]
 
-solver_objects = libemeus.extract_objects(solver_sources)
-
-e = executable('solver', 'solver.c',
-               include_directories: emeus_inc,
-               dependencies: [ glib_dep, mathlib_dep ],
-               objects: solver_objects)
-test('Solver', e)
+foreach t: tests
+  e = executable(t[0], t[1],
+                 include_directories: emeus_inc,
+                 dependencies: [ glib_dep, mathlib_dep ],
+                 objects: solver_objects)
+  test(t[0], e)
+endforeach

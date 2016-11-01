@@ -9,6 +9,7 @@ ignore_headers = [
   'emeus-types-private.h',
   'emeus-utils-private.h',
   'emeus-variable-private.h',
+  'emeus-vfl-parser-private.h',
 ]
 
 if get_option('enable-gtk-doc')
