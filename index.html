@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Emeus : Constraint-based layout manager for GTK+">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Emeus</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/ebassi/emeus">View on GitHub</a>
+
+          <h1 id="project_title">Emeus</h1>
+          <h2 id="project_tagline">Constraint-based layout manager for GTK+</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/ebassi/emeus/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/ebassi/emeus/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h2>
+<a id="emeus---constraint-based-layout-manager-for-gtk" class="anchor" href="#emeus---constraint-based-layout-manager-for-gtk" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Emeus - Constraint-based layout manager for GTK+</h2>
+
+<h3>
+<a id="what-is-emeus" class="anchor" href="#what-is-emeus" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What is Emeus?</h3>
+
+<p>Emeus is a constraint-based layout manager widget for <a href="https://www.gtk.org">GTK+</a>,
+written using the <a href="http://constraints.cs.washington.edu/cassowary/">Cassowary</a> constraint solving algorithm.</p>
+
+<h3>
+<a id="whats-the-difference-between-emeus-and-gtks-layout-managers" class="anchor" href="#whats-the-difference-between-emeus-and-gtks-layout-managers" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What's the difference between Emeus and GTK+'s layout managers?</h3>
+
+<p>GTK+ has two different sorts of layout managers:</p>
+
+<ul>
+<li>the boxes-inside-boxes model, represented by <a href="https://developer.gnome.org/gtk3/stable/GtkBox.html">GtkBox</a> and
+which is the preferred layout management mechanism</li>
+<li>the fixed positioning and sizing model, using the <a href="https://developer.gnome.org/gtk3/stable/GtkFixed.html">GtkFixed</a>
+and the <a href="https://developer.gnome.org/gtk3/stable/GtkLayout.html">GtkLayout</a> containers</li>
+</ul>
+
+<p>The first model works really well in ensuring that UIs are responsive to
+size changes, by avoiding pixel-perfect positioning on the screen, as well
+as ensuring that changing the font size or margins and paddings do not break
+the user interface; its main down side is that it requires accurate, and
+often verbose packing of widgets inside boxes, inside other boxes.</p>
+
+<p>The second model allows a more efficient way to construct a user interface,
+at the major costs of either "freezing" it, or requiring constant
+recalculations of the relative position and size of each UI element.</p>
+
+<p>Emeus provides a third layout management policy, based on <em>constraints</em>;
+each UI element binds one of more of its attributes — like its width, or its
+position — to other UI elements, in a way that is more natural to describe
+from a UI building perspective, and hopefully more efficient that stacking
+piles of boxes one inside another.</p>
+
+<h3>
+<a id="constraints" class="anchor" href="#constraints" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Constraints</h3>
+
+<p><code>EmeusLayoutConstraint</code> is a <a href="https://developer.gnome.org/gtk3/stable/GtkContainer.html">GtkContainer</a> that can
+support multiple children; each child, in turn, is associated to one or more
+<code>EmeusConstraint</code> instances. Each constraint is the expression of a simple
+linear equation:</p>
+
+<pre><code>item1.attr1 = item2.attr2 × multiplier + constant
+</code></pre>
+
+<p>Where:</p>
+
+<ul>
+<li>
+<code>item1</code> is the target widget, that is the widget we want to constraint;
+if unset, the target will be the layout itself</li>
+<li>
+<code>attr1</code> is an attribute of the target widget, like <code>width</code> or <code>end</code>,
+that we want to constraint</li>
+<li>
+<code>item2</code> is the source widget, that is the widget that provides the value
+of the constraint; if unset, the source will be the layout itself</li>
+<li>
+<code>attr2</code> is an attribute of the source widget that provides the value
+of the constraint</li>
+<li>
+<code>multiplier</code> is a multiplication factor, expressed as a floating point
+value</li>
+<li>
+<code>constant</code> is an additional constant factor, expressed as a floating
+point value</li>
+</ul>
+
+<p>Using both notations, then, we can construct user interfaces like:</p>
+
+<pre><code>+-------------------------------------------+
+|   [ button 1 ] [ button 2 ] [ button 3]   |
++-------------------------------------------+
+</code></pre>
+
+<p>By expressing the constraints between the UI elements. For instance, we can
+center <code>button2</code> within its parent and give it a minimum width of 250
+logical pixels:</p>
+
+<pre><code>button2.width &gt;= 250
+button2.centerX = parent.centerX
+button2.centerY = parent.centerY
+</code></pre>
+
+<p>Then, we can tie <code>button1</code> and <code>button3</code> to <code>button2</code>, and ensure that the
+width and height of all three buttons are the same:</p>
+
+<pre><code>button1.end = button2.start - 8
+button1.width = button2.width
+button1.height = button2.height
+
+button3.start = button2.end + 8
+button3.width = button2.width
+button3.height = button2.height
+</code></pre>
+
+<p>The <code>EmeusConstraintLayout</code> widget will attempt to resolve all the
+constraints, and lay out its children according to them.</p>
+
+<h2>
+<a id="building" class="anchor" href="#building" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building</h2>
+
+<ul>
+<li>Install <a href="http://mesonbuild.com/">meson</a>
+</li>
+<li>Install <a href="https://ninja-build.org/">ninja</a>
+</li>
+<li>Create a build directory:
+
+<ul>
+<li><code>$ mkdir _build &amp;&amp; cd _build</code></li>
+</ul>
+</li>
+<li>Run meson:
+
+<ul>
+<li><code>$ meson ..</code></li>
+</ul>
+</li>
+<li>Run ninja:
+
+<ul>
+<li><code>$ ninja</code></li>
+</ul>
+</li>
+</ul>
+
+<h2>
+<a id="licensing" class="anchor" href="#licensing" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Licensing</h2>
+
+<p>Emeus is released under the terms of the GNU Lesser General Public License,
+either version 2.1 or, at your option, any later version.</p>
+
+<p>The Cassowary simplex solving algorithm implementation is largely inspired
+by the equivalent implementations written in various other language,
+including:</p>
+
+<ul>
+<li>
+<a href="http://constraints.cs.washington.edu/cassowary/">Cassowary</a> — the original C++ implementation, released
+under the terms of the GNU Lesser General Public License, version 2.1 or
+later</li>
+<li>
+<a href="https://github.com/slightlyoff/cassowary.js">Cassowary.js</a> — JavaScript implementation, released
+under the terms of the Apache License, Version 2.0</li>
+<li>
+<a href="https://github.com/pybee/cassowary">Cassowary</a> — Python implementation, released under the
+terms of the BSD 3-clause license</li>
+</ul>
+
+<p>Additionally, the automatic layout solving is inspired by
+<a href="https://github.com/IjzerenHein/autolayout.js">autolayout.js</a>, a JavaScript automatic constraint-based
+layout, which, in turn, is based on the Apple <a href="https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/AutolayoutPG/index.html">autolayout</a>
+layout manager.</p>
+
+<p>You can check on the <a href="http://overconstrained.io/">Overconstrained</a> website for
+additional Cassowary implementations in various languages.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Emeus maintained by <a href="https://github.com/ebassi">ebassi</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
