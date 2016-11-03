@@ -18,6 +18,8 @@ emeus_constraint_get_target_attribute
 emeus_constraint_get_multiplier
 emeus_constraint_get_constant
 emeus_constraint_get_strength
+emeus_constraint_set_active
+emeus_constraint_get_active
 emeus_constraint_is_attached
 emeus_constraint_is_required
 <SUBSECTION Standard>
@@ -42,6 +44,11 @@ EmeusConstraintLayout
 EmeusConstraintLayoutClass
 emeus_constraint_layout_new
 emeus_constraint_layout_pack
+emeus_constraint_layout_add_constraint
+emeus_constraint_layout_add_constraints
+emeus_constraint_layout_get_constraints
+<SUBSECTION>
+emeus_create_constraints_from_description
 <SUBSECTION>
 EmeusConstraintLayoutChild
 EmeusConstraintLayoutChildClass
@@ -49,6 +56,7 @@ emeus_constraint_layout_child_new
 emeus_constraint_layout_child_add_constraint
 emeus_constraint_layout_child_remove_constraint
 emeus_constraint_layout_child_clear_constraints
+emeus_constraint_layout_child_get_name
 emeus_constraint_layout_child_get_top
 emeus_constraint_layout_child_get_bottom
 emeus_constraint_layout_child_get_left
@@ -57,8 +65,8 @@ emeus_constraint_layout_child_get_width
 emeus_constraint_layout_child_get_height
 emeus_constraint_layout_child_get_center_x
 emeus_constraint_layout_child_get_center_y
-emeus_constraint_layout_child_set_intrisic_width
-emeus_constraint_layout_child_set_intrisic_height
+emeus_constraint_layout_child_set_intrinsic_height
+emeus_constraint_layout_child_set_intrinsic_width
 <SUBSECTION Standard>
 EMEUS_TYPE_CONSTRAINT_LAYOUT
 EMEUS_TYPE_CONSTRAINT_LAYOUT_CHILD
@@ -76,6 +84,7 @@ emeus_constraint_layout_child_get_type
 </SECTION>
 
 <SECTION>
+<TITLE>Version checking</TITLE>
 <FILE>emeus-version</FILE>
 EMEUS_CHECK_VERSION
 <SUBSECTION Standard>
