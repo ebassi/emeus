@@ -1,0 +1,761 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>EmeusConstraintLayout: Emeus 1.0 Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="index.html" title="Emeus 1.0 Reference Manual">
+<link rel="up" href="ch01.html" title="Emeus">
+<link rel="prev" href="ch01.html" title="Emeus">
+<link rel="next" href="EmeusConstraint.html" title="EmeusConstraint">
+<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#EmeusConstraintLayout.description" class="shortcut">Description</a></span><span id="nav_hierarchy">  <span class="dim">|</span> 
+                  <a href="#EmeusConstraintLayout.object-hierarchy" class="shortcut">Object Hierarchy</a></span><span id="nav_interfaces">  <span class="dim">|</span> 
+                  <a href="#EmeusConstraintLayout.implemented-interfaces" class="shortcut">Implemented Interfaces</a></span><span id="nav_properties">  <span class="dim">|</span> 
+                  <a href="#EmeusConstraintLayout.properties" class="shortcut">Properties</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="ch01.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="ch01.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="EmeusConstraint.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="EmeusConstraintLayout"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="EmeusConstraintLayout.top_of_page"></a>EmeusConstraintLayout</span></h2>
+<p>EmeusConstraintLayout</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="EmeusConstraintLayout.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_return">
+<col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GtkWidget</span> *
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-new" title="emeus_constraint_layout_new ()">emeus_constraint_layout_new</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-pack" title="emeus_constraint_layout_pack ()">emeus_constraint_layout_pack</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-add-constraint" title="emeus_constraint_layout_add_constraint ()">emeus_constraint_layout_add_constraint</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-add-constraints" title="emeus_constraint_layout_add_constraints ()">emeus_constraint_layout_add_constraints</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GList</span> *
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-get-constraints" title="emeus_constraint_layout_get_constraints ()">emeus_constraint_layout_get_constraints</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GList</span> *
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-create-constraints-from-description" title="emeus_create_constraints_from_description ()">emeus_create_constraints_from_description</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">GtkWidget</span> *
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-new" title="emeus_constraint_layout_child_new ()">emeus_constraint_layout_child_new</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-add-constraint" title="emeus_constraint_layout_child_add_constraint ()">emeus_constraint_layout_child_add_constraint</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-remove-constraint" title="emeus_constraint_layout_child_remove_constraint ()">emeus_constraint_layout_child_remove_constraint</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-clear-constraints" title="emeus_constraint_layout_child_clear_constraints ()">emeus_constraint_layout_child_clear_constraints</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">const <span class="returnvalue">char</span> *
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-name" title="emeus_constraint_layout_child_get_name ()">emeus_constraint_layout_child_get_name</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-top" title="emeus_constraint_layout_child_get_top ()">emeus_constraint_layout_child_get_top</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-bottom" title="emeus_constraint_layout_child_get_bottom ()">emeus_constraint_layout_child_get_bottom</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-left" title="emeus_constraint_layout_child_get_left ()">emeus_constraint_layout_child_get_left</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-right" title="emeus_constraint_layout_child_get_right ()">emeus_constraint_layout_child_get_right</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-width" title="emeus_constraint_layout_child_get_width ()">emeus_constraint_layout_child_get_width</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-height" title="emeus_constraint_layout_child_get_height ()">emeus_constraint_layout_child_get_height</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-center-x" title="emeus_constraint_layout_child_get_center_x ()">emeus_constraint_layout_child_get_center_x</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">int</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-center-y" title="emeus_constraint_layout_child_get_center_y ()">emeus_constraint_layout_child_get_center_y</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-set-intrinsic-height" title="emeus_constraint_layout_child_set_intrinsic_height ()">emeus_constraint_layout_child_set_intrinsic_height</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-set-intrinsic-width" title="emeus_constraint_layout_child_set_intrinsic_width ()">emeus_constraint_layout_child_set_intrinsic_width</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraintLayout.properties"></a><h2>Properties</h2>
+<div class="informaltable"><table class="informaltable" border="0">
+<colgroup>
+<col width="150px" class="properties_type">
+<col width="300px" class="properties_name">
+<col width="200px" class="properties_flags">
+</colgroup>
+<tbody><tr>
+<td class="property_type">
+<span class="type">gchar</span> *</td>
+<td class="property_name"><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild--name" title="The “name” property">name</a></td>
+<td class="property_flags">Read / Write / Construct Only</td>
+</tr></tbody>
+</table></div>
+</div>
+<a name="EmeusConstraintLayoutChild"></a><div class="refsect1">
+<a name="EmeusConstraintLayout.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody>
+<tr>
+<td class="datatype_keyword"> </td>
+<td class="function_name"><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayout-struct" title="EmeusConstraintLayout">EmeusConstraintLayout</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword"> </td>
+<td class="function_name"><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild-struct" title="EmeusConstraintLayoutChild">EmeusConstraintLayoutChild</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraintLayout.object-hierarchy"></a><h2>Object Hierarchy</h2>
+<pre class="screen">    GObject
+    <span class="lineart">╰──</span> GInitiallyUnowned
+        <span class="lineart">╰──</span> GtkWidget
+            <span class="lineart">╰──</span> GtkContainer
+                <span class="lineart">├──</span> GtkBin
+                <span class="lineart">│</span>   <span class="lineart">╰──</span> EmeusConstraintLayoutChild
+                <span class="lineart">╰──</span> EmeusConstraintLayout
+</pre>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraintLayout.implemented-interfaces"></a><h2>Implemented Interfaces</h2>
+<p>
+EmeusConstraintLayout implements
+ AtkImplementorIface and  GtkBuildable.</p>
+<p>
+EmeusConstraintLayoutChild implements
+ AtkImplementorIface and  GtkBuildable.</p>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraintLayout.includes"></a><h2>Includes</h2>
+<pre class="synopsis">#include &lt;emeus.h&gt;
+</pre>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraintLayout.description"></a><h2>Description</h2>
+<p><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> is a <span class="type">GtkContainter</span> that uses constraints
+associated to each of its children to decide their layout.</p>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraintLayout.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="emeus-constraint-layout-new"></a><h3>emeus_constraint_layout_new ()</h3>
+<pre class="programlisting"><span class="returnvalue">GtkWidget</span> *
+emeus_constraint_layout_new (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
+<p>Creates a new constraint-based layout manager.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-new.returns"></a><h4>Returns</h4>
+<p> the newly created layout widget. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-pack"></a><h3>emeus_constraint_layout_pack ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+emeus_constraint_layout_pack (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> *layout</code></em>,
+                              <em class="parameter"><code><span class="type">GtkWidget</span> *child</code></em>,
+                              <em class="parameter"><code>const <span class="type">char</span> *name</code></em>,
+                              <em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *first_constraint</code></em>,
+                              <em class="parameter"><code>...</code></em>);</pre>
+<p>Adds <em class="parameter"><code>child</code></em>
+ to the <em class="parameter"><code>layout</code></em>
+, and applies a list of constraints to it.</p>
+<p>This convenience function is the equivalent of calling
+<code class="function">gtk_container_add()</code> and <a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-add-constraint" title="emeus_constraint_layout_child_add_constraint ()"><code class="function">emeus_constraint_layout_child_add_constraint()</code></a>
+for each constraint instance.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-pack.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>layout</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <span class="type">GtkWidget</span></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>name</p></td>
+<td class="parameter_description"><p> an optional name for the <em class="parameter"><code>child</code></em>
+. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="NULL may be passed as the value in, out, in-out; or as a return value."><span class="acronym">nullable</span></acronym>]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>first_constraint</p></td>
+<td class="parameter_description"><p> a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a>. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="NULL may be passed as the value in, out, in-out; or as a return value."><span class="acronym">nullable</span></acronym>]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>...</p></td>
+<td class="parameter_description"><p>a <code class="literal">NULL</code>-terminated list of <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> instances</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-add-constraint"></a><h3>emeus_constraint_layout_add_constraint ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+emeus_constraint_layout_add_constraint
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> *layout</code></em>,
+                                <em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-add-constraints"></a><h3>emeus_constraint_layout_add_constraints ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+emeus_constraint_layout_add_constraints
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> *layout</code></em>,
+                                <em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *first_constraint</code></em>,
+                                <em class="parameter"><code>...</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-get-constraints"></a><h3>emeus_constraint_layout_get_constraints ()</h3>
+<pre class="programlisting"><span class="returnvalue">GList</span> *
+emeus_constraint_layout_get_constraints
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> *layout</code></em>);</pre>
+<p>Retrieves all the constraints used by the <em class="parameter"><code>layout</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-get-constraints.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>layout</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-layout-get-constraints.returns"></a><h4>Returns</h4>
+<p> a list of
+<a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> instances, owned by the <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>. </p>
+<p><span class="annotation">[<acronym title="Free data container after the code is done."><span class="acronym">transfer container</span></acronym>][<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> EmeusConstraint]</span></p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-create-constraints-from-description"></a><h3>emeus_create_constraints_from_description ()</h3>
+<pre class="programlisting"><span class="returnvalue">GList</span> *
+emeus_create_constraints_from_description
+                               (<em class="parameter"><code>const <span class="type">char</span> * const lines[]</code></em>,
+                                <em class="parameter"><code><span class="type">guint</span> n_lines</code></em>,
+                                <em class="parameter"><code><span class="type">int</span> hspacing</code></em>,
+                                <em class="parameter"><code><span class="type">int</span> vspacing</code></em>,
+                                <em class="parameter"><code><span class="type">GHashTable</span> *views</code></em>,
+                                <em class="parameter"><code><span class="type">GHashTable</span> *metrics</code></em>);</pre>
+<p>Creates a list of constraints they formal description using the
+<a class="ulink" href="https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/AutolayoutPG/VisualFormatLanguage.html" target="_top">Visual Format Language</a>
+syntax.</p>
+<p>The <em class="parameter"><code>views</code></em>
+ dictionary is used to match widgets to the symbolic view name
+inside the VFL; the <em class="parameter"><code>metrics</code></em>
+ dictionary is used to substitute symbolic
+names with numeric values, to avoid hard coding constants inside the
+VFL strings.</p>
+<p>The VFL grammar is:</p>
+<div class="informalexample"><pre class="screen">
+       &lt;visualFormatString&gt; = (&lt;orientation&gt;)?
+                              (&lt;superview&gt;&lt;connection&gt;)?
+                              &lt;view&gt;(&lt;connection&gt;&lt;view&gt;)*
+                              (&lt;connection&gt;&lt;superview&gt;)?
+              &lt;orientation&gt; = 'H' | 'V'
+                &lt;superview&gt; = '|'
+               &lt;connection&gt; = '' | '-' &lt;predicateList&gt; '-' | '-'
+            &lt;predicateList&gt; = &lt;simplePredicate&gt; | &lt;predicateListWithParens&gt;
+          &lt;simplePredicate&gt; = &lt;metricName&gt; | &lt;positiveNumber&gt;
+  &lt;predicateListWithParens&gt; = '(' &lt;predicate&gt; (',' &lt;predicate&gt;)* ')'
+                &lt;predicate&gt; = (&lt;relation&gt;)? &lt;objectOfPredicate&gt; ('@' &lt;priority&gt;)?
+                 &lt;relation&gt; = '==' | '&lt;=' | '&gt;='
+        &lt;objectOfPredicate&gt; = &lt;constant&gt; | &lt;viewName&gt; | &lt;metricName&gt;
+                 &lt;priority&gt; = 'required' | 'strong' | 'medium' | 'weak'
+                 &lt;constant&gt; = &lt;number&gt;
+                 &lt;viewName&gt; = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
+               &lt;metricName&gt; = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
+           &lt;positiveNumber&gt; // A positive real number parseable by g_ascii_strtod()
+                   &lt;number&gt; // A real number parseable by g_ascii_strtod()
+</pre></div>
+<p></p>
+<p>**Note**: The VFL grammar is slightly different than the one defined by Apple,
+as it uses symbolic values for the constraint's priority instead of numeric
+values.</p>
+<p>Examples of VFL descriptions are:</p>
+<div class="informalexample"><pre class="screen">
+  // Default spacing
+  [button]-[textField]
+
+  // Width constraint
+  [button(&gt;=50)]
+
+  // Connection to super view
+  |-50-[purpleBox]-50-|
+
+  // Vertical layout
+  V:[topField]-10-[bottomField]
+
+  // Flush views
+  [maroonView][blueView]
+
+  // Priority
+  [button(100@strong)]
+
+  // Equal widths
+  [button1(==button2)]
+
+  // Multiple predicates
+  [flexibleButton(&gt;=70,&lt;=100)]
+
+  // A complete line of layout
+  |-[find]-[findNext]-[findField(&gt;=20)]-|
+</pre></div>
+<p></p>
+<div class="refsect3">
+<a name="emeus-create-constraints-from-description.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>lines</p></td>
+<td class="parameter_description"><p> an array of Visual Format Language lines
+defining a set of constraints. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Parameter points to an array of items."><span class="acronym">array</span></acronym> length=n_lines]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>n_lines</p></td>
+<td class="parameter_description"><p>the number of lines</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>hspacing</p></td>
+<td class="parameter_description"><p>default horizontal spacing value, or -1 for the fallback value</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>vspacing</p></td>
+<td class="parameter_description"><p>default vertical spacing value, or -1 for the fallback value</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>views</p></td>
+<td class="parameter_description"><p> a dictionary of [ name, widget ]
+pairs; the <code class="literal">name</code> keys map to the view names in the VFL lines, while
+the <code class="literal">widget</code> values map to the children of a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> utf8 Gtk.Widget]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>metrics</p></td>
+<td class="parameter_description"><p> a dictionary of
+[ name, value ] pairs; the <code class="literal">name</code> keys map to the metric names in the
+VFL lines, while the <code class="literal">value</code> values maps to its numeric value. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> utf8 double][<acronym title="NULL may be passed as the value in, out, in-out; or as a return value."><span class="acronym">nullable</span></acronym>]</span></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-create-constraints-from-description.returns"></a><h4>Returns</h4>
+<p> a list of <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a>
+instances, to be used with an <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>. </p>
+<p><span class="annotation">[<acronym title="Free data container after the code is done."><span class="acronym">transfer container</span></acronym>][<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> Emeus.Constraint]</span></p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-new"></a><h3>emeus_constraint_layout_child_new ()</h3>
+<pre class="programlisting"><span class="returnvalue">GtkWidget</span> *
+emeus_constraint_layout_child_new (<em class="parameter"><code>const <span class="type">char</span> *name</code></em>);</pre>
+<p>Creates a new <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> widget.</p>
+<p><span class="annotation">[<acronym title="This symbol is a constructor, not a static method."><span class="acronym">constructor</span></acronym>]</span></p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-new.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>name</p></td>
+<td class="parameter_description"><p> a name for the child. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="NULL may be passed as the value in, out, in-out; or as a return value."><span class="acronym">nullable</span></acronym>]</span></td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-new.returns"></a><h4>Returns</h4>
+<p> the newly created <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> widget. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-add-constraint"></a><h3>emeus_constraint_layout_child_add_constraint ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+emeus_constraint_layout_child_add_constraint
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>,
+                                <em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Adds the given <em class="parameter"><code>constraint</code></em>
+ to the list of constraints applied to
+the <em class="parameter"><code>child</code></em>
+ of a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a></p>
+<p>The <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> will own the <em class="parameter"><code>constraint</code></em>
+ until the
+<em class="parameter"><code>child</code></em>
+ is removed, or until the <em class="parameter"><code>constraint</code></em>
+ is removed.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-add-constraint.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-remove-constraint"></a><h3>emeus_constraint_layout_child_remove_constraint ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+emeus_constraint_layout_child_remove_constraint
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>,
+                                <em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Removes the given <em class="parameter"><code>constraint</code></em>
+ from the list of constraints applied
+to the <em class="parameter"><code>child</code></em>
+ of a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-remove-constraint.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-clear-constraints"></a><h3>emeus_constraint_layout_child_clear_constraints ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+emeus_constraint_layout_child_clear_constraints
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+<p>Clears all the constraints associated with a child of <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-clear-constraints.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-get-name"></a><h3>emeus_constraint_layout_child_get_name ()</h3>
+<pre class="programlisting">const <span class="returnvalue">char</span> *
+emeus_constraint_layout_child_get_name
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-get-top"></a><h3>emeus_constraint_layout_child_get_top ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+emeus_constraint_layout_child_get_top (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-get-bottom"></a><h3>emeus_constraint_layout_child_get_bottom ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+emeus_constraint_layout_child_get_bottom
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-get-left"></a><h3>emeus_constraint_layout_child_get_left ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+emeus_constraint_layout_child_get_left
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-get-right"></a><h3>emeus_constraint_layout_child_get_right ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+emeus_constraint_layout_child_get_right
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-get-width"></a><h3>emeus_constraint_layout_child_get_width ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+emeus_constraint_layout_child_get_width
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-get-height"></a><h3>emeus_constraint_layout_child_get_height ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+emeus_constraint_layout_child_get_height
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-get-center-x"></a><h3>emeus_constraint_layout_child_get_center_x ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+emeus_constraint_layout_child_get_center_x
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-get-center-y"></a><h3>emeus_constraint_layout_child_get_center_y ()</h3>
+<pre class="programlisting"><span class="returnvalue">int</span>
+emeus_constraint_layout_child_get_center_y
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-set-intrinsic-height"></a><h3>emeus_constraint_layout_child_set_intrinsic_height ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+emeus_constraint_layout_child_set_intrinsic_height
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>,
+                                <em class="parameter"><code><span class="type">int</span> height</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-child-set-intrinsic-width"></a><h3>emeus_constraint_layout_child_set_intrinsic_width ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+emeus_constraint_layout_child_set_intrinsic_width
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>,
+                                <em class="parameter"><code><span class="type">int</span> width</code></em>);</pre>
+</div>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraintLayout.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="EmeusConstraintLayout-struct"></a><h3>EmeusConstraintLayout</h3>
+<pre class="programlisting">typedef struct _EmeusConstraintLayout EmeusConstraintLayout;</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraintLayoutChild-struct"></a><h3>EmeusConstraintLayoutChild</h3>
+<pre class="programlisting">typedef struct _EmeusConstraintLayoutChild EmeusConstraintLayoutChild;</pre>
+</div>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraintLayout.property-details"></a><h2>Property Details</h2>
+<div class="refsect2">
+<a name="EmeusConstraintLayoutChild--name"></a><h3>The <code class="literal">“name”</code> property</h3>
+<pre class="programlisting">  “name”                     <span class="type">gchar</span> *</pre>
+<p>The name of the child.</p>
+<p>Flags: Read / Write / Construct Only</p>
+<p>Default value: NULL</p>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>Generated by GTK-Doc V1.25.1</div>
+</body>
+</html>

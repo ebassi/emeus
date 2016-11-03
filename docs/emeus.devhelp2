@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<book xmlns="http://www.devhelp.net/book" title="Emeus 1.0 Reference Manual" link="index.html" author="" name="emeus" version="2" language="c" online="http://ebassi.github.io/emeus/docs/index.html">
+  <chapters>
+    <sub name="Emeus" link="ch01.html">
+      <sub name="EmeusConstraintLayout" link="EmeusConstraintLayout.html"/>
+      <sub name="EmeusConstraint" link="EmeusConstraint.html"/>
+      <sub name="Version checking" link="emeus-Version-checking.html"/>
+    </sub>
+    <sub name="Object Hierarchy" link="object-tree.html"/>
+    <sub name="API Index" link="api-index-full.html"/>
+    <sub name="Index of deprecated API" link="deprecated-api-index.html"/>
+    <sub name="Index of new symbols in 1.0" link="ix03.html"/>
+    <sub name="Annotation Glossary" link="annotation-glossary.html"/>
+  </chapters>
+  <functions>
+    <keyword type="function" name="emeus_constraint_layout_new ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-new" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_layout_pack ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-pack" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_layout_add_constraint ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-add-constraint"/>
+    <keyword type="function" name="emeus_constraint_layout_add_constraints ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-add-constraints"/>
+    <keyword type="function" name="emeus_constraint_layout_get_constraints ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-get-constraints" since="1.0"/>
+    <keyword type="function" name="emeus_create_constraints_from_description ()" link="EmeusConstraintLayout.html#emeus-create-constraints-from-description" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_layout_child_new ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-new" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_layout_child_add_constraint ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-add-constraint" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_layout_child_remove_constraint ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-remove-constraint" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_layout_child_clear_constraints ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-clear-constraints" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_layout_child_get_name ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-name"/>
+    <keyword type="function" name="emeus_constraint_layout_child_get_top ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-top"/>
+    <keyword type="function" name="emeus_constraint_layout_child_get_bottom ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-bottom"/>
+    <keyword type="function" name="emeus_constraint_layout_child_get_left ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-left"/>
+    <keyword type="function" name="emeus_constraint_layout_child_get_right ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-right"/>
+    <keyword type="function" name="emeus_constraint_layout_child_get_width ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-width"/>
+    <keyword type="function" name="emeus_constraint_layout_child_get_height ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-height"/>
+    <keyword type="function" name="emeus_constraint_layout_child_get_center_x ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-center-x"/>
+    <keyword type="function" name="emeus_constraint_layout_child_get_center_y ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-get-center-y"/>
+    <keyword type="function" name="emeus_constraint_layout_child_set_intrinsic_height ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-set-intrinsic-height"/>
+    <keyword type="function" name="emeus_constraint_layout_child_set_intrinsic_width ()" link="EmeusConstraintLayout.html#emeus-constraint-layout-child-set-intrinsic-width"/>
+    <keyword type="struct" name="EmeusConstraintLayout" link="EmeusConstraintLayout.html#EmeusConstraintLayout-struct"/>
+    <keyword type="struct" name="EmeusConstraintLayoutChild" link="EmeusConstraintLayout.html#EmeusConstraintLayoutChild-struct"/>
+    <keyword type="property" name="The “name” property" link="EmeusConstraintLayout.html#EmeusConstraintLayoutChild--name"/>
+    <keyword type="function" name="emeus_constraint_new ()" link="EmeusConstraint.html#emeus-constraint-new" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_new_constant ()" link="EmeusConstraint.html#emeus-constraint-new-constant" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_get_source_object ()" link="EmeusConstraint.html#emeus-constraint-get-source-object"/>
+    <keyword type="function" name="emeus_constraint_get_source_attribute ()" link="EmeusConstraint.html#emeus-constraint-get-source-attribute" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_get_relation ()" link="EmeusConstraint.html#emeus-constraint-get-relation" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_get_target_object ()" link="EmeusConstraint.html#emeus-constraint-get-target-object" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_get_target_attribute ()" link="EmeusConstraint.html#emeus-constraint-get-target-attribute" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_get_multiplier ()" link="EmeusConstraint.html#emeus-constraint-get-multiplier" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_get_constant ()" link="EmeusConstraint.html#emeus-constraint-get-constant" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_get_strength ()" link="EmeusConstraint.html#emeus-constraint-get-strength" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_set_active ()" link="EmeusConstraint.html#emeus-constraint-set-active"/>
+    <keyword type="function" name="emeus_constraint_get_active ()" link="EmeusConstraint.html#emeus-constraint-get-active"/>
+    <keyword type="function" name="emeus_constraint_is_attached ()" link="EmeusConstraint.html#emeus-constraint-is-attached" since="1.0"/>
+    <keyword type="function" name="emeus_constraint_is_required ()" link="EmeusConstraint.html#emeus-constraint-is-required" since="1.0"/>
+    <keyword type="struct" name="EmeusConstraint" link="EmeusConstraint.html#EmeusConstraint-struct"/>
+    <keyword type="enum" name="enum EmeusConstraintStrength" link="EmeusConstraint.html#EmeusConstraintStrength" since="1.0"/>
+    <keyword type="enum" name="enum EmeusConstraintRelation" link="EmeusConstraint.html#EmeusConstraintRelation" since="1.0"/>
+    <keyword type="enum" name="enum EmeusConstraintAttribute" link="EmeusConstraint.html#EmeusConstraintAttribute" since="1.0"/>
+    <keyword type="property" name="The “active” property" link="EmeusConstraint.html#EmeusConstraint--active"/>
+    <keyword type="property" name="The “constant” property" link="EmeusConstraint.html#EmeusConstraint--constant"/>
+    <keyword type="property" name="The “multiplier” property" link="EmeusConstraint.html#EmeusConstraint--multiplier"/>
+    <keyword type="property" name="The “relation” property" link="EmeusConstraint.html#EmeusConstraint--relation"/>
+    <keyword type="property" name="The “source-attribute” property" link="EmeusConstraint.html#EmeusConstraint--source-attribute"/>
+    <keyword type="property" name="The “source-object” property" link="EmeusConstraint.html#EmeusConstraint--source-object"/>
+    <keyword type="property" name="The “strength” property" link="EmeusConstraint.html#EmeusConstraint--strength"/>
+    <keyword type="property" name="The “target-attribute” property" link="EmeusConstraint.html#EmeusConstraint--target-attribute"/>
+    <keyword type="property" name="The “target-object” property" link="EmeusConstraint.html#EmeusConstraint--target-object"/>
+    <keyword type="macro" name="EMEUS_CHECK_VERSION()" link="emeus-Version-checking.html#EMEUS-CHECK-VERSION:CAPS" since="1.0"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_STRENGTH_WEAK" link="EmeusConstraint.html#EMEUS-CONSTRAINT-STRENGTH-WEAK:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_STRENGTH_MEDIUM" link="EmeusConstraint.html#EMEUS-CONSTRAINT-STRENGTH-MEDIUM:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_STRENGTH_STRONG" link="EmeusConstraint.html#EMEUS-CONSTRAINT-STRENGTH-STRONG:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_STRENGTH_REQUIRED" link="EmeusConstraint.html#EMEUS-CONSTRAINT-STRENGTH-REQUIRED:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_RELATION_LE" link="EmeusConstraint.html#EMEUS-CONSTRAINT-RELATION-LE:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_RELATION_EQ" link="EmeusConstraint.html#EMEUS-CONSTRAINT-RELATION-EQ:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_RELATION_GE" link="EmeusConstraint.html#EMEUS-CONSTRAINT-RELATION-GE:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_INVALID" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-INVALID:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_LEFT" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-LEFT:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-RIGHT:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_TOP" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-TOP:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_BOTTOM" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-BOTTOM:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_START" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-START:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_END" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-END:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-WIDTH:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-HEIGHT:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-CENTER-X:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-CENTER-Y:CAPS"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_ATTRIBUTE_BASELINE" link="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-BASELINE:CAPS"/>
+  </functions>
+</book>

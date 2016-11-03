@@ -1,0 +1,1017 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>EmeusConstraint: Emeus 1.0 Reference Manual</title>
+<meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
+<link rel="home" href="index.html" title="Emeus 1.0 Reference Manual">
+<link rel="up" href="ch01.html" title="Emeus">
+<link rel="prev" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout">
+<link rel="next" href="emeus-Version-checking.html" title="Version checking">
+<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
+<link rel="stylesheet" href="style.css" type="text/css">
+</head>
+<body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
+<table class="navigation" id="top" width="100%" summary="Navigation header" cellpadding="2" cellspacing="5"><tr valign="middle">
+<td width="100%" align="left" class="shortcuts">
+<a href="#" class="shortcut">Top</a><span id="nav_description">  <span class="dim">|</span> 
+                  <a href="#EmeusConstraint.description" class="shortcut">Description</a></span><span id="nav_hierarchy">  <span class="dim">|</span> 
+                  <a href="#EmeusConstraint.object-hierarchy" class="shortcut">Object Hierarchy</a></span><span id="nav_properties">  <span class="dim">|</span> 
+                  <a href="#EmeusConstraint.properties" class="shortcut">Properties</a></span>
+</td>
+<td><a accesskey="h" href="index.html"><img src="home.png" width="16" height="16" border="0" alt="Home"></a></td>
+<td><a accesskey="u" href="ch01.html"><img src="up.png" width="16" height="16" border="0" alt="Up"></a></td>
+<td><a accesskey="p" href="EmeusConstraintLayout.html"><img src="left.png" width="16" height="16" border="0" alt="Prev"></a></td>
+<td><a accesskey="n" href="emeus-Version-checking.html"><img src="right.png" width="16" height="16" border="0" alt="Next"></a></td>
+</tr></table>
+<div class="refentry">
+<a name="EmeusConstraint"></a><div class="titlepage"></div>
+<div class="refnamediv"><table width="100%"><tr>
+<td valign="top">
+<h2><span class="refentrytitle"><a name="EmeusConstraint.top_of_page"></a>EmeusConstraint</span></h2>
+<p>EmeusConstraint</p>
+</td>
+<td class="gallery_image" valign="top" align="right"></td>
+</tr></table></div>
+<div class="refsect1">
+<a name="EmeusConstraint.functions"></a><h2>Functions</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="functions_return">
+<col class="functions_name">
+</colgroup>
+<tbody>
+<tr>
+<td class="function_type">
+<a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="returnvalue">EmeusConstraint</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-new" title="emeus_constraint_new ()">emeus_constraint_new</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="returnvalue">EmeusConstraint</span></a> *
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-new-constant" title="emeus_constraint_new_constant ()">emeus_constraint_new_constant</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gpointer</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-get-source-object" title="emeus_constraint_get_source_object ()">emeus_constraint_get_source_object</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="returnvalue">EmeusConstraintAttribute</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-get-source-attribute" title="emeus_constraint_get_source_attribute ()">emeus_constraint_get_source_attribute</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="EmeusConstraint.html#EmeusConstraintRelation" title="enum EmeusConstraintRelation"><span class="returnvalue">EmeusConstraintRelation</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-get-relation" title="emeus_constraint_get_relation ()">emeus_constraint_get_relation</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gpointer</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-get-target-object" title="emeus_constraint_get_target_object ()">emeus_constraint_get_target_object</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="returnvalue">EmeusConstraintAttribute</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-get-target-attribute" title="emeus_constraint_get_target_attribute ()">emeus_constraint_get_target_attribute</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">double</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-get-multiplier" title="emeus_constraint_get_multiplier ()">emeus_constraint_get_multiplier</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">double</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-get-constant" title="emeus_constraint_get_constant ()">emeus_constraint_get_constant</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<a class="link" href="EmeusConstraint.html#EmeusConstraintStrength" title="enum EmeusConstraintStrength"><span class="returnvalue">EmeusConstraintStrength</span></a>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-get-strength" title="emeus_constraint_get_strength ()">emeus_constraint_get_strength</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-set-active" title="emeus_constraint_set_active ()">emeus_constraint_set_active</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-get-active" title="emeus_constraint_get_active ()">emeus_constraint_get_active</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-is-attached" title="emeus_constraint_is_attached ()">emeus_constraint_is_attached</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">gboolean</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraint.html#emeus-constraint-is-required" title="emeus_constraint_is_required ()">emeus_constraint_is_required</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraint.properties"></a><h2>Properties</h2>
+<div class="informaltable"><table class="informaltable" border="0">
+<colgroup>
+<col width="150px" class="properties_type">
+<col width="300px" class="properties_name">
+<col width="200px" class="properties_flags">
+</colgroup>
+<tbody>
+<tr>
+<td class="property_type"><span class="type">gboolean</span></td>
+<td class="property_name"><a class="link" href="EmeusConstraint.html#EmeusConstraint--active" title="The “active” property">active</a></td>
+<td class="property_flags">Read / Write</td>
+</tr>
+<tr>
+<td class="property_type"><span class="type">gdouble</span></td>
+<td class="property_name"><a class="link" href="EmeusConstraint.html#EmeusConstraint--constant" title="The “constant” property">constant</a></td>
+<td class="property_flags">Read / Write / Construct Only</td>
+</tr>
+<tr>
+<td class="property_type"><span class="type">gdouble</span></td>
+<td class="property_name"><a class="link" href="EmeusConstraint.html#EmeusConstraint--multiplier" title="The “multiplier” property">multiplier</a></td>
+<td class="property_flags">Read / Write / Construct Only</td>
+</tr>
+<tr>
+<td class="property_type"><a class="link" href="EmeusConstraint.html#EmeusConstraintRelation" title="enum EmeusConstraintRelation"><span class="type">EmeusConstraintRelation</span></a></td>
+<td class="property_name"><a class="link" href="EmeusConstraint.html#EmeusConstraint--relation" title="The “relation” property">relation</a></td>
+<td class="property_flags">Read / Write / Construct Only</td>
+</tr>
+<tr>
+<td class="property_type"><a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="type">EmeusConstraintAttribute</span></a></td>
+<td class="property_name"><a class="link" href="EmeusConstraint.html#EmeusConstraint--source-attribute" title="The “source-attribute” property">source-attribute</a></td>
+<td class="property_flags">Read / Write / Construct Only</td>
+</tr>
+<tr>
+<td class="property_type">
+<span class="type">GtkWidget</span> *</td>
+<td class="property_name"><a class="link" href="EmeusConstraint.html#EmeusConstraint--source-object" title="The “source-object” property">source-object</a></td>
+<td class="property_flags">Read / Write / Construct Only</td>
+</tr>
+<tr>
+<td class="property_type"><a class="link" href="EmeusConstraint.html#EmeusConstraintStrength" title="enum EmeusConstraintStrength"><span class="type">EmeusConstraintStrength</span></a></td>
+<td class="property_name"><a class="link" href="EmeusConstraint.html#EmeusConstraint--strength" title="The “strength” property">strength</a></td>
+<td class="property_flags">Read / Write / Construct Only</td>
+</tr>
+<tr>
+<td class="property_type"><a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="type">EmeusConstraintAttribute</span></a></td>
+<td class="property_name"><a class="link" href="EmeusConstraint.html#EmeusConstraint--target-attribute" title="The “target-attribute” property">target-attribute</a></td>
+<td class="property_flags">Read / Write / Construct Only</td>
+</tr>
+<tr>
+<td class="property_type">
+<span class="type">GtkWidget</span> *</td>
+<td class="property_name"><a class="link" href="EmeusConstraint.html#EmeusConstraint--target-object" title="The “target-object” property">target-object</a></td>
+<td class="property_flags">Read / Write / Construct Only</td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraint.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody>
+<tr>
+<td class="datatype_keyword"> </td>
+<td class="function_name"><a class="link" href="EmeusConstraint.html#EmeusConstraint-struct" title="EmeusConstraint">EmeusConstraint</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="EmeusConstraint.html#EmeusConstraintStrength" title="enum EmeusConstraintStrength">EmeusConstraintStrength</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="EmeusConstraint.html#EmeusConstraintRelation" title="enum EmeusConstraintRelation">EmeusConstraintRelation</a></td>
+</tr>
+<tr>
+<td class="datatype_keyword">enum</td>
+<td class="function_name"><a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute">EmeusConstraintAttribute</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraint.object-hierarchy"></a><h2>Object Hierarchy</h2>
+<pre class="screen">    GEnum
+    <span class="lineart">├──</span> EmeusConstraintAttribute
+    <span class="lineart">├──</span> EmeusConstraintRelation
+    <span class="lineart">╰──</span> EmeusConstraintStrength
+    GObject
+    <span class="lineart">╰──</span> GInitiallyUnowned
+        <span class="lineart">╰──</span> EmeusConstraint
+</pre>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraint.includes"></a><h2>Includes</h2>
+<pre class="synopsis">#include &lt;emeus.h&gt;
+</pre>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraint.description"></a><h2>Description</h2>
+<p><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> is a type that describes a constraint between two widget
+attributes which must be satisfied by a <span class="type">GtkConstraintLayout</span>.</p>
+<p>Each constraint is a linear equation in the form:</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="normal">target</span><span class="symbol">.</span><span class="normal">attribute1 </span><span class="symbol">=</span><span class="normal"> source</span><span class="symbol">.</span><span class="normal">attribute2 × multiplier </span><span class="symbol">+</span><span class="normal"> constant</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p></p>
+<p>The <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> will take all the constraints associated to
+each of its children and solve the value of <code class="literal">attribute1</code> that satisfy the
+system of equations.</p>
+<p>For instance, if a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> has two children, <code class="literal">button1</code> and
+<code class="literal">button2</code>, and you wish for <code class="literal">button2</code> to follow <code class="literal">button1</code> with 8 pixels
+of spacing between the two, using the direction of the text, you can
+express this relationship as this constraint:</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="normal">button2</span><span class="symbol">.</span><span class="normal">start </span><span class="symbol">=</span><span class="normal"> button1</span><span class="symbol">.</span><span class="normal">end × </span><span class="number">1.0</span><span class="normal"> </span><span class="symbol">+</span><span class="normal"> </span><span class="number">8.0</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p></p>
+<p>If you also wish <code class="literal">button1</code> to have a minimum width of 120 pixels, and
+<code class="literal">button2</code> to have the same size, you can use the following constraints:</p>
+<div class="informalexample">
+  <table class="listing_frame" border="0" cellpadding="0" cellspacing="0">
+    <tbody>
+      <tr>
+        <td class="listing_lines" align="right"><pre>1
+2</pre></td>
+        <td class="listing_code"><pre class="programlisting"><span class="normal">button1</span><span class="symbol">.</span><span class="normal">width ≥ </span><span class="number">120.0</span>
+<span class="normal">button2</span><span class="symbol">.</span><span class="normal">width </span><span class="symbol">=</span><span class="normal"> button1</span><span class="symbol">.</span><span class="normal">width × </span><span class="number">1.0</span><span class="normal"> </span><span class="symbol">+</span><span class="normal"> </span><span class="number">0.0</span></pre></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<p></p>
+<p>Each <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> instance references a target attribute; the target
+object to which the attribute applies is a child of a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>,
+and it's associated with the <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> instance once the constraint
+is added to a child <span class="type">GtkWidget</span> of the layout.</p>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraint.functions_details"></a><h2>Functions</h2>
+<div class="refsect2">
+<a name="emeus-constraint-new"></a><h3>emeus_constraint_new ()</h3>
+<pre class="programlisting"><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="returnvalue">EmeusConstraint</span></a> *
+emeus_constraint_new (<em class="parameter"><code><span class="type">gpointer</span> target_object</code></em>,
+                      <em class="parameter"><code><a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="type">EmeusConstraintAttribute</span></a> target_attribute</code></em>,
+                      <em class="parameter"><code><a class="link" href="EmeusConstraint.html#EmeusConstraintRelation" title="enum EmeusConstraintRelation"><span class="type">EmeusConstraintRelation</span></a> relation</code></em>,
+                      <em class="parameter"><code><span class="type">gpointer</span> source_object</code></em>,
+                      <em class="parameter"><code><a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="type">EmeusConstraintAttribute</span></a> source_attribute</code></em>,
+                      <em class="parameter"><code><span class="type">double</span> multiplier</code></em>,
+                      <em class="parameter"><code><span class="type">double</span> constant</code></em>,
+                      <em class="parameter"><code><a class="link" href="EmeusConstraint.html#EmeusConstraintStrength" title="enum EmeusConstraintStrength"><span class="type">EmeusConstraintStrength</span></a> strength</code></em>);</pre>
+<p>Creates a new constraint using a value from the source widget's attribute
+and applying it to the target widget's attribute.</p>
+<p><span class="annotation">[<acronym title="This symbol is a constructor, not a static method."><span class="acronym">constructor</span></acronym>]</span></p>
+<div class="refsect3">
+<a name="emeus-constraint-new.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>target_object</p></td>
+<td class="parameter_description"><p> the target widget, or
+<code class="literal">NULL</code> for the parent layout. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Override the parsed C type with given type."><span class="acronym">type</span></acronym> Gtk.Widget][<acronym title="NULL may be passed as the value in, out, in-out; or as a return value."><span class="acronym">nullable</span></acronym>]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>target_attribute</p></td>
+<td class="parameter_description"><p>the attribute to set on the target widget</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>relation</p></td>
+<td class="parameter_description"><p>the relation between the target and source attributes</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>source_object</p></td>
+<td class="parameter_description"><p> the source widget, or
+<code class="literal">NULL</code> for the parent layout. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Override the parsed C type with given type."><span class="acronym">type</span></acronym> Gtk.Widget][<acronym title="NULL may be passed as the value in, out, in-out; or as a return value."><span class="acronym">nullable</span></acronym>]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>source_attribute</p></td>
+<td class="parameter_description"><p>the attribute to get from the source widget</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>multiplier</p></td>
+<td class="parameter_description"><p>the multiplication coefficient to apply to the source
+attribute</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>constant</p></td>
+<td class="parameter_description"><p>the constant to add to the source attribute</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-new.returns"></a><h4>Returns</h4>
+<p> the newly created constraint. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-new-constant"></a><h3>emeus_constraint_new_constant ()</h3>
+<pre class="programlisting"><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="returnvalue">EmeusConstraint</span></a> *
+emeus_constraint_new_constant (<em class="parameter"><code><span class="type">gpointer</span> target_object</code></em>,
+                               <em class="parameter"><code><a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="type">EmeusConstraintAttribute</span></a> target_attribute</code></em>,
+                               <em class="parameter"><code><a class="link" href="EmeusConstraint.html#EmeusConstraintRelation" title="enum EmeusConstraintRelation"><span class="type">EmeusConstraintRelation</span></a> relation</code></em>,
+                               <em class="parameter"><code><span class="type">double</span> constant</code></em>,
+                               <em class="parameter"><code><a class="link" href="EmeusConstraint.html#EmeusConstraintStrength" title="enum EmeusConstraintStrength"><span class="type">EmeusConstraintStrength</span></a> strength</code></em>);</pre>
+<p>Creates a new constant constraint.</p>
+<p>This function is the equivalent of creating a new <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> with:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem"><p><a class="link" href="EmeusConstraint.html#EmeusConstraint--source-object" title="The “source-object” property"><span class="type">“source_object”</span></a> set to <code class="literal">NULL</code></p></li>
+<li class="listitem"><p><a class="link" href="EmeusConstraint.html#EmeusConstraint--source-attribute" title="The “source-attribute” property"><span class="type">“source_attribute”</span></a> set to <a class="link" href="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-INVALID:CAPS"><code class="literal">EMEUS_CONSTRAINT_ATTRIBUTE_INVALID</code></a></p></li>
+<li class="listitem"><p><a class="link" href="EmeusConstraint.html#EmeusConstraint--multiplier" title="The “multiplier” property"><span class="type">“multiplier”</span></a> set to 1.0</p></li>
+</ul></div>
+<p><span class="annotation">[<acronym title="This symbol is a constructor, not a static method."><span class="acronym">constructor</span></acronym>]</span></p>
+<div class="refsect3">
+<a name="emeus-constraint-new-constant.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>target_object</p></td>
+<td class="parameter_description"><p> the target widget,
+or <code class="literal">NULL</code> for the parent layout. </p></td>
+<td class="parameter_annotations"><span class="annotation">[<acronym title="Override the parsed C type with given type."><span class="acronym">type</span></acronym> Gtk.Widget][<acronym title="NULL may be passed as the value in, out, in-out; or as a return value."><span class="acronym">nullable</span></acronym>]</span></td>
+</tr>
+<tr>
+<td class="parameter_name"><p>target_attribute</p></td>
+<td class="parameter_description"><p>the attribute to set on the target widget</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>relation</p></td>
+<td class="parameter_description"><p>the relation between the target and the constant</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>constant</p></td>
+<td class="parameter_description"><p>the constant value of the constraint</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-new-constant.returns"></a><h4>Returns</h4>
+<p> the newly created constraint. </p>
+<p><span class="annotation">[<acronym title="Free data after the code is done."><span class="acronym">transfer full</span></acronym>]</span></p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-get-source-object"></a><h3>emeus_constraint_get_source_object ()</h3>
+<pre class="programlisting"><span class="returnvalue">gpointer</span>
+emeus_constraint_get_source_object (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Retrieves the source object of the <em class="parameter"><code>constraint</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-get-source-object.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-get-source-object.returns"></a><h4>Returns</h4>
+<p> the source object. </p>
+<p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>][<acronym title="NULL may be passed as the value in, out, in-out; or as a return value."><span class="acronym">nullable</span></acronym>][<acronym title="Override the parsed C type with given type."><span class="acronym">type</span></acronym> Gtk.Widget]</span></p>
+</div>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-get-source-attribute"></a><h3>emeus_constraint_get_source_attribute ()</h3>
+<pre class="programlisting"><a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="returnvalue">EmeusConstraintAttribute</span></a>
+emeus_constraint_get_source_attribute (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Retrieves the attribute of the source object bound by this <em class="parameter"><code>constraint</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-get-source-attribute.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-get-source-attribute.returns"></a><h4>Returns</h4>
+<p> a constraint attribute</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-get-relation"></a><h3>emeus_constraint_get_relation ()</h3>
+<pre class="programlisting"><a class="link" href="EmeusConstraint.html#EmeusConstraintRelation" title="enum EmeusConstraintRelation"><span class="returnvalue">EmeusConstraintRelation</span></a>
+emeus_constraint_get_relation (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Retrieves the relation between the target and source attributes.</p>
+<div class="refsect3">
+<a name="emeus-constraint-get-relation.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-get-relation.returns"></a><h4>Returns</h4>
+<p> a constraint relation</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-get-target-object"></a><h3>emeus_constraint_get_target_object ()</h3>
+<pre class="programlisting"><span class="returnvalue">gpointer</span>
+emeus_constraint_get_target_object (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Retrieves the target object of the constraint.</p>
+<p>This function may return <code class="literal">NULL</code> if the <em class="parameter"><code>constraint</code></em>
+ is not attached
+to a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>. Use <a class="link" href="EmeusConstraint.html#emeus-constraint-is-attached" title="emeus_constraint_is_attached ()"><code class="function">emeus_constraint_is_attached()</code></a> to
+before calling this function.</p>
+<div class="refsect3">
+<a name="emeus-constraint-get-target-object.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-get-target-object.returns"></a><h4>Returns</h4>
+<p> the target
+object. </p>
+<p><span class="annotation">[<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>][<acronym title="Override the parsed C type with given type."><span class="acronym">type</span></acronym> Gtk.Widget][<acronym title="NULL may be passed as the value in, out, in-out; or as a return value."><span class="acronym">nullable</span></acronym>]</span></p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-get-target-attribute"></a><h3>emeus_constraint_get_target_attribute ()</h3>
+<pre class="programlisting"><a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="returnvalue">EmeusConstraintAttribute</span></a>
+emeus_constraint_get_target_attribute (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Retrieves the attribute of the target object bound by this <em class="parameter"><code>constraint</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-get-target-attribute.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-get-target-attribute.returns"></a><h4>Returns</h4>
+<p> a constraint attribute</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-get-multiplier"></a><h3>emeus_constraint_get_multiplier ()</h3>
+<pre class="programlisting"><span class="returnvalue">double</span>
+emeus_constraint_get_multiplier (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Retrieves the multiplication factor of the <em class="parameter"><code>constraint</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-get-multiplier.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-get-multiplier.returns"></a><h4>Returns</h4>
+<p> a factor</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-get-constant"></a><h3>emeus_constraint_get_constant ()</h3>
+<pre class="programlisting"><span class="returnvalue">double</span>
+emeus_constraint_get_constant (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Retrieves the additional constant of the <em class="parameter"><code>constraint</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-get-constant.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-get-constant.returns"></a><h4>Returns</h4>
+<p> a constant</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-get-strength"></a><h3>emeus_constraint_get_strength ()</h3>
+<pre class="programlisting"><a class="link" href="EmeusConstraint.html#EmeusConstraintStrength" title="enum EmeusConstraintStrength"><span class="returnvalue">EmeusConstraintStrength</span></a>
+emeus_constraint_get_strength (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Retrieves the strength of the <em class="parameter"><code>constraint</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-get-strength.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-get-strength.returns"></a><h4>Returns</h4>
+<p> a constraint strength</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-set-active"></a><h3>emeus_constraint_set_active ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+emeus_constraint_set_active (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>,
+                             <em class="parameter"><code><span class="type">gboolean</span> is_active</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-get-active"></a><h3>emeus_constraint_get_active ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+emeus_constraint_get_active (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-is-attached"></a><h3>emeus_constraint_is_attached ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+emeus_constraint_is_attached (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Checks whether the <em class="parameter"><code>constraint</code></em>
+ is attached to a child of a
+<a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>.</p>
+<div class="refsect3">
+<a name="emeus-constraint-is-attached.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-is-attached.returns"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if the constraint is attached</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-is-required"></a><h3>emeus_constraint_is_required ()</h3>
+<pre class="programlisting"><span class="returnvalue">gboolean</span>
+emeus_constraint_is_required (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Checks whether a <em class="parameter"><code>constraint</code></em>
+ is marked as required.</p>
+<div class="refsect3">
+<a name="emeus-constraint-is-required.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-is-required.returns"></a><h4>Returns</h4>
+<p> <code class="literal">TRUE</code> if the constraint is required</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraint.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="EmeusConstraint-struct"></a><h3>EmeusConstraint</h3>
+<pre class="programlisting">typedef struct _EmeusConstraint EmeusConstraint;</pre>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraintStrength"></a><h3>enum EmeusConstraintStrength</h3>
+<p>The possible strengths for a constraint.</p>
+<p>The order is:</p>
+<div class="informalexample"><pre class="screen">
+  weak &lt; medium &lt; strong &lt; required
+</pre></div>
+<p></p>
+<div class="refsect3">
+<a name="EmeusConstraintStrength.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-STRENGTH-WEAK:CAPS"></a>EMEUS_CONSTRAINT_STRENGTH_WEAK</p></td>
+<td class="enum_member_description">
+<p>Weak constraint</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-STRENGTH-MEDIUM:CAPS"></a>EMEUS_CONSTRAINT_STRENGTH_MEDIUM</p></td>
+<td class="enum_member_description">
+<p>Medium constraint</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-STRENGTH-STRONG:CAPS"></a>EMEUS_CONSTRAINT_STRENGTH_STRONG</p></td>
+<td class="enum_member_description">
+<p>Strong constraint</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-STRENGTH-REQUIRED:CAPS"></a>EMEUS_CONSTRAINT_STRENGTH_REQUIRED</p></td>
+<td class="enum_member_description">
+<p>Requires constraint</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraintRelation"></a><h3>enum EmeusConstraintRelation</h3>
+<p>The relation between the two terms of the constraint.</p>
+<div class="refsect3">
+<a name="EmeusConstraintRelation.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-RELATION-LE:CAPS"></a>EMEUS_CONSTRAINT_RELATION_LE</p></td>
+<td class="enum_member_description">
+<p>Less than, or equal</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-RELATION-EQ:CAPS"></a>EMEUS_CONSTRAINT_RELATION_EQ</p></td>
+<td class="enum_member_description">
+<p>Equal</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-RELATION-GE:CAPS"></a>EMEUS_CONSTRAINT_RELATION_GE</p></td>
+<td class="enum_member_description">
+<p>Greater than, or equal</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraintAttribute"></a><h3>enum EmeusConstraintAttribute</h3>
+<p>The attributes that can be used to build a constraint.</p>
+<div class="refsect3">
+<a name="EmeusConstraintAttribute.members"></a><h4>Members</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="300px" class="enum_members_name">
+<col class="enum_members_description">
+<col width="200px" class="enum_members_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-INVALID:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_INVALID</p></td>
+<td class="enum_member_description">
+<p>Used for constants</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-LEFT:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_LEFT</p></td>
+<td class="enum_member_description">
+<p>The left edge of a widget</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-RIGHT:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT</p></td>
+<td class="enum_member_description">
+<p>The right edge of a widget</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-TOP:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_TOP</p></td>
+<td class="enum_member_description">
+<p>The top edge of a widget</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-BOTTOM:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_BOTTOM</p></td>
+<td class="enum_member_description">
+<p>The bottom edge of a widget</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-START:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_START</p></td>
+<td class="enum_member_description">
+<p>The leading edge of a widget, depending
+  on the text direction (left for LTR languages, right for RTL ones)</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-END:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_END</p></td>
+<td class="enum_member_description">
+<p>The trailing edge of a widget, depending
+  on the text direction (right for LTR languages, left for RTL ones)</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-WIDTH:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH</p></td>
+<td class="enum_member_description">
+<p>The width of a widget</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-HEIGHT:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT</p></td>
+<td class="enum_member_description">
+<p>The height of a widget</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-CENTER-X:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X</p></td>
+<td class="enum_member_description">
+<p>The center of a widget, on the horizontal
+  axis</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-CENTER-Y:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y</p></td>
+<td class="enum_member_description">
+<p>The center of a widget, on the vertical
+  axis</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+<tr>
+<td class="enum_member_name"><p><a name="EMEUS-CONSTRAINT-ATTRIBUTE-BASELINE:CAPS"></a>EMEUS_CONSTRAINT_ATTRIBUTE_BASELINE</p></td>
+<td class="enum_member_description">
+<p>The baseline of a widget</p>
+</td>
+<td class="enum_member_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+</div>
+<div class="refsect1">
+<a name="EmeusConstraint.property-details"></a><h2>Property Details</h2>
+<div class="refsect2">
+<a name="EmeusConstraint--active"></a><h3>The <code class="literal">“active”</code> property</h3>
+<pre class="programlisting">  “active”                   <span class="type">gboolean</span></pre>
+<p>Flags: Read / Write</p>
+<p>Default value: TRUE</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraint--constant"></a><h3>The <code class="literal">“constant”</code> property</h3>
+<pre class="programlisting">  “constant”                 <span class="type">gdouble</span></pre>
+<p>Flags: Read / Write / Construct Only</p>
+<p>Default value: 0</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraint--multiplier"></a><h3>The <code class="literal">“multiplier”</code> property</h3>
+<pre class="programlisting">  “multiplier”               <span class="type">gdouble</span></pre>
+<p>Flags: Read / Write / Construct Only</p>
+<p>Default value: 1</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraint--relation"></a><h3>The <code class="literal">“relation”</code> property</h3>
+<pre class="programlisting">  “relation”                 <a class="link" href="EmeusConstraint.html#EmeusConstraintRelation" title="enum EmeusConstraintRelation"><span class="type">EmeusConstraintRelation</span></a></pre>
+<p>Flags: Read / Write / Construct Only</p>
+<p>Default value: EMEUS_CONSTRAINT_RELATION_EQ</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraint--source-attribute"></a><h3>The <code class="literal">“source-attribute”</code> property</h3>
+<pre class="programlisting">  “source-attribute”         <a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="type">EmeusConstraintAttribute</span></a></pre>
+<p>Flags: Read / Write / Construct Only</p>
+<p>Default value: EMEUS_CONSTRAINT_ATTRIBUTE_INVALID</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraint--source-object"></a><h3>The <code class="literal">“source-object”</code> property</h3>
+<pre class="programlisting">  “source-object”            <span class="type">GtkWidget</span> *</pre>
+<p>Flags: Read / Write / Construct Only</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraint--strength"></a><h3>The <code class="literal">“strength”</code> property</h3>
+<pre class="programlisting">  “strength”                 <a class="link" href="EmeusConstraint.html#EmeusConstraintStrength" title="enum EmeusConstraintStrength"><span class="type">EmeusConstraintStrength</span></a></pre>
+<p>Flags: Read / Write / Construct Only</p>
+<p>Default value: EMEUS_CONSTRAINT_STRENGTH_REQUIRED</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraint--target-attribute"></a><h3>The <code class="literal">“target-attribute”</code> property</h3>
+<pre class="programlisting">  “target-attribute”         <a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="type">EmeusConstraintAttribute</span></a></pre>
+<p>Flags: Read / Write / Construct Only</p>
+<p>Default value: EMEUS_CONSTRAINT_ATTRIBUTE_INVALID</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EmeusConstraint--target-object"></a><h3>The <code class="literal">“target-object”</code> property</h3>
+<pre class="programlisting">  “target-object”            <span class="type">GtkWidget</span> *</pre>
+<p>Flags: Read / Write / Construct Only</p>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr>Generated by GTK-Doc V1.25.1</div>
+</body>
+</html>
