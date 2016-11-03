@@ -1,5 +1,5 @@
 option('enable-gtk-doc', type: 'boolean',
-       value: false,
+       value: true,
        description: 'Enable generating the API reference (depends on GTK-Doc)')
 option('enable-introspection', type: 'boolean',
        value: true,

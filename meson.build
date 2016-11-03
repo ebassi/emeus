@@ -157,5 +157,8 @@ gtk_dep = dependency('gtk+-3.0', version: '>= ' + gtk_version_required)
 gnome = import('gnome')
 
 subdir('src')
-subdir('doc')
 subdir('examples')
+
+if get_option('enable-gtk-doc')
+  subdir('doc')
+endif
