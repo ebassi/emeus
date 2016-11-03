@@ -89,9 +89,11 @@ constraints, and lay out its children according to them.
  * Create a build directory:
   * `$ mkdir _build && cd _build`
  * Run meson:
-  * `$ meson ..`
+  * `$ meson`
  * Run ninja:
   * `$ ninja`
+  * `$ ninja test`
+  * `# ninja install`
 
 ## Licensing
 
