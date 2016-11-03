@@ -95,6 +95,10 @@ constraints, and lay out its children according to them.
   * `$ ninja test`
   * `# ninja install`
 
+## Documentation
+
+The API reference for Emeus is available [online][emeus-apiref].
+
 ## Licensing
 
 Emeus is released under the terms of the GNU Lesser General Public License,
@@ -132,3 +136,4 @@ additional Cassowary implementations in various languages.
 [cassowary-py-web]: https://github.com/pybee/cassowary
 [autolayout-js-web]: https://github.com/IjzerenHein/autolayout.js
 [nsautolayout-web]: https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/AutolayoutPG/index.html
+[emeus-apiref]: https://ebassi.github.io/emeus/docs/index.html
