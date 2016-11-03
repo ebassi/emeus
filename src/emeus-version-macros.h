@@ -20,6 +20,16 @@
 
 #include <emeus-version.h>
 
+/**
+ * EMEUS_CHECK_VERSION:
+ * @major: the major version, or 1 in 1.2.3
+ * @minor: the minor version, or 2 in 1.2.3
+ * @micro: the micro version, or 3 in 1.2.3
+ *
+ * Compile time check for a specific version of Emeus.
+ *
+ * Since: 1.0
+ */
 #define EMEUS_CHECK_VERSION(major,minor,micro) \
   (((major) > EMEUS_MAJOR_VERSION) || \
    ((major) == EMEUS_MAJOR_VERSION && (minor) > EMEUS_MINOR_VERSION) || \
