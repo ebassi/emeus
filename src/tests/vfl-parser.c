@@ -46,6 +46,8 @@ static struct {
   { "view-invalid-identifier-3", "[-a]", { NULL, }, VFL_ERROR_INVALID_VIEW, },
   { "predicate-wrong-relation", "[view(>30)]", { "view", NULL, }, VFL_ERROR_INVALID_RELATION, },
   { "predicate-wrong-priority", "[view(>=30@foo)]", { "view", NULL, }, VFL_ERROR_INVALID_PRIORITY, },
+  { "predicate-numeric-priority", "[view(==0@500)]", { "view", NULL, }, VFL_ERROR_INVALID_PRIORITY, },
+  { "predicate-spacing-priority", "[view1]-(==0@500)-[view2]", { "view1", "view2", NULL, }, VFL_ERROR_INVALID_PRIORITY, },
 };
 
 static void
