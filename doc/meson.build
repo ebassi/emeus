@@ -64,5 +64,6 @@ if xsltproc.found()
                                'http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl',
                                '@INPUT@',
                              ],
-                             build_always: true)
+                             install: true,
+                             install_dir: get_option('mandir') + '/man1')
 endif

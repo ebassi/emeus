@@ -1,0 +1,170 @@
+<?xml version="1.0"?>
+<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+               "http://www.oasis-open.org/docbook/xml/4.3/docbookx.dtd" [
+]>
+<refentry id="emeus-gen-constraints">
+
+<refentryinfo>
+  <title>emeus-gen-constraints</title>
+  <productname>Emeus</productname>
+  <authorgroup>
+    <author>
+      <contrib>Developer</contrib>
+      <firstname>Emmanuele</firstname>
+      <surname>Bassi</surname>
+      <email>ebassi@gnome.org</email>
+      <affiliation>
+        <orgname class="nonprofit">GNOME Project</orgname>
+      </affiliation>
+    </author>
+  </authorgroup>
+  <copyright>
+    <year>2016</year>
+    <holder>Emmanuele Bassi</holder>
+  </copyright>
+</refentryinfo>
+
+<refmeta>
+  <refentrytitle>emeus-gen-constraints</refentrytitle>
+  <manvolnum>1</manvolnum>
+  <refmiscinfo class="manual">User Commands</refmiscinfo>
+</refmeta>
+
+<refnamediv>
+  <refname>emeus-gen-constraints</refname>
+  <refpurpose>Emeus constraint generation utility</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+  <cmdsynopsis>
+    <command>emeus-gen-constraints</command>
+    <group>
+      <arg choice="opt">--hspacing <arg choice="plain"><replaceable>SPACING</replaceable></arg></arg>
+      <arg choice="opt">--vspacing <arg choice="plain"><replaceable>SPACING</replaceable></arg></arg>
+    </group>
+    <arg choice="opt" rep="repeat">--view <arg choice="plain"><replaceable>NAME</replaceable></arg></arg>
+    <arg choice="plain" rep="repeat"><replaceable>FORMAT</replaceable></arg>
+  </cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+  <command>emeus-gen-constraints</command> translates constraints expressed
+  via the Visual Format Language syntax into XML definitions that can
+  be consumed by GtkBuilder when describing an EmeusConstraintLayout.
+</para>
+<para>
+  See the <replaceable>VISUAL FORMAT LANGUAGE</replaceable> section for the
+  syntax of the format language.
+</para>
+</refsect1>
+
+<refsect1><title>Options</title>
+<variablelist>
+  <varlistentry>
+    <term>--hspacing</term>
+    <term>-H</term>
+    <listitem><para>Define the default horizontal spacing for connections
+    without a predicate or an explicit spacing.</para></listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>--vspacing</term>
+    <term>-V</term>
+    <listitem><para>Define the default vertical spacing for connections
+    without a predicate or an explicit spacing.</para></listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>--view</term>
+    <listitem><para>Specifies a view <replaceable>NAME</replaceable> in
+    the format. This argument should be specified for each view in the
+    format.</para></listitem>
+  </varlistentry>
+</variablelist>
+</refsect1>
+
+<refsect1><title>Visual Format Language</title>
+<para>
+  The Visual Format Language syntax is and ASCII-art like format string
+  that can be used to define your constraints. This language provides a
+  visually descriptive representation of the constraints.
+</para>
+
+<para>
+  The Visual Formatting Language has advantages and disadvantages:
+</para>
+
+<itemizedlist>
+  <listitem><simpara>it lets you create multiple constraints at once,
+  using a very compact expression</simpara></listitem>
+  <listitem><simpara>it lets you create only valid
+  constraints</simpara></listitem>
+  <listitem><simpara>it emphasizes good visualization over completeness.
+  Therefore some constraints (for example, aspect ratios) cannot be
+  created using the visual format language</simpara></listitem>
+  <listitem><simpara>it is not validated at compile time, and can only
+  be validated at run time</simpara></listitem>
+</itemizedlist>
+
+<example><title>Visual Format Language pseudo-grammar</title>
+<literallayout>
+     &lt;visualFormatString&gt; = (&lt;orientation&gt;)?
+                                  (&lt;superview&gt;&lt;connection&gt;)?
+                                  &lt;view&gt;(&lt;connection&gt;&lt;view&gt;)*
+                                  (&lt;connection&gt;&lt;superview&gt;)?
+            &lt;orientation&gt; = 'H' | 'V'
+              &lt;superview&gt; = '|'
+             &lt;connection&gt; = '' | '-' &lt;predicateList&gt; '-' | '-'
+          &lt;predicateList&gt; = &lt;simplePredicate&gt; | &lt;predicateListWithParens&gt;
+        &lt;simplePredicate&gt; = &lt;metricName&gt; | &lt;positiveNumber&gt;
+&lt;predicateListWithParens&gt; = '(' &lt;predicate&gt; (',' &lt;predicate&gt;)* ')'
+              &lt;predicate&gt; = (&lt;relation&gt;)? &lt;objectOfPredicate&gt; ('@' &lt;priority&gt;)?
+               &lt;relation&gt; = '==' | '&lt;=' | '&gt;='
+      &lt;objectOfPredicate&gt; = &lt;constant&gt; | &lt;viewName&gt; | &lt;metricName&gt;
+               &lt;priority&gt; = 'required' | 'strong' | 'medium' | 'weak'
+               &lt;constant&gt; = &lt;number&gt;
+               &lt;viewName&gt; = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
+             &lt;metricName&gt; = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
+         &lt;positiveNumber&gt; // A positive real number parseable by g_ascii_strtod()
+                 &lt;number&gt; // A real number parseable by g_ascii_strtod()
+</literallayout>
+</example>
+
+<para>
+  Some examples of constraints expressed through the VFL are:
+</para>
+
+<informalexample>
+<literallayout>
+ // Default spacing
+ [button]-[textField]
+ 
+ // Width constraint
+ [button(&gt;=50)]
+ 
+ // Connection to super view
+ |-50-[purpleBox]-50-|
+ 
+ // Vertical layout
+ V:[topField]-10-[bottomField]
+ 
+ // Flush views
+ [maroonView][blueView]
+ 
+ // Priority
+ [button(100@strong)]
+ 
+ // Equal widths
+ [button1(==button2)]
+ 
+ // Multiple predicates
+ [flexibleButton(&gt;=70,&lt;=100)]
+ 
+ // A complete line of layout
+ |-[find]-[findNext]-[findField(&gt;=20)]-|
+</literallayout>
+</informalexample>
+</refsect1>
+
+</refentry>
