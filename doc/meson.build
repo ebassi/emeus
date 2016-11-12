@@ -34,3 +34,35 @@ gnome.gtkdoc('emeus',
                extra_dir_arg + '/gtk',
              ],
              install: true)
+
+xsltproc = find_program('xsltproc', required: false)
+
+if xsltproc.found()
+  xlstproc_flags = [
+    '--nonet',
+    '--stringparam', 'man.output.quietly', '1',
+    '--stringparam', 'funcsynopsis.style', 'ansi',
+    '--stringparam', 'man.th.extra1.suppress', '1',
+    '--stringparam', 'man.authors.section.enabled', '1',
+    '--stringparam', 'man.copyright.section.enabled', '1',
+  ]
+
+  man_input_files = [
+    'emeus-gen-constraints.xml',
+  ]
+
+  man_output_files = [
+    'emeus-gen-constraints.1',
+  ]
+
+  man_target = custom_target('man pages',
+                             input: man_input_files,
+                             output: man_output_files,
+                             command: [
+                               xsltproc,
+                               xlstproc_flags,
+                               'http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl',
+                               '@INPUT@',
+                             ],
+                             build_always: true)
+endif
