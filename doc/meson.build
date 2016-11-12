@@ -61,6 +61,7 @@ if xsltproc.found()
                              command: [
                                xsltproc,
                                xlstproc_flags,
+                               '-o', '@OUTPUT@',
                                'http://docbook.sourceforge.net/release/xsl/current/manpages/docbook.xsl',
                                '@INPUT@',
                              ],
