@@ -714,7 +714,7 @@ emeus_constraint_get_active (EmeusConstraint *constraint)
  *                 <predicate> = (<relation>)? <objectOfPredicate> ('@' <priority>)?
  *                  <relation> = '==' | '<=' | '>='
  *         <objectOfPredicate> = <constant> | <viewName> | <metricName>
- *                  <priority> = 'required' | 'strong' | 'medium' | 'weak'
+ *                  <priority> = <positiveNumber> | 'required' | 'strong' | 'medium' | 'weak'
  *                  <constant> = <number>
  *                  <viewName> = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
  *                <metricName> = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
@@ -820,7 +820,6 @@ emeus_create_constraints_from_description (const char * const  lines[],
           gpointer source, target;
           EmeusConstraintAttribute source_attr, target_attr;
           EmeusConstraintRelation relation;
-          EmeusConstraintStrength strength;
 
           target = g_hash_table_lookup (views, c->view1);
           target_attr = attribute_from_name (c->attr1);
@@ -836,7 +835,6 @@ emeus_create_constraints_from_description (const char * const  lines[],
             source_attr = EMEUS_CONSTRAINT_ATTRIBUTE_INVALID;
 
           relation = operator_to_relation (c->relation);
-          strength = value_to_strength (c->strength);
 
           EmeusConstraint *constraint =
             emeus_constraint_new (target, target_attr,
@@ -844,7 +842,7 @@ emeus_create_constraints_from_description (const char * const  lines[],
                                   source, source_attr,
                                   c->multiplier,
                                   c->constant,
-                                  strength);
+                                  c->strength);
 
           res = g_list_prepend (res, constraint);
         }

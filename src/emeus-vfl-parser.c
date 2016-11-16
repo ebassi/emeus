@@ -227,7 +227,7 @@ parse_predicate (VflParser *parser,
    *          <constant> = <number> | <metricName>
    *          <viewName> = [A-Za-z_]([A-Za-z0-9_]*)
    *        <metricName> = [A-Za-z_]([A-Za-z0-9_]*)
-   *          <priority> = 'weak' | 'medium' | 'strong' | 'required'
+   *          <priority> = <positiveNumber> | 'weak' | 'medium' | 'strong' | 'required'
    */
 
   /* Parse relation */
@@ -344,7 +344,14 @@ parse_priority:
       double priority;
       end += 1;
 
-      if (strncmp (end, "weak", 4) == 0)
+      if (g_ascii_isdigit (*end))
+        {
+          char *tmp;
+
+          priority = g_ascii_strtod (end, &tmp);
+          end = tmp;
+        }
+      else if (strncmp (end, "weak", 4) == 0)
         {
           priority = STRENGTH_WEAK;
           end += 4;
@@ -986,7 +993,7 @@ vfl_parser_get_constraints (VflParser *parser,
                "  .attr2: '%s',\n"
                "  .constant: %g,\n"
                "  .multiplier: %g,\n"
-               "  .strength: %d\n"
+               "  .strength: %g\n"
                "}\n",
                c->view1, c->attr1,
                c->relation,
