@@ -35,13 +35,13 @@ EmeusConstraint *               emeus_constraint_new                    (gpointe
                                                                          EmeusConstraintAttribute source_attribute,
                                                                          double                   multiplier,
                                                                          double                   constant,
-                                                                         EmeusConstraintStrength  strength);
+                                                                         int                      strength);
 EMEUS_AVAILABLE_IN_1_0
 EmeusConstraint *               emeus_constraint_new_constant           (gpointer                 target_object,
                                                                          EmeusConstraintAttribute target_attribute,
                                                                          EmeusConstraintRelation  relation,
                                                                          double                   constant,
-                                                                         EmeusConstraintStrength  strength);
+                                                                         int                      strength);
 
 EMEUS_AVAILABLE_IN_1_0
 gpointer                        emeus_constraint_get_target_object      (EmeusConstraint         *constraint);
@@ -58,7 +58,7 @@ double                          emeus_constraint_get_multiplier         (EmeusCo
 EMEUS_AVAILABLE_IN_1_0
 double                          emeus_constraint_get_constant           (EmeusConstraint         *constraint);
 EMEUS_AVAILABLE_IN_1_0
-EmeusConstraintStrength         emeus_constraint_get_strength           (EmeusConstraint         *constraint);
+int                             emeus_constraint_get_strength           (EmeusConstraint         *constraint);
 EMEUS_AVAILABLE_IN_1_0
 gboolean                        emeus_constraint_is_required            (EmeusConstraint         *constraint);
 

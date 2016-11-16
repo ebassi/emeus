@@ -39,7 +39,7 @@ struct _EmeusConstraint
   double multiplier;
   double constant;
 
-  EmeusConstraintStrength strength;
+  int strength;
 
   gboolean is_active;
 

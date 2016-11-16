@@ -139,7 +139,7 @@ emeus_constraint_set_property (GObject      *gobject,
       break;
 
     case PROP_STRENGTH:
-      self->strength = g_value_get_enum (value);
+      self->strength = g_value_get_int (value);
       break;
 
     case PROP_ACTIVE:
@@ -190,7 +190,7 @@ emeus_constraint_get_property (GObject    *gobject,
       break;
 
     case PROP_STRENGTH:
-      g_value_set_enum (value, self->strength);
+      g_value_set_int (value, self->strength);
       break;
 
     case PROP_ACTIVE:
@@ -266,12 +266,12 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
                          G_PARAM_STATIC_STRINGS);
 
   emeus_constraint_properties[PROP_STRENGTH] =
-    g_param_spec_enum ("strength", "Strength", NULL,
-                       EMEUS_TYPE_CONSTRAINT_STRENGTH,
-                       EMEUS_CONSTRAINT_STRENGTH_REQUIRED,
-                       G_PARAM_CONSTRUCT_ONLY |
-                       G_PARAM_READWRITE |
-                       G_PARAM_STATIC_STRINGS);
+    g_param_spec_int ("strength", "Strength", NULL,
+                      G_MININT, G_MAXINT,
+                      EMEUS_CONSTRAINT_STRENGTH_REQUIRED,
+                      G_PARAM_CONSTRUCT_ONLY |
+                      G_PARAM_READWRITE |
+                      G_PARAM_STATIC_STRINGS);
 
   emeus_constraint_properties[PROP_ACTIVE] =
     g_param_spec_boolean ("active", "Active", NULL,
@@ -307,6 +307,7 @@ emeus_constraint_init (EmeusConstraint *self)
  * @multiplier: the multiplication coefficient to apply to the source
  *   attribute
  * @constant: the constant to add to the source attribute
+ * @strength: the priority of the constraint
  *
  * Creates a new constraint using a value from the source widget's attribute
  * and applying it to the target widget's attribute.
@@ -323,7 +324,7 @@ emeus_constraint_new (gpointer                 target_object,
                       EmeusConstraintAttribute source_attribute,
                       double                   multiplier,
                       double                   constant,
-                      EmeusConstraintStrength  strength)
+                      int                      strength)
 {
   g_return_val_if_fail (target_object == NULL || GTK_IS_WIDGET (target_object), NULL);
   g_return_val_if_fail (source_object == NULL || GTK_IS_WIDGET (source_object), NULL);
@@ -347,6 +348,7 @@ emeus_constraint_new (gpointer                 target_object,
  * @target_attribute: the attribute to set on the target widget
  * @relation: the relation between the target and the constant
  * @constant: the constant value of the constraint
+ * @strength: the priority of the constraint
  *
  * Creates a new constant constraint.
  *
@@ -365,7 +367,7 @@ emeus_constraint_new_constant (gpointer                 target_object,
                                EmeusConstraintAttribute target_attribute,
                                EmeusConstraintRelation  relation,
                                double                   constant,
-                               EmeusConstraintStrength  strength)
+                               int                      strength)
 {
   g_return_val_if_fail (target_object == NULL || GTK_IS_WIDGET (target_object), NULL);
 
@@ -520,7 +522,7 @@ emeus_constraint_get_constant (EmeusConstraint *constraint)
  *
  * Since: 1.0
  */
-EmeusConstraintStrength
+int
 emeus_constraint_get_strength (EmeusConstraint *constraint)
 {
   g_return_val_if_fail (EMEUS_IS_CONSTRAINT (constraint), EMEUS_CONSTRAINT_STRENGTH_REQUIRED);
@@ -585,6 +587,13 @@ emeus_constraint_to_string (EmeusConstraint *constraint)
     }
 
   g_string_append_printf (buf, "%g", constraint->constant);
+
+  g_string_append (buf, " ");
+
+  double strength = strength_to_value (constraint->strength);
+  g_string_append_printf (buf, "[%s (%g)]",
+                          strength_to_string (strength),
+                          strength);
 
   constraint->description = g_string_free (buf, FALSE);
 

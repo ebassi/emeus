@@ -114,21 +114,24 @@ operator_to_relation (OperatorType op)
 }
 
 double
-strength_to_value (EmeusConstraintStrength strength)
+strength_to_value (int strength)
 {
   switch (strength)
     {
     case EMEUS_CONSTRAINT_STRENGTH_REQUIRED:
       return STRENGTH_REQUIRED;
+
     case EMEUS_CONSTRAINT_STRENGTH_WEAK:
       return STRENGTH_WEAK;
+
     case EMEUS_CONSTRAINT_STRENGTH_MEDIUM:
       return STRENGTH_MEDIUM;
+
     case EMEUS_CONSTRAINT_STRENGTH_STRONG:
       return STRENGTH_STRONG;
     }
 
-  return STRENGTH_REQUIRED;
+  return strength;
 }
 
 EmeusConstraintStrength
