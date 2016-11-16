@@ -1511,7 +1511,7 @@ simplex_solver_add_constraint (SimplexSolver *solver,
                                Variable *variable,
                                OperatorType op,
                                Expression *expression,
-                               StrengthType strength)
+                               double strength)
 {
   Constraint *res;
 
@@ -1564,7 +1564,7 @@ simplex_solver_add_constraint (SimplexSolver *solver,
 Constraint *
 simplex_solver_add_stay_variable (SimplexSolver *solver,
                                   Variable *variable,
-                                  StrengthType strength)
+                                  double strength)
 {
   Constraint *res;
 
@@ -1630,7 +1630,7 @@ simplex_solver_remove_stay_variable (SimplexSolver *solver,
 Constraint *
 simplex_solver_add_edit_variable (SimplexSolver *solver,
                                   Variable *variable,
-                                  StrengthType strength)
+                                  double strength)
 {
   Constraint *res;
 

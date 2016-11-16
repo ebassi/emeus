@@ -63,15 +63,15 @@ Constraint *simplex_solver_add_constraint (SimplexSolver *solver,
                                            Variable *variable,
                                            OperatorType op,
                                            Expression *expression,
-                                           StrengthType strength);
+                                           double strength);
 
 Constraint *simplex_solver_add_stay_variable (SimplexSolver *solver,
                                               Variable *variable,
-                                              StrengthType strength);
+                                              double strength);
 
 Constraint *simplex_solver_add_edit_variable (SimplexSolver *solver,
                                               Variable *variable,
-                                              StrengthType strength);
+                                              double strength);
 
 bool simplex_solver_has_edit_variable (SimplexSolver *solver,
                                        Variable *variable);

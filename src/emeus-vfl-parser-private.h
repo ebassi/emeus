@@ -26,7 +26,7 @@ typedef struct {
   const char *attr2;
   double constant;
   double multiplier;
-  StrengthType strength;
+  double strength;
 } VflConstraint;
 
 GQuark vfl_error_quark (void);

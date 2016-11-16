@@ -29,13 +29,13 @@ const char *get_relation_symbol (EmeusConstraintRelation rel);
 EmeusConstraintAttribute attribute_from_name (const char *name);
 
 OperatorType relation_to_operator (EmeusConstraintRelation rel);
-StrengthType strength_to_value (EmeusConstraintStrength strength);
+double strength_to_value (EmeusConstraintStrength strength);
 
 EmeusConstraintRelation operator_to_relation (OperatorType op);
-EmeusConstraintStrength value_to_strength (StrengthType strength);
+EmeusConstraintStrength value_to_strength (double strength);
 
 const char *operator_to_string (OperatorType op);
-const char *strength_to_string (StrengthType strength);
+const char *strength_to_string (double strength);
 
 bool approx_val (double v1, double v2);
 

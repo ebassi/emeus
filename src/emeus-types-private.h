@@ -76,12 +76,26 @@ typedef enum {
   OPERATOR_TYPE_GE = 1
 } OperatorType;
 
-typedef enum {
-  STRENGTH_REQUIRED = 1001001000,
-  STRENGTH_STRONG = 1000000,
-  STRENGTH_MEDIUM = 1000,
-  STRENGTH_WEAK = 1
-} StrengthType;
+G_GNUC_PURE
+static inline double
+create_strength (double a,
+                 double b,
+                 double c,
+                 double w)
+{
+  double res = 0.0;
+
+  res += CLAMP (a * w, 0.0, 1000.0) * 1000000.0;
+  res += CLAMP (b * w, 0.0, 1000.0) * 1000.0;
+  res += CLAMP (c * w, 0.0, 1000.0);
+
+  return res;
+}
+
+#define STRENGTH_REQUIRED       (create_strength (1000.0, 1000.0, 1000.0, 1.0))
+#define STRENGTH_STRONG         (create_strength (   1.0,    0.0,    0.0, 1.0))
+#define STRENGTH_MEDIUM         (create_strength (   0.0,    1.0,    0.0, 1.0))
+#define STRENGTH_WEAK           (create_strength (   0.0,    0.0,    1.0, 1.0))
 
 typedef struct {
   /* While the Constraint's normal form is expressed in terms of a linear
@@ -101,7 +115,7 @@ typedef struct {
   /* The variable used by edit and stay constraints */
   Variable *variable;
 
-  StrengthType strength;
+  double strength;
 
   bool is_edit;
   bool is_stay;

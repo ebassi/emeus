@@ -17,7 +17,7 @@ typedef struct {
   char *object;
   const char *attr;
 
-  StrengthType priority;
+  double priority;
 } VflPredicate;
 
 typedef struct {
@@ -341,7 +341,7 @@ parse_priority:
   /* Parse priority */
   if (*end == '@')
     {
-      StrengthType priority;
+      double priority;
       end += 1;
 
       if (strncmp (end, "weak", 4) == 0)

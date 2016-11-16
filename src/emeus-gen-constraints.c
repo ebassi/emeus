@@ -36,9 +36,9 @@ relation_to_string (OperatorType rel)
 }
 
 static const char *
-strength_to_string (StrengthType strength)
+strength_to_string (double strength)
 {
-  if (strength == STRENGTH_REQUIRED)
+  if (strength >= STRENGTH_REQUIRED)
     return "required";
 
   if (strength >= STRENGTH_STRONG)

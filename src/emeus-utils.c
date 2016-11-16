@@ -113,7 +113,7 @@ operator_to_relation (OperatorType op)
   return EMEUS_CONSTRAINT_RELATION_EQ;
 }
 
-StrengthType
+double
 strength_to_value (EmeusConstraintStrength strength)
 {
   switch (strength)
@@ -132,7 +132,7 @@ strength_to_value (EmeusConstraintStrength strength)
 }
 
 EmeusConstraintStrength
-value_to_strength (StrengthType strength)
+value_to_strength (double strength)
 {
   if (strength >= STRENGTH_REQUIRED)
     return EMEUS_CONSTRAINT_STRENGTH_REQUIRED;
@@ -159,7 +159,7 @@ operator_to_string (OperatorType o)
 }
 
 const char *
-strength_to_string (StrengthType s)
+strength_to_string (double s)
 {
   if (s >= STRENGTH_REQUIRED)
     return "required";
