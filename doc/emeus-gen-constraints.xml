@@ -122,7 +122,7 @@
               &lt;predicate&gt; = (&lt;relation&gt;)? &lt;objectOfPredicate&gt; ('@' &lt;priority&gt;)?
                &lt;relation&gt; = '==' | '&lt;=' | '&gt;='
       &lt;objectOfPredicate&gt; = &lt;constant&gt; | &lt;viewName&gt; | &lt;metricName&gt;
-               &lt;priority&gt; = 'required' | 'strong' | 'medium' | 'weak'
+               &lt;priority&gt; = &lt;positiveNumber&gt; | 'required' | 'strong' | 'medium' | 'weak'
                &lt;constant&gt; = &lt;number&gt;
                &lt;viewName&gt; = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
              &lt;metricName&gt; = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
