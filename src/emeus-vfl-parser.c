@@ -384,7 +384,8 @@ parse_priority:
 
           parser->error_offset = end - parser->cursor;
           g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_PRIORITY,
-                       "Priority must be one of 'weak', 'medium', 'strong', and 'required'");
+                       "Priority must be a positive number or one of "
+                       "'weak', 'medium', 'strong', and 'required'");
           return false;
         }
 
