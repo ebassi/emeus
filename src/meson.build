@@ -80,7 +80,7 @@ configure_file(input: 'emeus.pc.in',
                output: 'emeus-@0@.pc'.format(emeus_api_version),
                configuration: conf,
                install: true,
-               install_dir: 'lib/pkgconfig')
+               install_dir: join_paths(emeus_libdir, 'pkgconfig'))
 
 # Introspection
 if get_option('enable-introspection')
@@ -88,8 +88,8 @@ if get_option('enable-introspection')
     '--c-include=emeus.h',
     '-DEMEUS_COMPILATION',
     '--cflags-begin',
-    '-I' + meson.source_root() + '/src',
-    '-I' + meson.build_root() + '/src',
+    '-I@0@'.format(join_paths(meson.source_root(), 'src')),
+    '-I@0@'.format(join_paths(meson.build_root(), 'src')),
     '--cflags-end',
   ]
 

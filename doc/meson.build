@@ -15,11 +15,15 @@ ignore_headers = [
   'emeus-test-utils.h',
 ]
 
-extra_dir_arg = '--extra-dir=' + get_option('prefix') + '/share/gtk-doc/html'
+glib_prefix = dependency('glib-2.0').get_pkgconfig_variable('prefix')
+glib_docpath = join_paths(glib_prefix, 'share', 'gtk-doc', 'html')
+gtk_prefix = dependency('gtk+-3.0').get_pkgconfig_variable('prefix')
+gtk_docpath = join_paths(gtk_prefix, 'share', 'gtk-doc', 'html')
+docpath = join_paths(emeus_datadir, 'gtk-doc', 'html')
 
 gnome.gtkdoc('emeus',
              main_xml: 'emeus-docs.xml',
-             src_dir: meson.source_root() + '/src',
+             src_dir: join_paths(meson.source_root(), 'src'),
              dependencies: emeus_dep,
              gobject_typesfile: 'emeus.types',
              scan_args: [
@@ -28,10 +32,10 @@ gnome.gtkdoc('emeus',
                '--ignore-headers=' + ' '.join(ignore_headers),
              ],
              fixxref_args: [
-               '--html-dir=@0@/@1@/gtk-doc/html'.format(get_option('prefix'), get_option('datadir')),
-               extra_dir_arg + '/glib',
-               extra_dir_arg + '/gobject',
-               extra_dir_arg + '/gtk',
+               '--html-dir=@0@'.format(docpath),
+               '--extra-dir=@0@'.format(join_paths(glib_docpath, 'glib')),
+               '--extra-dir=@0@'.format(join_paths(glib_docpath, 'gobject')),
+               '--extra-dir=@0@'.format(join_paths(gtk_docpath, 'gtk3')),
              ],
              install: true)
 
@@ -66,5 +70,5 @@ if xsltproc.found()
                                '@INPUT@',
                              ],
                              install: true,
-                             install_dir: get_option('mandir') + '/man1')
+                             install_dir: join_paths(get_option('mandir'), 'man1'))
 endif
