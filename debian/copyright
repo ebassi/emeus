@@ -1,0 +1,5 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: emeus
+Upstream-Contact: Emmanuele Bassi <emmanuele@endlessm.com>
+Copyright: Copyright 2016 Endless Mobile, Inc.
+License: LGPL-2.1+
