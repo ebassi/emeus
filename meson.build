@@ -21,9 +21,9 @@ emeus_binary_age = emeus_minor_version * 100 + emeus_micro_version
 emeus_is_development = emeus_minor_version.is_odd()
 
 emeus_prefix = get_option('prefix')
-emeus_libdir = emeus_prefix + '/' + get_option('libdir')
-emeus_datadir = emeus_prefix + '/share'
-emeus_includedir = emeus_prefix + '/include'
+emeus_libdir = join_paths(emeus_prefix, get_option('libdir'))
+emeus_datadir = join_paths(emeus_prefix, get_option('datadir'))
+emeus_includedir = join_paths(emeus_prefix, get_option('includedir'))
 
 cc = meson.get_compiler('c')
 host_system = host_machine.system()
@@ -151,6 +151,8 @@ if gtk_version_is_development
     '-DGDK_VERSION_MAX_ALLOWED=' + max_allowed,
   ]
 endif
+
+conf.set('EMEUS_REQUIRES', 'gtk+-3.0 >= ' + gtk_version_required)
 
 gtk_dep = dependency('gtk+-3.0', version: '>= ' + gtk_version_required)
 
