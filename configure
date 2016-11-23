@@ -59,15 +59,15 @@ done
 
 # Defaults
 test -z ${prefix} && prefix=/usr
-test -z ${bindir} && bindir=${prefix}/bin
+test -z ${bindir} && bindir=bin
 test -z ${sbindir} && sbindir=${prefix}/sbin
 test -z ${libexecdir} && libexecdir=${prefix}/bin
-test -z ${datarootdir} && datarootdir=${prefix}/share
+test -z ${datarootdir} && datarootdir=share
 test -z ${datadir} && datadir=${datarootdir}
 test -z ${sysconfdir} && sysconfdir=${prefix}/etc
-test -z ${libdir} && libdir=${prefix}/lib
-test -z ${mandir} && mandir=${prefix}/share/man
-test -z ${includedir} && includedir=${prefix}/include
+test -z ${libdir} && libdir=lib
+test -z ${mandir} && mandir=share/man
+test -z ${includedir} && includedir=include
 
 # The source directory is the location of this file
 srcdir=$(dirname $0)
