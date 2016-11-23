@@ -6,7 +6,7 @@ project('emeus', 'c',
           'warning_level=1'
         ],
         license: 'LGPLv2.1+',
-        meson_version: '>= 0.34.0')
+        meson_version: '>= 0.36.0')
 
 emeus_version = meson.project_version().split('.')
 emeus_major_version = emeus_version[0].to_int()
