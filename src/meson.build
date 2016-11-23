@@ -45,17 +45,29 @@ configure_file(input: 'emeus-version.h.meson',
 
 install_headers(public_headers + [ 'emeus.h' ], subdir: 'emeus-1.0')
 
+libemeus_private = static_library('emeus-private',
+                                  sources: solver_sources + private_headers,
+                                  dependencies: [ mathlib_dep, glib_dep ],
+                                  c_args: common_cflags + debug_cflags + [
+                                    '-DEMEUS_COMPILATION=1',
+                                    '-DG_LOG_USE_STRUCTURED=1',
+                                    '-DG_LOG_DOMAIN="Emeus"',
+                                  ],
+                                  link_args: [ '-Wl,-Bsymbolic-functions' ],
+                                  install: false)
+
 libemeus = shared_library('emeus-@0@'.format(emeus_api_version),
-  sources: sources + solver_sources + private_headers,
-  version: '@0@.@1@.@2@'.format(emeus_major_version, emeus_minor_version, emeus_micro_version),
-  install: true,
-  dependencies: [ gtk_dep, mathlib_dep ],
-  c_args: common_cflags + debug_cflags + gtk_version_cflags + [
-    '-DEMEUS_COMPILATION=1',
-    '-DG_LOG_USE_STRUCTURED=1',
-    '-DG_LOG_DOMAIN="Emeus"',
-  ],
-  link_args: [ '-Wl,-Bsymbolic-functions' ])
+                          sources: sources + solver_sources + private_headers,
+                          version: meson.project_version(),
+                          install: true,
+                          dependencies: [ gtk_dep, mathlib_dep ],
+                          c_args: common_cflags + debug_cflags + gtk_version_cflags + [
+                            '-DEMEUS_COMPILATION=1',
+                            '-DG_LOG_USE_STRUCTURED=1',
+                            '-DG_LOG_DOMAIN="Emeus"',
+                          ],
+                          link_with: libemeus_private,
+                          link_args: [ '-Wl,-Bsymbolic-functions' ])
 
 # Internal dependency, for tests
 emeus_inc = include_directories('.')
@@ -93,12 +105,10 @@ if get_option('enable-introspection')
                      extra_args: gir_extra_args)
 endif
 
-solver_objects = libemeus.extract_objects(solver_sources)
-
 gen_constraints = executable('emeus-gen-constraints', 'emeus-gen-constraints.c',
                              include_directories: emeus_inc,
                              dependencies: [ glib_dep, mathlib_dep ],
-                             objects: solver_objects,
+                             link_with: libemeus_private,
                              install: true)
 
 subdir('tests')
