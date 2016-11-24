@@ -87,10 +87,6 @@ if get_option('enable-introspection')
   gir_extra_args = [
     '--c-include=emeus.h',
     '-DEMEUS_COMPILATION',
-    '--cflags-begin',
-    '-I@0@'.format(join_paths(meson.source_root(), 'src')),
-    '-I@0@'.format(join_paths(meson.build_root(), 'src')),
-    '--cflags-end',
   ]
 
   gnome.generate_gir(libemeus,
