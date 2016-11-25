@@ -91,8 +91,9 @@ main (int argc, char *argv[])
 
   GHashTable *views = g_hash_table_new (g_str_hash, g_str_equal);
 
+  /* We populate the views set with fake pointers */
   for (int i = 0; opt_views[i] != NULL; i++)
-    g_hash_table_add (views, opt_views[i]);
+    g_hash_table_insert (views, opt_views[i], GINT_TO_POINTER (1));
 
   VflParser *parser = vfl_parser_new (opt_hspacing, opt_vspacing, NULL, views);
 
