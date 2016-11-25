@@ -58,9 +58,9 @@ struct _VflParser
 
   int default_spacing[2];
 
-  /* Set<name, widget> */
-  GHashTable *metrics_set;
   /* Set<name, double> */
+  GHashTable *metrics_set;
+  /* Set<name, widget> */
   GHashTable *views_set;
 
   const char *cursor;
@@ -206,7 +206,10 @@ has_view (VflParser *parser,
   if (parser->views_set == NULL)
     return false;
 
-  return g_hash_table_contains (parser->views_set, name);
+  if (!g_hash_table_contains (parser->views_set, name))
+    return false;
+
+  return g_hash_table_lookup (parser->views_set, name) != NULL;
 }
 
 static bool
