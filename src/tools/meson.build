@@ -21,7 +21,13 @@ editor_sources = [
   'emeus-edit-constraints.c'
 ]
 
-editor = executable('emeus-edit-constraints', editor_sources,
+editor_resources = gnome.compile_resources('editor-resources',
+                                           'editor.gresource.xml',
+                                           c_name: '_editor')
+
+editor = executable('emeus-edit-constraints',
+                    editor_sources + editor_resources,
                     include_directories: emeus_inc,
                     dependencies: [ glib_dep, gtk_dep, emeus_dep ],
+                    link_with: libemeus_private,
                     install: true)

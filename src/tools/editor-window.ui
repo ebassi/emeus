@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="EditorApplicationWindow" parent="GtkApplicationWindow">
+    <property name="show_menubar">False</property>
+    <child>
+      <object class="GtkGrid" id="main_grid">
+        <property name="hexpand">True</property>
+        <property name="vexpand">True</property>
+        <property name="visible">True</property>
+        <child>
+          <object class="GtkBox" id="views_box">
+            <property name="vexpand">True</property>
+            <property name="visible">True</property>
+            <child>
+              <object class="GtkStackSwitcher" id="lists_switcher">
+                <property name="visible">True</property>
+                <property name="hexpand">True</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkStack" id="lists_stack">
+                <property name="visible">True</property>
+                <property name="vexpand">True</property>
+                <child>
+                  <object class="GtkListBox" id="views_listbox">
+                    <property name="visible">True</property>
+                  </object>
+                  <packing>
+                    <property name="name">views</property>
+                    <property name="title">Views</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkListBox" id="metrics_listbox">
+                    <property name="visible">True</property>
+                  </object>
+                  <packing>
+                    <property name="name">metrics</property>
+                    <property name="title">Metrics</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="top_attach">0</property>
+            <property name="left_attach">0</property>
+            <property name="height">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="EmeusConstraintLayout" id="layout_box">
+            <property name="visible">True</property>
+            <property name="hexpand">True</property>
+            <property name="vexpand">True</property>
+          </object>
+          <packing>
+            <property name="top_attach">0</property>
+            <property name="left_attach">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkScrolledWindow" id="scrolledwindow">
+            <property name="visible">True</property>
+            <child>
+              <object class="GtkTextView" id="vfl_text_area">
+                <property name="visible">True</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+              </object>
+            </child>
+          </object>
+          <packing>
+            <property name="top_attach">1</property>
+            <property name="left_attach">1</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>
