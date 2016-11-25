@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Emeus Editor
+Comment=Editor for Emeus constraints
+Exec=emeus-edit-constraints
+DBusActivatable=true
+StartupNotify=true
+Terminal=false
+Type=Application
+Icon=view-fullscreen-symbolic
+Keywords=Build;Develop;Editor;

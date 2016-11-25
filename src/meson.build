@@ -33,9 +33,14 @@ sources = [
   'emeus-types.c',
 ]
 
+# Version macros
+version_conf = configuration_data()
+version_conf.set('EMEUS_MAJOR_VERSION', emeus_major_version)
+version_conf.set('EMEUS_MINOR_VERSION', emeus_minor_version)
+version_conf.set('EMEUS_MICRO_VERSION', emeus_micro_version)
+
 # Generated headers
-configure_file(input: 'config.h.meson',
-               output: 'config.h',
+configure_file(output: 'config.h',
                configuration: conf)
 configure_file(input: 'emeus-version.h.meson',
                output: 'emeus-version.h',
@@ -76,9 +81,18 @@ emeus_dep = declare_dependency(link_with: libemeus,
                                dependencies: [ gtk_dep, mathlib_dep ])
 
 # PkgConfig file
+pkgconf = configuration_data()
+pkgconf.set('prefix', emeus_prefix)
+pkgconf.set('exec_prefix', emeus_prefix)
+pkgconf.set('libdir', emeus_libdir)
+pkgconf.set('includedir', emeus_includedir)
+pkgconf.set('EMEUS_API_VERSION', emeus_api_version)
+pkgconf.set('EMEUS_VERSION', meson.project_version())
+pkgconf.set('EMEUS_REQUIRES', 'gtk+-3.0 >= ' + gtk_version_required)
+
 configure_file(input: 'emeus.pc.in',
                output: 'emeus-@0@.pc'.format(emeus_api_version),
-               configuration: conf,
+               configuration: pkgconf,
                install: true,
                install_dir: join_paths(emeus_libdir, 'pkgconfig'))
 

@@ -29,14 +29,16 @@ cc = meson.get_compiler('c')
 host_system = host_machine.system()
 
 conf = configuration_data()
-
-# Compat variables for pkgconfig
-conf.set('prefix', emeus_prefix)
-conf.set('exec_prefix', emeus_prefix)
-conf.set('libdir', emeus_libdir)
-conf.set('includedir', emeus_includedir)
-conf.set('EMEUS_API_VERSION', emeus_api_version)
-conf.set('EMEUS_VERSION', meson.project_version())
+conf.set_quoted('PACKAGE_NAME', 'emeus')
+conf.set_quoted('PACKAGE_VERSION', meson.project_version())
+conf.set_quoted('PACKAGE_STRING', 'emeus-' + meson.project_version())
+conf.set_quoted('PACKAGE_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
+conf.set_quoted('PACKAGE_LIBDIR', join_paths(get_option('prefix'), get_option('datadir')))
+conf.set_quoted('PACKAGE_LOCALE_DIR', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
+conf.set_quoted('PACKAGE_LIBEXECDIR', join_paths(get_option('prefix'), get_option('libexecdir')))
+conf.set('GETTEXT_PACKAGE', 'PACKAGE_NAME')
+conf.set('LOCALEDIR', 'PACKAGE_LOCALE_DIR')
+conf.set10('ENABLE_NLS', true) # Always enabled
 
 # Compiler flags
 test_cflags = [
@@ -76,12 +78,6 @@ endforeach
 conf.set('HAVE_STDLIB_H', cc.has_header('stdlib.h'))
 conf.set('HAVE_STDINT_H', cc.has_header('stdint.h'))
 conf.set('HAVE_STDBOOL_H', cc.has_header('stdbool.h'))
-
-# Version macros
-version_conf = configuration_data()
-version_conf.set('EMEUS_MAJOR_VERSION', emeus_major_version)
-version_conf.set('EMEUS_MINOR_VERSION', emeus_minor_version)
-version_conf.set('EMEUS_MICRO_VERSION', emeus_micro_version)
 
 # Debugging
 debug_cflags = []
@@ -152,9 +148,9 @@ if gtk_version_is_development
   ]
 endif
 
-conf.set('EMEUS_REQUIRES', 'gtk+-3.0 >= ' + gtk_version_required)
-
 gtk_dep = dependency('gtk+-3.0', version: '>= ' + gtk_version_required)
+
+find_program('msgmerge')
 
 gnome = import('gnome')
 
