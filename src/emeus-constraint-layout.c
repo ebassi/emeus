@@ -493,20 +493,36 @@ emeus_constraint_layout_remove (GtkContainer *container,
                                 GtkWidget    *widget)
 {
   EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (container);
-  EmeusConstraintLayoutChild *child;
+  EmeusConstraintLayoutChild *layout_child;
   gboolean was_visible;
 
-  child = EMEUS_CONSTRAINT_LAYOUT_CHILD (widget);
-  if (g_sequence_iter_get_sequence (child->iter) != self->children)
+  if (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (widget))
+      layout_child = EMEUS_CONSTRAINT_LAYOUT_CHILD (widget);
+  else
     {
-      g_critical ("Tried to remove non child %p", widget);
+      GtkWidget *parent = gtk_widget_get_parent (widget);
+
+      if (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (parent))
+        layout_child = EMEUS_CONSTRAINT_LAYOUT_CHILD (parent);
+      else
+        {
+          g_critical ("Attempting to remove widget '%s' but "
+                      "it's not a child of the layout",
+                      G_OBJECT_TYPE_NAME (widget));
+          return;
+        }
+    }
+
+  if (g_sequence_iter_get_sequence (layout_child->iter) != self->children)
+    {
+      g_critical ("Tried to remove non child %p", layout_child);
       return;
     }
 
-  was_visible = gtk_widget_get_visible (widget);
+  was_visible = gtk_widget_get_visible (GTK_WIDGET (layout_child));
 
-  gtk_widget_unparent (widget);
-  g_sequence_remove (child->iter);
+  gtk_widget_unparent (GTK_WIDGET (layout_child));
+  g_sequence_remove (layout_child->iter);
 
   if (was_visible && gtk_widget_get_visible (GTK_WIDGET (container)))
     gtk_widget_queue_resize (GTK_WIDGET (container));
