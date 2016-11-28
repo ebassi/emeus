@@ -2,6 +2,15 @@
 <interface>
   <template class="EditorApplicationWindow" parent="GtkApplicationWindow">
     <property name="show_menubar">False</property>
+    <property name="default_width">700</property>
+    <property name="default_height">500</property>
+    <child type="titlebar">
+      <object class="GtkHeaderBar" id="headerbar">
+        <property name="visible">True</property>
+        <property name="show-close-button">True</property>
+        <property name="title" translatable="yes">Constraints Editor</property>
+      </object>
+    </child>
     <child>
       <object class="GtkGrid" id="main_grid">
         <property name="hexpand">True</property>
@@ -9,12 +18,15 @@
         <property name="visible">True</property>
         <child>
           <object class="GtkBox" id="views_box">
+            <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
             <property name="vexpand">True</property>
             <property name="visible">True</property>
             <child>
               <object class="GtkStackSwitcher" id="lists_switcher">
+                <property name="halign">GTK_ALIGN_CENTER</property>
                 <property name="visible">True</property>
                 <property name="hexpand">True</property>
+                <property name="stack">lists_stack</property>
               </object>
             </child>
             <child>
@@ -27,7 +39,7 @@
                   </object>
                   <packing>
                     <property name="name">views</property>
-                    <property name="title">Views</property>
+                    <property name="title" translatable="yes">Views</property>
                   </packing>
                 </child>
                 <child>
@@ -36,7 +48,7 @@
                   </object>
                   <packing>
                     <property name="name">metrics</property>
-                    <property name="title">Metrics</property>
+                    <property name="title" translatable="yes">Metrics</property>
                   </packing>
                 </child>
               </object>

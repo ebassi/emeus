@@ -2,5 +2,6 @@
 <gresources>
   <gresource prefix="/com/endlessm/EmeusEditor">
     <file>editor-window.ui</file>
+    <file>editor-menu.ui</file>
   </gresource>
 </gresources>

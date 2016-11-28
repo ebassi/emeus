@@ -78,10 +78,6 @@ editor_application_window_init (EditorApplicationWindow *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
 
-  GtkWindow *window = GTK_WINDOW (self);
-  gtk_window_set_title (window, "Constraint Editor");
-  gtk_window_set_default_size (window, 600, 400);
-
   self->vfl_parser = vfl_parser_new (-1, -1, NULL, NULL);
 }
 
@@ -95,11 +91,44 @@ struct _EditorApplication
 G_DEFINE_TYPE (EditorApplication, editor_application, GTK_TYPE_APPLICATION)
 
 static void
+quit_activated (GSimpleAction *action,
+                GVariant      *parameter,
+                gpointer       user_data)
+{
+  g_application_quit (G_APPLICATION (user_data));
+}
+
+static GActionEntry app_entries[] =
+{
+  { "quit", quit_activated, NULL, NULL, NULL }
+};
+
+static void
+editor_application_startup (GApplication *application)
+{
+  const char *quit_accels[] = { "<Ctrl>Q", NULL };
+
+  G_APPLICATION_CLASS (editor_application_parent_class)->startup (application);
+
+  g_action_map_add_action_entries (G_ACTION_MAP (application),
+                                   app_entries, G_N_ELEMENTS (app_entries),
+                                   application);
+  gtk_application_set_accels_for_action (GTK_APPLICATION (application),
+                                         "app.quit",
+                                         quit_accels);
+
+  GtkBuilder *builder = gtk_builder_new_from_resource ("/com/endlessm/EmeusEditor/editor-menu.ui");
+  GMenuModel *app_menu = G_MENU_MODEL (gtk_builder_get_object (builder, "appmenu"));
+  gtk_application_set_app_menu (GTK_APPLICATION (application), app_menu);
+  g_object_unref (builder);
+}
+
+static void
 editor_application_activate (GApplication *application)
 {
   GtkWidget *widget = g_object_new (editor_application_window_get_type (),
-				    "application", application,
-				    NULL);
+                                    "application", application,
+                                    NULL);
 
   gtk_widget_show (widget);
 }
@@ -109,6 +138,7 @@ editor_application_class_init (EditorApplicationClass *klass)
 {
   GApplicationClass *application_class = G_APPLICATION_CLASS (klass);
 
+  application_class->startup = editor_application_startup;
   application_class->activate = editor_application_activate;
 }
 
