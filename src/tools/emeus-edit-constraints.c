@@ -62,21 +62,23 @@ view_widget__draw (GtkWidget   *area,
 }
 
 static void
-view_list_row_destroy (GtkWidget *widget)
+view_list_row_dispose (GObject *gobject)
 {
-  ViewListRow *self = VIEW_LIST_ROW (widget);
+  ViewListRow *self = VIEW_LIST_ROW (gobject);
 
-  g_object_unref (self->view_widget);
+  g_clear_object (&self->view_widget);
 
-  GTK_WIDGET_CLASS (view_list_row_parent_class)->destroy (widget);
+  G_OBJECT_CLASS (view_list_row_parent_class)->dispose (gobject);
 }
 
 static void
 view_list_row_class_init (ViewListRowClass *klass)
 {
-  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+  GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
-  widget_class->destroy = view_list_row_destroy;
+  gobject_class->dispose = view_list_row_dispose;
+
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
 
   gtk_widget_class_set_template_from_resource (widget_class, "/com/endlessm/EmeusEditor/view-list-row.ui");
 
@@ -178,7 +180,9 @@ add_view_button__clicked (EditorApplicationWindow *self)
       emeus_constraint_layout_pack (EMEUS_CONSTRAINT_LAYOUT (self->layout_box),
                                     row->view_widget,
                                     view_name, NULL);
+
       gtk_widget_show (row->view_widget);
+      g_object_ref (row->view_widget);
 
       g_debug ("*** Added view '%s' (widget: %p)", view_name, row->view_widget);
     }
