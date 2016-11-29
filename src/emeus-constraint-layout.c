@@ -450,6 +450,41 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
 }
 
 static void
+add_layout_stays (EmeusConstraintLayout *self)
+{
+  Variable *var;
+
+  /* Add two required stay constraints for the top left corner */
+  var = simplex_solver_create_variable (&self->solver, "top", 0.0);
+  variable_set_prefix (var, "super");
+  g_hash_table_insert (self->bound_attributes,
+                       (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_TOP),
+                       var);
+  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
+
+  var = simplex_solver_create_variable (&self->solver, "left", 0.0);
+  variable_set_prefix (var, "super");
+  g_hash_table_insert (self->bound_attributes,
+                       (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT),
+                       var);
+  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
+
+  var = simplex_solver_create_variable (&self->solver, "width", 0.0);
+  variable_set_prefix (var, "super");
+  g_hash_table_insert (self->bound_attributes,
+                       (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH),
+                       var);
+  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
+
+  var = simplex_solver_create_variable (&self->solver, "height", 0.0);
+  variable_set_prefix (var, "super");
+  g_hash_table_insert (self->bound_attributes,
+                       (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT),
+                       var);
+  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
+}
+
+static void
 emeus_constraint_layout_get_preferred_size (EmeusConstraintLayout *self,
                                             GtkOrientation         orientation,
                                             int                   *minimum_p,
@@ -1085,8 +1120,6 @@ emeus_constraint_layout_class_init (EmeusConstraintLayoutClass *klass)
 static void
 emeus_constraint_layout_init (EmeusConstraintLayout *self)
 {
-  Variable *var;
-
   gtk_widget_set_has_window (GTK_WIDGET (self), FALSE);
 
   simplex_solver_init (&self->solver);
@@ -1101,34 +1134,7 @@ emeus_constraint_layout_init (EmeusConstraintLayout *self)
                                              g_object_unref,
                                              NULL);
 
-  /* Add two required stay constraints for the top left corner */
-  var = simplex_solver_create_variable (&self->solver, "top", 0.0);
-  variable_set_prefix (var, "super");
-  g_hash_table_insert (self->bound_attributes,
-                       (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_TOP),
-                       var);
-  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
-
-  var = simplex_solver_create_variable (&self->solver, "left", 0.0);
-  variable_set_prefix (var, "super");
-  g_hash_table_insert (self->bound_attributes,
-                       (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT),
-                       var);
-  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
-
-  var = simplex_solver_create_variable (&self->solver, "width", 0.0);
-  variable_set_prefix (var, "super");
-  g_hash_table_insert (self->bound_attributes,
-                       (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH),
-                       var);
-  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
-
-  var = simplex_solver_create_variable (&self->solver, "height", 0.0);
-  variable_set_prefix (var, "super");
-  g_hash_table_insert (self->bound_attributes,
-                       (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT),
-                       var);
-  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
+  add_layout_stays (self);
 }
 
 /**
@@ -1562,6 +1568,38 @@ emeus_constraint_layout_get_constraints (EmeusConstraintLayout *layout)
     }
 
   return res;
+}
+
+void
+emeus_constraint_layout_clear_constraints (EmeusConstraintLayout *layout)
+{
+  g_return_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT (layout));
+
+  GHashTableIter iter;
+  gpointer key;
+
+  g_hash_table_iter_init (&iter, layout->constraints);
+  while (g_hash_table_iter_next (&iter, &key, NULL))
+    {
+      EmeusConstraint *constraint = key;
+
+      emeus_constraint_detach (constraint);
+
+      g_hash_table_iter_remove (&iter);
+    }
+
+  g_hash_table_remove_all (layout->bound_attributes);
+  add_layout_stays (layout);
+
+  GSequenceIter *child_iter = g_sequence_get_begin_iter (layout->children);
+  while (!g_sequence_iter_is_end (child_iter))
+    {
+      EmeusConstraintLayoutChild *child = g_sequence_get (child_iter);
+
+      child_iter = g_sequence_iter_next (child_iter);
+
+      emeus_constraint_layout_child_clear_constraints (child);
+    }
 }
 
 static void
