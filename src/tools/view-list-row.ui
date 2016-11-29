@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="ViewListRow" parent="GtkListBoxRow">
+    <property name="visible">True</property>
+    <property name="can-focus">True</property>
+    <child>
+      <object class="GtkBox" id="box1">
+        <property name="visible">True</property>
+        <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
+        <child>
+          <object class="GtkEntry" id="name_entry">
+            <property name="halign">GTK_ALIGN_START</property>
+            <property name="visible">True</property>
+            <property name="width-chars">20</property>
+            <property name="placeholder-text" translatable="yes">Enter the view name…</property>
+          </object>
+        </child>
+        <child>
+          <object class="GtkColorButton" id="color_chooser">
+            <property name="visible">True</property>
+            <property name="use-alpha">False</property>
+            <property name="halign">GTK_ALIGN_END</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

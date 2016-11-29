@@ -28,6 +28,86 @@
 
 #include "emeus-vfl-parser-private.h"
 
+static int last_view_id;
+
+G_DECLARE_FINAL_TYPE (ViewListRow, view_list_row, VIEW, LIST_ROW, GtkListBoxRow)
+
+struct _ViewListRow
+{
+  GtkListBoxRow parent_instance;
+
+  GtkWidget *name_entry;
+  GtkWidget *color_chooser;
+  GtkWidget *view_widget;
+};
+
+G_DEFINE_TYPE (ViewListRow, view_list_row, GTK_TYPE_LIST_BOX_ROW)
+
+static gboolean
+view_widget__draw (GtkWidget   *area,
+                   cairo_t     *cr,
+                   ViewListRow *row)
+{
+  GdkRGBA color;
+
+  gtk_color_chooser_get_rgba (GTK_COLOR_CHOOSER (row->color_chooser), &color);
+
+  gdk_cairo_set_source_rgba (cr, &color);
+  cairo_rectangle (cr, 0, 0,
+                   gtk_widget_get_allocated_width (area),
+                   gtk_widget_get_allocated_height (area));
+  cairo_fill (cr);
+
+  return TRUE;
+}
+
+static void
+view_list_row_destroy (GtkWidget *widget)
+{
+  ViewListRow *self = VIEW_LIST_ROW (widget);
+
+  g_object_unref (self->view_widget);
+
+  GTK_WIDGET_CLASS (view_list_row_parent_class)->destroy (widget);
+}
+
+static void
+view_list_row_class_init (ViewListRowClass *klass)
+{
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+
+  widget_class->destroy = view_list_row_destroy;
+
+  gtk_widget_class_set_template_from_resource (widget_class, "/com/endlessm/EmeusEditor/view-list-row.ui");
+
+  gtk_widget_class_bind_template_child (widget_class, ViewListRow, name_entry);
+  gtk_widget_class_bind_template_child (widget_class, ViewListRow, color_chooser);
+}
+
+static void
+view_list_row_init (ViewListRow *self)
+{
+  gtk_widget_init_template (GTK_WIDGET (self));
+
+  char *tmp_name = g_strdup_printf ("view%d", last_view_id++);
+  gtk_entry_set_text (GTK_ENTRY (self->name_entry), tmp_name);
+  g_free (tmp_name);
+
+  self->view_widget = gtk_drawing_area_new ();
+  g_object_ref_sink (self->view_widget);
+
+  g_signal_connect (self->view_widget, "draw", G_CALLBACK (view_widget__draw), self);
+
+  GdkRGBA color = {
+    .red = g_random_double_range (0.2, 0.8),
+    .green = g_random_double_range (0.2, 0.8),
+    .blue = g_random_double_range (0.2, 0.8),
+    .alpha = 1.0
+  };
+
+  gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (self->color_chooser), &color);
+}
+
 #if 0
 G_DECLARE_FINAL_TYPE (MetricListRow, metric_list_row, METRIC, LIST_ROW, GtkListBoxRow)
 
@@ -88,7 +168,19 @@ add_view_button__clicked (EditorApplicationWindow *self)
 
   if (g_strcmp0 (current_list, "views") == 0)
     {
+      ViewListRow *row = g_object_new (view_list_row_get_type (), NULL);
 
+      gtk_list_box_insert (GTK_LIST_BOX (self->views_listbox), GTK_WIDGET (row), -1);
+
+      const char *view_name = gtk_entry_get_text (GTK_ENTRY (row->name_entry));
+      g_hash_table_insert (self->views, g_strdup (view_name), row->view_widget);
+
+      emeus_constraint_layout_pack (EMEUS_CONSTRAINT_LAYOUT (self->layout_box),
+                                    row->view_widget,
+                                    view_name, NULL);
+      gtk_widget_show (row->view_widget);
+
+      g_debug ("*** Added view '%s' (widget: %p)", view_name, row->view_widget);
     }
 
   if (g_strcmp0 (current_list, "metrics") == 0)
@@ -118,6 +210,7 @@ log_text_area_add_message (EditorApplicationWindow *self,
 
   GtkTextIter end_iter;
   gtk_text_buffer_get_end_iter (buffer, &end_iter);
+
   if (is_error)
     gtk_text_buffer_insert_with_tags_by_name (buffer, &end_iter, message, -1, "error", NULL);
   else
@@ -142,9 +235,16 @@ vfl_text_area__changed (EditorApplicationWindow *self,
   gtk_text_buffer_get_end_iter (buffer, &end_iter);
 
   char *contents = gtk_text_buffer_get_text (buffer, &start_iter, &end_iter, FALSE);
+  if (contents == NULL || *contents == '\0')
+    return;
+
   char **lines = g_strsplit (contents, "\n", -1);
 
+  g_free (contents);
+
   gboolean had_error = FALSE;
+
+  vfl_parser_set_views (self->vfl_parser, self->views);
 
   for (int i = 0; lines[i] != 0; i += 1)
     {
@@ -187,11 +287,32 @@ vfl_text_area__changed (EditorApplicationWindow *self,
         }
     }
 
-  g_strfreev (lines);
-  g_free (contents);
+  if (had_error)
+    {
+      g_strfreev (lines);
+      return;
+    }
 
-  if (!had_error)
-    log_text_area_add_message (self, _("Visual format parsed successfully"), FALSE);
+  log_text_area_add_message (self, _("Visual format parsed successfully\n"), FALSE);
+
+  emeus_constraint_layout_clear_constraints (EMEUS_CONSTRAINT_LAYOUT (self->layout_box));
+
+  GList *constraints = emeus_create_constraints_from_description ((const char * const *) lines,
+                                                                  g_strv_length (lines),
+                                                                  -1, -1,
+                                                                  self->views,
+                                                                  NULL);
+
+  g_debug ("*** Generated %d constraints from %d lines", g_list_length (constraints), g_strv_length (lines));
+
+  for (GList *l = constraints; l != NULL; l = l->next)
+    emeus_constraint_layout_add_constraint (EMEUS_CONSTRAINT_LAYOUT (self->layout_box), l->data);
+
+  g_list_free (constraints);
+
+  g_strfreev (lines);
+
+  gtk_widget_queue_resize (GTK_WIDGET (self->layout_box));
 }
 
 static void
@@ -200,6 +321,8 @@ editor_application_window_finalize (GObject *gobject)
   EditorApplicationWindow *self = (EditorApplicationWindow *) gobject;
 
   vfl_parser_free (self->vfl_parser);
+
+  g_clear_pointer (&self->views, g_hash_table_unref);
 
   G_OBJECT_CLASS (editor_application_window_parent_class)->finalize (gobject);
 }
@@ -233,7 +356,8 @@ editor_application_window_init (EditorApplicationWindow *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
 
-  self->vfl_parser = vfl_parser_new (-1, -1, NULL, NULL);
+  self->views = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
+  self->vfl_parser = vfl_parser_new (-1, -1, self->views, NULL);
 
   g_signal_connect_swapped (gtk_text_view_get_buffer (GTK_TEXT_VIEW (self->vfl_text_area)),
                             "changed", G_CALLBACK (vfl_text_area__changed),
