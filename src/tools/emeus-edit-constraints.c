@@ -218,7 +218,7 @@ log_text_area_add_message (EditorApplicationWindow *self,
   if (is_error)
     gtk_text_buffer_insert_with_tags_by_name (buffer, &end_iter, message, -1, "error", NULL);
   else
-    gtk_text_buffer_insert (buffer, &end_iter, message, -1);
+    gtk_text_buffer_insert_with_tags_by_name (buffer, &end_iter, message, -1, "info", NULL);
 
   if (is_error)
     {
@@ -385,6 +385,9 @@ editor_application_window_init (EditorApplicationWindow *self)
   GtkTextBuffer *log_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self->log_text_area));
   gtk_text_buffer_create_tag (log_buffer, "error",
                               "foreground-rgba", &(GdkRGBA) { 1.0, 0.0, 0.0, 1.0 },
+                              NULL);
+  gtk_text_buffer_create_tag (log_buffer, "info",
+                              "foreground-rgba", &(GdkRGBA) { 0.0, 1.0, 0.0, 1.0 },
                               NULL);
 }
 
