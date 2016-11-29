@@ -28,6 +28,35 @@
 
 #include "emeus-vfl-parser-private.h"
 
+#if 0
+G_DECLARE_FINAL_TYPE (MetricListRow, metric_list_row, METRIC, LIST_ROW, GtkListBoxRow)
+
+struct _MetricListRow
+{
+  GtkListBoxRow parent_instance;
+
+  GtkWidget *name_entry;
+  GtkWidget *spin_button;
+};
+
+G_DEFINE_TYPE (MetricListRow, metric_list_row, GTK_TYPE_LIST_BOX_ROW)
+
+static void
+metric_list_row_class_init (MetricListRowClass *klass)
+{
+  GtkWidgetClass *widget_class = GTK_WIDGET_CLASS (klass);
+  gtk_widget_class_set_template_from_resource (widget_class, "/com/endlessm/EmeusEditor/metric-list-row.ui");
+  gtk_widget_class_bind_template_child (widget_class, MetricListRow, name_entry);
+  gtk_widget_class_bind_template_child (widget_class, MetricListRow, spin_button);
+}
+
+static void
+metric_list_row_init (MetricListRow *self)
+{
+  gtk_widget_init_template (GTK_WIDGET (self));
+}
+#endif
+
 G_DECLARE_FINAL_TYPE (EditorApplicationWindow, editor_application_window, EDITOR, APPLICATION_WINDOW, GtkApplicationWindow)
 
 struct _EditorApplicationWindow
@@ -40,11 +69,130 @@ struct _EditorApplicationWindow
   GtkWidget *lists_stack;
   GtkWidget *views_listbox;
   GtkWidget *metrics_listbox;
+  GtkWidget *text_switcher;
+  GtkWidget *text_stack;
   GtkWidget *vfl_text_area;
+  GtkWidget *log_text_area;
   GtkWidget *layout_box;
+
+  GHashTable *views;
+  GHashTable *metrics;
 };
 
 G_DEFINE_TYPE (EditorApplicationWindow, editor_application_window, GTK_TYPE_APPLICATION_WINDOW)
+
+static void
+add_view_button__clicked (EditorApplicationWindow *self)
+{
+  const char *current_list = gtk_stack_get_visible_child_name (GTK_STACK (self->lists_stack));
+
+  if (g_strcmp0 (current_list, "views") == 0)
+    {
+
+    }
+
+  if (g_strcmp0 (current_list, "metrics") == 0)
+    {
+
+    }
+}
+
+static void
+remove_view_button__clicked (EditorApplicationWindow *self)
+{
+
+}
+
+static void
+clear_view_button__clicked (EditorApplicationWindow *self)
+{
+
+}
+
+static void
+log_text_area_add_message (EditorApplicationWindow *self,
+                           const char              *message,
+                           gboolean                 is_error)
+{
+  GtkTextBuffer *buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self->log_text_area));
+
+  GtkTextIter end_iter;
+  gtk_text_buffer_get_end_iter (buffer, &end_iter);
+  if (is_error)
+    gtk_text_buffer_insert_with_tags_by_name (buffer, &end_iter, message, -1, "error", NULL);
+  else
+    gtk_text_buffer_insert (buffer, &end_iter, message, -1);
+
+  if (is_error)
+    {
+      GtkWidget *log_view = gtk_stack_get_child_by_name (GTK_STACK (self->text_stack), "log");
+      gtk_container_child_set (GTK_CONTAINER (self->text_stack), log_view,
+                               "needs-attention", TRUE,
+                               NULL);
+    }
+}
+
+static void
+vfl_text_area__changed (EditorApplicationWindow *self,
+                        GtkTextBuffer           *buffer)
+{
+  GtkTextIter start_iter, end_iter;
+
+  gtk_text_buffer_get_start_iter (buffer, &start_iter);
+  gtk_text_buffer_get_end_iter (buffer, &end_iter);
+
+  char *contents = gtk_text_buffer_get_text (buffer, &start_iter, &end_iter, FALSE);
+  char **lines = g_strsplit (contents, "\n", -1);
+
+  gboolean had_error = FALSE;
+
+  for (int i = 0; lines[i] != 0; i += 1)
+    {
+      const char *line = lines[i];
+      GError *error = NULL;
+
+      vfl_parser_parse_line (self->vfl_parser, line, -1, &error);
+      if (error != NULL)
+        {
+          int offset = vfl_parser_get_error_offset (self->vfl_parser);
+          int range = vfl_parser_get_error_range (self->vfl_parser);
+
+          char *squiggly = NULL;
+
+          if (range > 0)
+            {
+              squiggly = g_new0 (char, range + 1);
+              for (int s = 0; s < range - 1; s++)
+                squiggly[s] = '~';
+              squiggly[range] = '\0';
+            }
+
+          char *error_msg =
+            g_strdup_printf ("ERROR: line %d: %s\n"
+                             "%s\n"
+                             "%*s^%s\n",
+                             i + 1, error->message,
+                             line,
+                             offset, " ", squiggly != NULL ? squiggly : "");
+
+          g_free (squiggly);
+          g_error_free (error);
+
+          log_text_area_add_message (self, error_msg, TRUE);
+          g_free (error_msg);
+
+          had_error = TRUE;
+
+          break;
+        }
+    }
+
+  g_strfreev (lines);
+  g_free (contents);
+
+  if (!had_error)
+    log_text_area_add_message (self, _("Visual format parsed successfully"), FALSE);
+}
 
 static void
 editor_application_window_finalize (GObject *gobject)
@@ -70,7 +218,14 @@ editor_application_window_class_init (EditorApplicationWindowClass *klass)
   gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, views_listbox);
   gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, metrics_listbox);
   gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, vfl_text_area);
+  gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, log_text_area);
+  gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, text_switcher);
+  gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, text_stack);
   gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, layout_box);
+
+  gtk_widget_class_bind_template_callback (widget_class, add_view_button__clicked);
+  gtk_widget_class_bind_template_callback (widget_class, remove_view_button__clicked);
+  gtk_widget_class_bind_template_callback (widget_class, clear_view_button__clicked);
 }
 
 static void
@@ -79,6 +234,15 @@ editor_application_window_init (EditorApplicationWindow *self)
   gtk_widget_init_template (GTK_WIDGET (self));
 
   self->vfl_parser = vfl_parser_new (-1, -1, NULL, NULL);
+
+  g_signal_connect_swapped (gtk_text_view_get_buffer (GTK_TEXT_VIEW (self->vfl_text_area)),
+                            "changed", G_CALLBACK (vfl_text_area__changed),
+                            self);
+
+  GtkTextBuffer *log_buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (self->log_text_area));
+  gtk_text_buffer_create_tag (log_buffer, "error",
+                              "foreground-rgba", &(GdkRGBA) { 1.0, 0.0, 0.0, 1.0 },
+                              NULL);
 }
 
 G_DECLARE_FINAL_TYPE (EditorApplication, editor_application, EDITOR, APPLICATION, GtkApplication)

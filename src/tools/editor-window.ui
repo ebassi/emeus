@@ -25,7 +25,6 @@
               <object class="GtkStackSwitcher" id="lists_switcher">
                 <property name="halign">GTK_ALIGN_CENTER</property>
                 <property name="visible">True</property>
-                <property name="hexpand">True</property>
                 <property name="stack">lists_stack</property>
               </object>
             </child>
@@ -53,6 +52,36 @@
                 </child>
               </object>
             </child>
+            <child>
+              <object class="GtkToolbar" id="toolbar">
+                <property name="visible">True</property>
+                <property name="halign">GTK_ALIGN_CENTER</property>
+                <style>
+                  <class name="inline-toolbar"/>
+                </style>
+                <child>
+                  <object class="GtkToolButton" id="add_view_button">
+                    <property name="visible">True</property>
+                    <property name="icon-name">list-add-symbolic</property>
+                    <signal name="clicked" handler="add_view_button__clicked" object="EditorApplicationWindow" swapped="yes"/>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkToolButton" id="remove_view_button">
+                    <property name="visible">True</property>
+                    <property name="icon-name">list-remove-symbolic</property>
+                    <signal name="clicked" handler="remove_view_button__clicked" object="EditorApplicationWindow" swapped="yes"/>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkToolButton" id="clear_view_button">
+                    <property name="visible">True</property>
+                    <property name="icon-name">edit-clear-all-symbolic</property>
+                    <signal name="clicked" handler="clear_view_button__clicked" object="EditorApplicationWindow" swapped="yes"/>
+                  </object>
+                </child>
+              </object>
+            </child>
           </object>
           <packing>
             <property name="top_attach">0</property>
@@ -72,13 +101,54 @@
           </packing>
         </child>
         <child>
-          <object class="GtkScrolledWindow" id="scrolledwindow">
+          <object class="GtkBox" id="box1">
+            <property name="orientation">GTK_ORIENTATION_VERTICAL</property>
             <property name="visible">True</property>
             <child>
-              <object class="GtkTextView" id="vfl_text_area">
+              <object class="GtkStackSwitcher" id="text_switcher">
                 <property name="visible">True</property>
+                <property name="stack">text_stack</property>
                 <property name="hexpand">True</property>
-                <property name="vexpand">True</property>
+                <property name="halign">GTK_ALIGN_CENTER</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkStack" id="text_stack">
+                <property name="visible">True</property>
+                <child>
+                  <object class="GtkScrolledWindow" id="scrolledwindow1">
+                    <property name="visible">True</property>
+                    <child>
+                      <object class="GtkTextView" id="vfl_text_area">
+                        <property name="visible">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
+                        <property name="monospace">True</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="title" translatable="yes">Visual Format</property>
+                    <property name="name">vfl</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkScrolledWindow" id="scrolledwindow2">
+                    <property name="visible">True</property>
+                    <child>
+                      <object class="GtkTextView" id="log_text_area">
+                        <property name="visible">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="vexpand">True</property>
+                        <property name="monospace">True</property>
+                      </object>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="title" translatable="yes">Log</property>
+                    <property name="name">log</property>
+                  </packing>
+                </child>
               </object>
             </child>
           </object>
