@@ -230,6 +230,20 @@ log_text_area_add_message (EditorApplicationWindow *self,
 }
 
 static void
+text_stack__notify__visible_child_name (EditorApplicationWindow *self)
+{
+  const char *page_name = gtk_stack_get_visible_child_name (GTK_STACK (self->text_stack));
+
+  if (g_strcmp0 (page_name, "log") == 0)
+    {
+      GtkWidget *log_view = gtk_stack_get_child_by_name (GTK_STACK (self->text_stack), "log");
+      gtk_container_child_set (GTK_CONTAINER (self->text_stack), log_view,
+                               "needs-attention", FALSE,
+                               NULL);
+    }
+}
+
+static void
 vfl_text_area__changed (EditorApplicationWindow *self,
                         GtkTextBuffer           *buffer)
 {
@@ -353,6 +367,7 @@ editor_application_window_class_init (EditorApplicationWindowClass *klass)
   gtk_widget_class_bind_template_callback (widget_class, add_view_button__clicked);
   gtk_widget_class_bind_template_callback (widget_class, remove_view_button__clicked);
   gtk_widget_class_bind_template_callback (widget_class, clear_view_button__clicked);
+  gtk_widget_class_bind_template_callback (widget_class, text_stack__notify__visible_child_name);
 }
 
 static void

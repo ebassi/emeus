@@ -110,6 +110,7 @@
                 <property name="stack">text_stack</property>
                 <property name="hexpand">True</property>
                 <property name="halign">GTK_ALIGN_CENTER</property>
+                <signal name="notify::visible-child-name" handler="text_stack__notify__visible_child_name" object="EditorApplicationWindow" swapped="yes"/>
               </object>
             </child>
             <child>
