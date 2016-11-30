@@ -29,9 +29,9 @@ cc = meson.get_compiler('c')
 host_system = host_machine.system()
 
 conf = configuration_data()
-conf.set_quoted('PACKAGE_NAME', 'emeus')
+conf.set_quoted('PACKAGE_NAME', meson.project_name())
 conf.set_quoted('PACKAGE_VERSION', meson.project_version())
-conf.set_quoted('PACKAGE_STRING', 'emeus-' + meson.project_version())
+conf.set_quoted('PACKAGE_STRING', '@0@-@1@'.format(meson.project_name(), meson.project_version()))
 conf.set_quoted('PACKAGE_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
 conf.set_quoted('PACKAGE_LIBDIR', join_paths(get_option('prefix'), get_option('datadir')))
 conf.set_quoted('PACKAGE_LOCALE_DIR', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
@@ -156,6 +156,9 @@ gnome = import('gnome')
 
 subdir('src')
 subdir('examples')
+
+# We don't have translations, yet
+# subdir('po')
 
 if get_option('enable-gtk-doc')
   subdir('doc')
