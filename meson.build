@@ -157,8 +157,7 @@ gnome = import('gnome')
 subdir('src')
 subdir('examples')
 
-# We don't have translations, yet
-# subdir('po')
+subdir('po')
 
 if get_option('enable-gtk-doc')
   subdir('doc')
