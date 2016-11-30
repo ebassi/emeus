@@ -173,6 +173,7 @@ struct _EditorApplicationWindow
 
   VflParser *vfl_parser;
 
+  GtkWidget *header_bar;
   GtkWidget *lists_switcher;
   GtkWidget *lists_stack;
   GtkWidget *views_listbox;
@@ -192,6 +193,20 @@ struct _EditorApplicationWindow
 };
 
 G_DEFINE_TYPE (EditorApplicationWindow, editor_application_window, GTK_TYPE_APPLICATION_WINDOW)
+
+static void
+editor_application_window_toggle_selection (EditorApplicationWindow *self)
+{
+  self->in_selection = !self->in_selection;
+
+  gtk_widget_set_visible (self->add_view_button, !self->in_selection);
+  gtk_widget_set_visible (self->remove_view_button, self->in_selection);
+
+  if (self->in_selection)
+    gtk_style_context_add_class (gtk_widget_get_style_context (self->header_bar), "selection-mode");
+  else
+    gtk_style_context_remove_class (gtk_widget_get_style_context (self->header_bar), "selection-mode");
+}
 
 static void
 add_view_button__clicked (EditorApplicationWindow *self)
@@ -262,12 +277,7 @@ remove_view_button__clicked (EditorApplicationWindow *self)
 
       /* If we removed all children, we exit the selection state */
       if (n_removed == n_children)
-        {
-          self->in_selection = FALSE;
-
-          gtk_widget_set_visible (self->add_view_button, !self->in_selection);
-          gtk_widget_set_visible (self->remove_view_button, self->in_selection);
-        }
+        editor_application_window_toggle_selection (self);
     }
 
   if (g_strcmp0 (current_list, "metrics") == 0)
@@ -281,7 +291,7 @@ select_view_button__clicked (EditorApplicationWindow *self)
 {
   const char *current_list = gtk_stack_get_visible_child_name (GTK_STACK (self->lists_stack));
 
-  self->in_selection = !self->in_selection;
+  editor_application_window_toggle_selection (self);
 
   if (g_strcmp0 (current_list, "views") == 0)
     {
@@ -291,9 +301,6 @@ select_view_button__clicked (EditorApplicationWindow *self)
         view_list_row_set_selectable (l->data, self->in_selection);
 
       g_list_free (children);
-
-      gtk_widget_set_visible (self->add_view_button, !self->in_selection);
-      gtk_widget_set_visible (self->remove_view_button, self->in_selection);
     }
 }
 
@@ -457,6 +464,7 @@ editor_application_window_class_init (EditorApplicationWindowClass *klass)
   gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, layout_box);
   gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, add_view_button);
   gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, remove_view_button);
+  gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, header_bar);
 
   gtk_widget_class_bind_template_callback (widget_class, add_view_button__clicked);
   gtk_widget_class_bind_template_callback (widget_class, remove_view_button__clicked);
