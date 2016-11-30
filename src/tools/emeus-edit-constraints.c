@@ -36,9 +36,12 @@ struct _ViewListRow
 {
   GtkListBoxRow parent_instance;
 
+  GtkWidget *select_check;
   GtkWidget *name_entry;
   GtkWidget *color_chooser;
   GtkWidget *view_widget;
+
+  gboolean is_selected : 1;
 };
 
 G_DEFINE_TYPE (ViewListRow, view_list_row, GTK_TYPE_LIST_BOX_ROW)
@@ -62,6 +65,13 @@ view_widget__draw (GtkWidget   *area,
 }
 
 static void
+select_check__toggled (GtkToggleButton *check_button,
+                       ViewListRow     *self)
+{
+  self->is_selected = gtk_toggle_button_get_active (check_button);
+}
+
+static void
 view_list_row_dispose (GObject *gobject)
 {
   ViewListRow *self = VIEW_LIST_ROW (gobject);
@@ -82,6 +92,7 @@ view_list_row_class_init (ViewListRowClass *klass)
 
   gtk_widget_class_set_template_from_resource (widget_class, "/com/endlessm/EmeusEditor/view-list-row.ui");
 
+  gtk_widget_class_bind_template_child (widget_class, ViewListRow, select_check);
   gtk_widget_class_bind_template_child (widget_class, ViewListRow, name_entry);
   gtk_widget_class_bind_template_child (widget_class, ViewListRow, color_chooser);
 }
@@ -90,6 +101,8 @@ static void
 view_list_row_init (ViewListRow *self)
 {
   gtk_widget_init_template (GTK_WIDGET (self));
+
+  g_signal_connect (self->select_check, "toggled", G_CALLBACK (select_check__toggled), self);
 
   char *tmp_name = g_strdup_printf ("view%d", last_view_id++);
   gtk_entry_set_text (GTK_ENTRY (self->name_entry), tmp_name);
@@ -108,6 +121,19 @@ view_list_row_init (ViewListRow *self)
   };
 
   gtk_color_chooser_set_rgba (GTK_COLOR_CHOOSER (self->color_chooser), &color);
+}
+
+static void
+view_list_row_set_selectable (ViewListRow *self,
+                              gboolean     selectable)
+{
+  /* Reset the check button state */
+  gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (self->select_check), FALSE);
+
+  if (selectable)
+    gtk_widget_show (self->select_check);
+  else
+    gtk_widget_hide (self->select_check);
 }
 
 #if 0
@@ -156,9 +182,13 @@ struct _EditorApplicationWindow
   GtkWidget *vfl_text_area;
   GtkWidget *log_text_area;
   GtkWidget *layout_box;
+  GtkWidget *add_view_button;
+  GtkWidget *remove_view_button;
 
   GHashTable *views;
   GHashTable *metrics;
+
+  gboolean in_selection : 1;
 };
 
 G_DEFINE_TYPE (EditorApplicationWindow, editor_application_window, GTK_TYPE_APPLICATION_WINDOW)
@@ -196,13 +226,75 @@ add_view_button__clicked (EditorApplicationWindow *self)
 static void
 remove_view_button__clicked (EditorApplicationWindow *self)
 {
+  const char *current_list = gtk_stack_get_visible_child_name (GTK_STACK (self->lists_stack));
+  GList *removed_children = NULL;
 
+  if (g_strcmp0 (current_list, "views") == 0)
+    {
+      GList *children = gtk_container_get_children (GTK_CONTAINER (self->views_listbox));
+      int n_children = 0, n_removed = 0;
+
+      for (GList *l = children; l != NULL; l = l->next)
+        {
+          ViewListRow *row = l->data;
+
+          n_children += 1;
+
+          if (gtk_toggle_button_get_active (GTK_TOGGLE_BUTTON (row->select_check)))
+            removed_children = g_list_prepend (removed_children, row);
+        }
+
+      g_list_free (children);
+
+      for (GList *l = removed_children; l != NULL; l = l->next)
+        {
+          ViewListRow *row = l->data;
+
+          n_removed += 1;
+
+          g_debug ("*** Removed view '%s' (widget: %p)",
+                  gtk_entry_get_text (GTK_ENTRY (row->name_entry)),
+                  row->view_widget);
+          gtk_container_remove (GTK_CONTAINER (self->views_listbox), l->data);
+        }
+
+      g_list_free (removed_children);
+
+      /* If we removed all children, we exit the selection state */
+      if (n_removed == n_children)
+        {
+          self->in_selection = FALSE;
+
+          gtk_widget_set_visible (self->add_view_button, !self->in_selection);
+          gtk_widget_set_visible (self->remove_view_button, self->in_selection);
+        }
+    }
+
+  if (g_strcmp0 (current_list, "metrics") == 0)
+    {
+
+    }
 }
 
 static void
-clear_view_button__clicked (EditorApplicationWindow *self)
+select_view_button__clicked (EditorApplicationWindow *self)
 {
+  const char *current_list = gtk_stack_get_visible_child_name (GTK_STACK (self->lists_stack));
 
+  self->in_selection = !self->in_selection;
+
+  if (g_strcmp0 (current_list, "views") == 0)
+    {
+      GList *children = gtk_container_get_children (GTK_CONTAINER (self->views_listbox));
+
+      for (GList *l = children; l != NULL; l = l->next)
+        view_list_row_set_selectable (l->data, self->in_selection);
+
+      g_list_free (children);
+
+      gtk_widget_set_visible (self->add_view_button, !self->in_selection);
+      gtk_widget_set_visible (self->remove_view_button, self->in_selection);
+    }
 }
 
 static void
@@ -363,10 +455,12 @@ editor_application_window_class_init (EditorApplicationWindowClass *klass)
   gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, text_switcher);
   gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, text_stack);
   gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, layout_box);
+  gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, add_view_button);
+  gtk_widget_class_bind_template_child (widget_class, EditorApplicationWindow, remove_view_button);
 
   gtk_widget_class_bind_template_callback (widget_class, add_view_button__clicked);
   gtk_widget_class_bind_template_callback (widget_class, remove_view_button__clicked);
-  gtk_widget_class_bind_template_callback (widget_class, clear_view_button__clicked);
+  gtk_widget_class_bind_template_callback (widget_class, select_view_button__clicked);
   gtk_widget_class_bind_template_callback (widget_class, text_stack__notify__visible_child_name);
 }
 

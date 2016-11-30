@@ -44,6 +44,7 @@
                 <child>
                   <object class="GtkListBox" id="metrics_listbox">
                     <property name="visible">True</property>
+                    <property name="border-width">2</property>
                   </object>
                   <packing>
                     <property name="name">metrics</property>
@@ -53,32 +54,54 @@
               </object>
             </child>
             <child>
-              <object class="GtkToolbar" id="toolbar">
+              <object class="GtkBox" id="controls_box">
                 <property name="visible">True</property>
-                <property name="halign">GTK_ALIGN_CENTER</property>
-                <style>
-                  <class name="inline-toolbar"/>
-                </style>
+                <property name="halign">GTK_ALIGN_FILL</property>
+                <property name="border-width">2</property>
                 <child>
-                  <object class="GtkToolButton" id="add_view_button">
+                  <object class="GtkButton" id="add_view_button">
                     <property name="visible">True</property>
-                    <property name="icon-name">list-add-symbolic</property>
+                    <child>
+                      <object class="GtkImage" id="add_view_image">
+                        <property name="icon-name">list-add-symbolic</property>
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
                     <signal name="clicked" handler="add_view_button__clicked" object="EditorApplicationWindow" swapped="yes"/>
                   </object>
+                  <packing>
+                    <property name="pack_type">GTK_PACK_START</property>
+                  </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton" id="remove_view_button">
-                    <property name="visible">True</property>
-                    <property name="icon-name">list-remove-symbolic</property>
+                  <object class="GtkButton" id="remove_view_button">
+                    <property name="visible">False</property>
+                    <child>
+                      <object class="GtkImage" id="remove_view_image">
+                        <property name="icon-name">list-remove-symbolic</property>
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
                     <signal name="clicked" handler="remove_view_button__clicked" object="EditorApplicationWindow" swapped="yes"/>
                   </object>
+                  <packing>
+                    <property name="pack_type">GTK_PACK_START</property>
+                  </packing>
                 </child>
                 <child>
-                  <object class="GtkToolButton" id="clear_view_button">
+                  <object class="GtkButton" id="select_view_button">
                     <property name="visible">True</property>
-                    <property name="icon-name">edit-clear-all-symbolic</property>
-                    <signal name="clicked" handler="clear_view_button__clicked" object="EditorApplicationWindow" swapped="yes"/>
+                    <child>
+                      <object class="GtkImage" id="select_view_image">
+                        <property name="icon-name">object-select-symbolic</property>
+                        <property name="visible">True</property>
+                      </object>
+                    </child>
+                    <signal name="clicked" handler="select_view_button__clicked" object="EditorApplicationWindow" swapped="yes"/>
                   </object>
+                  <packing>
+                    <property name="pack_type">GTK_PACK_END</property>
+                  </packing>
                 </child>
               </object>
             </child>
@@ -90,10 +113,15 @@
           </packing>
         </child>
         <child>
-          <object class="EmeusConstraintLayout" id="layout_box">
+          <object class="GtkFrame" id="frame1">
             <property name="visible">True</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
+            <child>
+              <object class="EmeusConstraintLayout" id="layout_box">
+                <property name="visible">True</property>
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+              </object>
+            </child>
           </object>
           <packing>
             <property name="top_attach">0</property>
@@ -116,6 +144,7 @@
             <child>
               <object class="GtkStack" id="text_stack">
                 <property name="visible">True</property>
+                <property name="border-width">2</property>
                 <child>
                   <object class="GtkScrolledWindow" id="scrolledwindow1">
                     <property name="visible">True</property>

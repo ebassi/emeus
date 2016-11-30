@@ -3,24 +3,41 @@
   <template class="ViewListRow" parent="GtkListBoxRow">
     <property name="visible">True</property>
     <property name="can-focus">True</property>
+    <property name="halign">GTK_ALIGN_FILL</property>
     <child>
       <object class="GtkBox" id="box1">
         <property name="visible">True</property>
         <property name="orientation">GTK_ORIENTATION_HORIZONTAL</property>
+        <property name="spacing">6</property>
+        <child>
+          <object class="GtkColorButton" id="color_chooser">
+            <property name="visible">True</property>
+            <property name="use-alpha">False</property>
+            <property name="halign">GTK_ALIGN_START</property>
+          </object>
+          <packing>
+            <property name="pack_type">GTK_PACK_START</property>
+          </packing>
+        </child>
         <child>
           <object class="GtkEntry" id="name_entry">
             <property name="halign">GTK_ALIGN_START</property>
             <property name="visible">True</property>
             <property name="width-chars">20</property>
+            <property name="can-focus">True</property>
             <property name="placeholder-text" translatable="yes">Enter the view name…</property>
           </object>
+          <packing>
+            <property name="pack_type">GTK_PACK_START</property>
+          </packing>
         </child>
         <child>
-          <object class="GtkColorButton" id="color_chooser">
-            <property name="visible">True</property>
-            <property name="use-alpha">False</property>
-            <property name="halign">GTK_ALIGN_END</property>
+          <object class="GtkCheckButton" id="select_check">
+            <property name="visible">False</property>
           </object>
+          <packing>
+            <property name="pack_type">GTK_PACK_END</property>
+          </packing>
         </child>
       </object>
     </child>
