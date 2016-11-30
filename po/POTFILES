@@ -1,1 +1,4 @@
+src/tools/com.endlessm.EmeusEditor.desktop.in.in
+src/tools/editor-window.ui
 src/tools/emeus-edit-constraints.c
+src/tools/view-list-row.ui

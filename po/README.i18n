@@ -1,0 +1,30 @@
+# How to add a translation for Emeus
+
+In order to add a translation, you need to take the `emeus.pot` file and
+turn it into the `.po` file for your locale; the most direct way is to
+just copy it, e.g.
+
+    # For the Italian (it) translation
+    cp po/emeus.pot po/it.po
+
+In order for the build to pick the new file up, you'll have to modify
+the `po/meson.build` file, and add your language to the list of available
+ones, for instance:
+
+     langs = [
+       'en_GB',
+    +  'it'',
+     ]
+
+Now edit the newly added translation file and commit it to the repository
+when done.
+
+# Regenerating the POT file
+
+Run the `ninja emeus-pot` command, which will re-scan all the files
+listed in the POTFILES file for translatable strings.
+
+# Updating existing translations
+
+Run the `ninja emeus-update-po` command, which will update the PO files
+for all the listed languages with the contents of the POT file.

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: emeus\n"
 "Report-Msgid-Bugs-To: https://github.com/ebassi/emeus/issues/new\n"
-"POT-Creation-Date: 2016-11-30 17:29+0000\n"
+"POT-Creation-Date: 2016-11-30 17:41+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,46 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: src/tools/com.endlessm.EmeusEditor.desktop.in.in:3
+msgid "Emeus Editor"
+msgstr ""
+
+#: src/tools/com.endlessm.EmeusEditor.desktop.in.in:4
+msgid "Editor for Emeus constraints"
+msgstr ""
+
+#: src/tools/com.endlessm.EmeusEditor.desktop.in.in:10
+msgid "view-fullscreen-symbolic"
+msgstr ""
+
+#: src/tools/com.endlessm.EmeusEditor.desktop.in.in:11
+msgid "Build;Develop;Editor;"
+msgstr ""
+
+#: src/tools/editor-window.ui:11
+msgid "Constraints Editor"
+msgstr ""
+
+#: src/tools/editor-window.ui:41
+msgid "Views"
+msgstr ""
+
+#: src/tools/editor-window.ui:51
+msgid "Metrics"
+msgstr ""
+
+#: src/tools/editor-window.ui:161
+msgid "Visual Format"
+msgstr ""
+
+#: src/tools/editor-window.ui:178
+msgid "Log"
+msgstr ""
+
 #: src/tools/emeus-edit-constraints.c:406
 msgid "Visual format parsed successfully\n"
+msgstr ""
+
+#: src/tools/view-list-row.ui:28
+msgid "Enter the view name…"
 msgstr ""
