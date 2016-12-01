@@ -112,3 +112,5 @@ exec ${MESON} \
 	--mandir=${mandir} \
 	-Denable-gtk-doc=false \
 	${srcdir}
+
+# vim: ai ts=8 noet sts=2 ft=sh
