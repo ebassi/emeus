@@ -62,7 +62,7 @@ while (($# > 0)); do
 done
 
 # Defaults
-test -z ${prefix} && prefix=/usr
+test -z ${prefix} && prefix="/usr/local"
 test -z ${bindir} && bindir=${prefix}/bin
 test -z ${sbindir} && sbindir=${prefix}/sbin
 test -z ${libexecdir} && libexecdir=${prefix}/bin
