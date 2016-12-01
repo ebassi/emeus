@@ -4,22 +4,26 @@
 # Copyright 2016 Emmanuele Bassi
 # Licensed under the new-BSD license (http://www.opensource.org/licenses/bsd-license.php)
 
-MESON=`which meson`
-NINJA=`which ninja`
+MESON=$(which meson 2>/dev/null)
 
 if test -z ${MESON}; then
   echo "*** You must install meson to build this project"
   exit 1
 fi
 
-if test -z ${NINJA}; then
-  # Some distributions rename the Ninja binary to avoid a namespace
-  # conflict with another "ninja" application
-  NINJA=`which ninja-build`
-  if test -z ${NINJA}; then
-    echo "*** You must install ninja to build this project"
-    exit 1
+# Some distributions rename the Ninja binary to avoid a namespace
+# conflict with another "ninja" application
+NINJA=
+for ninja in "ninja ninja-build"; do
+  ninja_bin=$(which ${ninja} 2>/dev/null)
+  if test -x ${ninja_bin}; then
+    NINJA=${ninja_bin}
   fi
+done
+
+if test -z ${NINJA}; then
+  echo "*** You must install ninja to build this project"
+  exit 1
 fi
 
 # Little helper function for reading args from the commandline.
@@ -84,6 +88,8 @@ install:
 END
 
 echo "Summary:"
+echo "  meson:....... ${MESON}"
+echo "  ninja:....... ${NINJA}"
 echo "  prefix:...... ${prefix}"
 echo "  bindir:...... ${bindir}"
 echo "  sbindir:..... ${sbindir}"
