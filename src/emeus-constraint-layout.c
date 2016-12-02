@@ -307,10 +307,12 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
 static void
 emeus_constraint_layout_get_preferred_size (EmeusConstraintLayout *self,
                                             GtkOrientation         orientation,
+                                            int                    for_size,
                                             int                   *minimum_p,
                                             int                   *natural_p)
 {
   Variable *size = NULL;
+  Variable *opposite_size = NULL;
 
   if (g_sequence_is_empty (self->children))
     {
@@ -327,24 +329,53 @@ emeus_constraint_layout_get_preferred_size (EmeusConstraintLayout *self,
     {
     case GTK_ORIENTATION_HORIZONTAL:
       size = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
+      opposite_size = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
       break;
 
     case GTK_ORIENTATION_VERTICAL:
       size = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
+      opposite_size = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
       break;
     }
 
   g_assert (size != NULL);
+  g_assert (opposite_size != NULL);
 
-  DEBUG (g_debug ("layout %p preferred %s size: %.3f",
+  /* We impose new temporary stay constraints on the size and its opposite,
+   * with a low priority so that the solver will revert to the preferred
+   * size of the layout for the duration of this function.
+   *
+   * The strength is (WEAK + 1) because it has to override the WEAK strength
+   * stay constraints we add to the layout inside the instance initialization
+   * function, whose job is to keep the layout origin and size greather than
+   * or equal to zero. If we used the same priority, the solver would be in
+   * an unstable state, and randomly fall back to a preferred size of 0.
+   */
+  variable_set_value (size, 0.0);
+
+  Constraint *stay_s =
+    simplex_solver_add_stay_variable (&self->solver, size, STRENGTH_WEAK + 1);
+
+  variable_set_value (opposite_size, for_size > 0 ? for_size : 0.0);
+
+  Constraint *stay_o =
+    simplex_solver_add_stay_variable (&self->solver, opposite_size, STRENGTH_WEAK + 1);
+
+  DEBUG (g_debug ("layout %p preferred %s size: %.3f (for opposite size: %d)",
                   self,
                   orientation == GTK_ORIENTATION_HORIZONTAL ? "horizontal" : "vertical",
-                  variable_get_value (size)));
+                  variable_get_value (size),
+                  for_size));
+
+  double value = variable_get_value (size);
+
+  simplex_solver_remove_constraint (&self->solver, stay_s);
+  simplex_solver_remove_constraint (&self->solver, stay_o);
 
   if (minimum_p != NULL)
-    *minimum_p = variable_get_value (size);
+    *minimum_p = value;
   if (natural_p != NULL)
-    *natural_p = variable_get_value (size);
+    *natural_p = value;
 }
 
 static void
@@ -354,6 +385,7 @@ emeus_constraint_layout_get_preferred_width (GtkWidget *widget,
 {
   emeus_constraint_layout_get_preferred_size (EMEUS_CONSTRAINT_LAYOUT (widget),
                                               GTK_ORIENTATION_HORIZONTAL,
+                                              -1.0,
                                               minimum_p, natural_p);
 }
 
@@ -364,6 +396,31 @@ emeus_constraint_layout_get_preferred_height (GtkWidget *widget,
 {
   emeus_constraint_layout_get_preferred_size (EMEUS_CONSTRAINT_LAYOUT (widget),
                                               GTK_ORIENTATION_VERTICAL,
+                                              -1.0,
+                                              minimum_p, natural_p);
+}
+
+static void
+emeus_constraint_layout_get_preferred_width_for_height (GtkWidget *widget,
+                                                        int        height,
+                                                        int       *minimum_p,
+                                                        int       *natural_p)
+{
+  emeus_constraint_layout_get_preferred_size (EMEUS_CONSTRAINT_LAYOUT (widget),
+                                              GTK_ORIENTATION_HORIZONTAL,
+                                              height,
+                                              minimum_p, natural_p);
+}
+
+static void
+emeus_constraint_layout_get_preferred_height_for_width (GtkWidget *widget,
+                                                        int        width,
+                                                        int       *minimum_p,
+                                                        int       *natural_p)
+{
+  emeus_constraint_layout_get_preferred_size (EMEUS_CONSTRAINT_LAYOUT (widget),
+                                              GTK_ORIENTATION_VERTICAL,
+                                              width,
                                               minimum_p, natural_p);
 }
 
@@ -924,6 +981,8 @@ emeus_constraint_layout_class_init (EmeusConstraintLayoutClass *klass)
 
   widget_class->get_preferred_width = emeus_constraint_layout_get_preferred_width;
   widget_class->get_preferred_height = emeus_constraint_layout_get_preferred_height;
+  widget_class->get_preferred_width_for_height = emeus_constraint_layout_get_preferred_width_for_height;
+  widget_class->get_preferred_height_for_width = emeus_constraint_layout_get_preferred_height_for_width;
   widget_class->size_allocate = emeus_constraint_layout_size_allocate;
   widget_class->draw = emeus_constraint_layout_draw;
   widget_class->destroy = emeus_constraint_layout_destroy;
