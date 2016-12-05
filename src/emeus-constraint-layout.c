@@ -669,24 +669,89 @@ emeus_constraint_layout_add (GtkContainer *container,
 }
 
 static void
+remove_constraints_from_widget (GHashTable *constraints,
+                                GtkWidget  *widget)
+{
+  GHashTableIter iter;
+  gpointer key;
+
+  g_return_if_fail (GTK_IS_WIDGET (widget));
+
+  if (constraints == NULL)
+    return;
+
+  g_hash_table_iter_init (&iter, constraints);
+  while (g_hash_table_iter_next (&iter, &key, NULL))
+    {
+      EmeusConstraint *constraint = key;
+      GtkWidget *real_target = constraint->target_object;
+
+      if (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (real_target))
+          real_target = gtk_bin_get_child (GTK_BIN (real_target));
+
+      if (constraint->source_object == widget || real_target == widget)
+        {
+          emeus_constraint_detach (constraint);
+          g_hash_table_iter_remove (&iter);
+        }
+    }
+}
+
+static void
 emeus_constraint_layout_remove (GtkContainer *container,
                                 GtkWidget    *widget)
 {
   EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (container);
-  EmeusConstraintLayoutChild *child;
+  EmeusConstraintLayoutChild *layout_child;
+  GtkWidget *child;
+  GSequenceIter *iter;
   gboolean was_visible;
 
-  child = EMEUS_CONSTRAINT_LAYOUT_CHILD (widget);
-  if (g_sequence_iter_get_sequence (child->iter) != self->children)
+  if (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (widget))
     {
-      g_critical ("Tried to remove non child %p", widget);
+      layout_child = EMEUS_CONSTRAINT_LAYOUT_CHILD (widget);
+      child = gtk_bin_get_child (GTK_BIN (widget));
+    }
+  else
+    {
+      GtkWidget *parent = gtk_widget_get_parent (widget);
+
+      if (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (parent))
+        {
+          layout_child = EMEUS_CONSTRAINT_LAYOUT_CHILD (parent);
+          child = widget;
+        }
+      else
+        {
+          g_critical ("Attempting to remove widget '%s' but "
+                      "it's not a child of the layout",
+                      G_OBJECT_TYPE_NAME (widget));
+          return;
+        }
+    }
+
+  if (g_sequence_iter_get_sequence (layout_child->iter) != self->children)
+    {
+      g_critical ("Tried to remove non child %p", layout_child);
       return;
     }
 
-  was_visible = gtk_widget_get_visible (widget);
+  /* Remove layout constraints */
+  remove_constraints_from_widget (self->constraints, child);
 
-  gtk_widget_unparent (widget);
-  g_sequence_remove (child->iter);
+  /* Remove other children constraints */
+  iter = g_sequence_get_begin_iter (self->children);
+  while (!g_sequence_iter_is_end (iter))
+    {
+      EmeusConstraintLayoutChild *other = g_sequence_get (iter);
+      remove_constraints_from_widget (other->constraints, child);
+      iter = g_sequence_iter_next (iter);
+    }
+
+  was_visible = gtk_widget_get_visible (GTK_WIDGET (layout_child));
+
+  gtk_widget_unparent (GTK_WIDGET (layout_child));
+  g_sequence_remove (layout_child->iter);
 
   if (was_visible && gtk_widget_get_visible (GTK_WIDGET (container)))
     gtk_widget_queue_resize (GTK_WIDGET (container));
