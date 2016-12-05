@@ -777,9 +777,9 @@ simplex_solver_pivot (SimplexSolver *solver,
     return;
 
   if (entry_var == NULL)
-    g_critical ("No entry variable for pivot");
+    g_critical ("INTERNAL: No entry variable for pivot");
   if (exit_var == NULL)
-    g_critical ("No exit variable for pivot");
+    g_critical ("INTERNAL: No exit variable for pivot");
 
   expr = simplex_solver_remove_row (solver, exit_var);
   expression_change_subject (expr, exit_var, entry_var);
@@ -876,7 +876,7 @@ simplex_solver_optimize (SimplexSolver *solver,
 
       if (min_ratio == DBL_MAX)
         {
-          g_critical ("Unbounded objective variable during optimization");
+          g_debug ("Unbounded objective variable during optimization");
           break;
         }
 
@@ -1177,7 +1177,7 @@ simplex_solver_delta_edit_constant (SimplexSolver *solver,
   column_set = g_hash_table_lookup (solver->columns, minus_error_var);
   if (column_set == NULL)
     {
-      g_critical ("Columns are unset during delta edit");
+      g_critical ("INTERNAL: Columns are unset during delta edit");
       return;
     }
 
@@ -1289,7 +1289,7 @@ simplex_solver_choose_subject (SimplexSolver *solver,
 
   if (!approx_val (expression->constant, 0.0))
     {
-      g_critical ("Unable to satisfy required constraint (choose_subject)");
+      g_debug ("Unable to satisfy required constraint (choose_subject)");
       return NULL;
     }
 
@@ -1354,7 +1354,7 @@ simplex_solver_add_with_artificial_variable (SimplexSolver *solver,
       simplex_solver_remove_column (solver, av);
       simplex_solver_remove_row (solver, az);
 
-      g_critical ("Unable to satisfy a required constraint (add): %s", str);
+      g_debug ("Unable to satisfy a required constraint (add): %s", str);
 
       g_free (str);
 

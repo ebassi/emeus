@@ -379,6 +379,8 @@ emeus_solver_buttons (void)
                                  b2.width, OPERATOR_TYPE_EQ, expression_new_from_constant (113.0),
                                  STRENGTH_STRONG);
 
+  g_test_message ("right_limit := 0 (preferred size)");
+
   {
     char *b1_s = button_to_string (&b1);
     char *b2_s = button_to_string (&b2);
@@ -478,6 +480,33 @@ emeus_solver_buttons (void)
   emeus_assert_almost_equals (variable_get_value (right_limit), 600.0);
 
   simplex_solver_remove_constraint (&solver, stay);
+
+  g_test_message ("right_limit := 0 (preferred size, again)");
+
+  simplex_solver_add_edit_variable (&solver, right_limit, STRENGTH_WEAK);
+  simplex_solver_begin_edit (&solver);
+  simplex_solver_suggest_value (&solver, right_limit, 0);
+  simplex_solver_resolve (&solver);
+
+  {
+    char *b1_s = button_to_string (&b1);
+    char *b2_s = button_to_string (&b2);
+    char *l_s = variable_to_string (left_limit);
+    char *r_s = variable_to_string (right_limit);
+
+    g_test_message ("b1 := %s, b2 := %s, left := %s, right := %s", b1_s, b2_s, l_s, r_s);
+
+    g_free (b1_s);
+    g_free (b2_s);
+    g_free (l_s);
+    g_free (r_s);
+  }
+
+  emeus_assert_almost_equals (variable_get_value (b1.left), 50.0);
+  emeus_assert_almost_equals (variable_get_value (b1.width), 113.0);
+  emeus_assert_almost_equals (variable_get_value (b2.left), 263.0);
+  emeus_assert_almost_equals (variable_get_value (b2.width), 113.0);
+  emeus_assert_almost_equals (variable_get_value (right_limit), 426.0);
 
   simplex_solver_clear (&solver);
 }
