@@ -23,6 +23,151 @@
  *
  * #EmeusConstraintLayout is a #GtkContainter that uses constraints
  * associated to each of its children to decide their layout.
+ *
+ * # How do constraints work
+ *
+ * Constraints are objects defining the relationship between attributes
+ * of a widget; you can read the description of the #EmeusConstraint
+ * class to have a more in depth definition.
+ *
+ * By taking multiple constraints and applying them to the children of
+ * an #EmeusConstraintLayout, it's possible to describe complex layout
+ * policies; each constraint applied to a child or to the layout itself
+ * contributes to the full description of the layout, in terms of
+ * parameters for resolving the value of each attribute.
+ *
+ * It is important to note that a layout is defined by the totality of
+ * constraints; removing a child, or a constraint, from an existing layout
+ * without changing the remaining constraints may result in a layout that
+ * cannot be solved.
+ *
+ * Constraints have an implicit "reading order"; you should start describing
+ * each edge of each child, as well as their relationship with the parent
+ * container, from the top left (or top right, in RTL languages), horizontally
+ * first, and then vertically.
+ *
+ * A constraint-based layout with too few constraints can become "unstable",
+ * that is: have more than one solution. The behavior of an unstable layout
+ * is undefined.
+ *
+ * A constraint-based layout with conflicting constraints may be unsolvable,
+ * and lead to an unstable layout.
+ *
+ * # Adding and removing widgets
+ *
+ * #EmeusConstraintLayout accepts only one type of widget as its direct
+ * child, #EmeusConstraintLayoutChild. As a convenience for the developer,
+ * #EmeusConstraintLayout will automatically add an #EmeusConstraintLayoutChild
+ * for any other widget type when calling emeus_constraint_layout_pack() or
+ * gtk_container_add().
+ *
+ * Similarly, when removing a #GtkWidget from an #EmeusConstraintLayout,
+ * the container will remove the intermediate #EmeusConstraintLayoutChild
+ * that was added automatically.
+ *
+ * When iterating over the children of #EmeusConstraintLayout, you will
+ * get only #EmeusConstraintLayoutChild instances; use gtk_bin_get_child()
+ * to retrieve the grandchild of the layout.
+ *
+ * # Describing constraints using GtkBuilder
+ *
+ * When creating an #EmeusConstraintLayout layout with GtkBuilder, it
+ * can be simpler to also load constraints directly from the UI definition
+ * file.
+ *
+ * #EmeusConstraintLayout implements the #GtkBuildable interface, and
+ * adds the `constraints` tag, which contains `constraint` elements.
+ *
+ * The `constraint` element has various attributes:
+ *
+ *  - `target-object`, used to point to a widget using its builder id; this
+ *    attribute is mandatory, and specifies the value of the
+ *    #EmeusConstraint:target-object property
+ *  - `target-attr`, which contains an %EmeusConstraintAttribute value; this
+ *    attribute is mandatory, and specifies the value of the
+ *    #EmeusConstraint:taregt-attribute property
+ *  - `source-object`, used to point to a widget using its builder id; this
+ *    attribute is optional, for constant constraints, and specifies the value
+ *    of the #EmeusConstraint:source-object property
+ *  - `source-attr`, which contains an %EmeusConstraintAttribute value; this
+ *    attribute is optional, for constant constraints, and specifies the value
+ *    of the #EmeusConstraint:source-attribute property
+ *  - `relation`, which contains an %EmeusConstraintRelation value; this
+ *    attribute is optional, and if not found the relation will be
+ *    %EMEUS_CONSTRAINT_RELATION_EQ
+ *  - `constant`, which contains the constant factor value as a floating point
+ *    numer; this attribute is optional, and if not found the constant will
+ *    be set to 0
+ *  - `multiplier`, which contains the multiplication factor value as a
+ *    floating point number; this attribute is option, and if not found the
+ *    multiplier will be set to 1
+ *  - `strength`, which contains an %EmeusConstraintStrength value, or a positive
+ *   integer; this attribute is optional, and if not found the strength will
+ *   be %EMEUS_CONSTRAINT_STRENGTH_REQUIRED
+ *
+ * A simple layout definitions is:
+ *
+ * |[<!-- language="plain" -->
+ * <object class="EmeusConstraintLayout" id="layout">
+ *   <property name="visible">True</property>
+ *   <child>
+ *     <object class="GtkButton" id="button1">
+ *     ...
+ *     </object>
+ *   </child>
+ *   <child>
+ *     <object class="GtkButton" id="button2">
+ *     ...
+ *     </object>
+ *   </child>
+ *   <constraints>
+ *     <constraint target-object="button1"
+ *                 target-attr="width"
+ *                 relation="EMEUS_CONSTRAINT_RELATION_GE"
+ *                 constant="250"
+ *                 strength="EMEUS_CONSTRAINT_STRENGTH_STRONG"/>
+ *     <constraint target-object="button2"
+ *                 target-attr="width"
+ *                 relation="EMEUS_CONSTRAINT_RELATION_EQ"
+ *                 source-object="button1"
+ *                 source-attr="width"/>
+ *     ...
+ *   </constraints>
+ * </object>
+ * ]|
+ *
+ * # Describing constraints using the Visual Format Language
+ *
+ * While it's entirely possible to describe layouts by writing constraints
+ * by hand, it can be tedious to do so. Additionally, writing constraints
+ * by hand may lead to forgetting one or more of them, thus causing the
+ * layout to be unstable or incomplete; or to add conflicting constraints,
+ * thus causing the layout to be unsolvable.
+ *
+ * In order to quickly visualize, and generate, constraints for a layout,
+ * Emeus implements a Visual Format language. Each row and column of a
+ * layout can be described by the VFL, and translated into constraints to
+ * be applied on top of a #EmeusConstraintLayout and its children. Once
+ * the layout has been established, it's also possible to impose new
+ * constraints for additional layout rules.
+ *
+ * A simple VFL description of a layout is:
+ *
+ * |[<!-- language="plain" -->
+ *   |-[view0]-[view1(view0)]-|
+ *   [view2(view1)]-|
+ *   V:|-[view0]-|
+ *   V:|-[view1]-[view2(view1)]-|
+ * ]|
+ *
+ * The description will generate a layout composed by three widgets arrange
+ * in two columns: one with 'view0', and the other with 'view1' and 'view2'.
+ * The 'view1' and 'view2' widgets will have the same width and height, and
+ * all three widgets will grow to fill the available space if their parent
+ * grows.
+ *
+ * See emeus_create_constraints_from_description() for the VFL grammar and
+ * additional examples of layouts.
  */
 
 #include "config.h"
