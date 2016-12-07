@@ -732,9 +732,7 @@ remove_constraints_from_widget (GHashTable *constraints,
   GHashTableIter iter;
   gpointer key;
 
-  g_return_if_fail (GTK_IS_WIDGET (widget));
-
-  if (constraints == NULL)
+  if (constraints == NULL || widget == NULL)
     return;
 
   g_hash_table_iter_init (&iter, constraints);
