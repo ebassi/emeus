@@ -807,6 +807,7 @@ emeus_constraint_layout_remove (GtkContainer *container,
 
   was_visible = gtk_widget_get_visible (GTK_WIDGET (layout_child));
 
+  gtk_container_remove (GTK_CONTAINER (layout_child), child);
   gtk_widget_unparent (GTK_WIDGET (layout_child));
   g_sequence_remove (layout_child->iter);
 
