@@ -13,6 +13,7 @@ typedef struct {
   OperatorType relation;
 
   double constant;
+  double multiplier;
   const char *subject;
   char *object;
   const char *attr;
@@ -223,13 +224,15 @@ parse_predicate (VflParser *parser,
   const char *end = cursor;
 
   predicate->object = NULL;
+  predicate->multiplier = 1.0;
 
-  /*         <predicate> = (<relation>)? (<objectOfPredicate>) ('@'<priority>)?
+  /*         <predicate> = (<relation>)? (<objectOfPredicate>) (<operator>)? ('@'<priority>)?
    *          <relation> = '==' | '<=' | '>='
    * <objectOfPredicate> = <constant> | <viewName>
    *          <constant> = <number> | <metricName>
    *          <viewName> = [A-Za-z_]([A-Za-z0-9_]*)
    *        <metricName> = [A-Za-z_]([A-Za-z0-9_]*)
+   *          <operator> = (['*'|'/']<positiveNumber>)? (['+'|'-']<positiveNumber>)?
    *          <priority> = <positiveNumber> | 'weak' | 'medium' | 'strong' | 'required'
    */
 
@@ -298,7 +301,7 @@ parse_predicate (VflParser *parser,
 
           g_free (name);
 
-          goto parse_priority;
+          goto parse_operators;
         }
 
       if (has_metric (parser, name))
@@ -311,7 +314,7 @@ parse_predicate (VflParser *parser,
 
           g_free (name);
 
-          goto parse_priority;
+          goto parse_operators;
         }
 
       if (has_view (parser, name))
@@ -321,7 +324,7 @@ parse_predicate (VflParser *parser,
           predicate->attr = default_attribute[orientation];
           predicate->constant = 0;
 
-          goto parse_priority;
+          goto parse_operators;
         }
 
       parser->error_offset = name_start - parser->cursor;
@@ -340,7 +343,92 @@ parse_predicate (VflParser *parser,
       return false;
     }
 
-parse_priority:
+parse_operators:
+  /* Parse multiplier operator */
+  while (g_ascii_isspace (*end))
+    end += 1;
+
+  if ((*end == '*') || (*end == '/'))
+    {
+      double multiplier;
+      const char *operator;
+
+      operator = end;
+      end += 1;
+
+      while (g_ascii_isspace (*end))
+        end += 1;
+
+      if (g_ascii_isdigit (*end))
+        {
+          char *tmp;
+
+          multiplier = g_ascii_strtod (end, &tmp);
+          end = tmp;
+        }
+      else
+        {
+          parser->error_offset = end - parser->cursor;
+          parser->error_range = 0;
+          g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
+                       "Expected a positive number as a multiplier");
+          return false;
+        }
+
+      if (predicate->object != NULL)
+        {
+          if (*operator == '*')
+            predicate->multiplier = multiplier;
+          else
+            predicate->multiplier = 1.0 / multiplier;
+        }
+      else
+        {
+          /* If the subject is a constant then apply multiplier directly */
+          if (*operator == '*')
+            predicate->constant *= multiplier;
+          else
+            predicate->constant *= 1.0 / multiplier;
+        }
+    }
+
+  /* Parse constant operator */
+  while (g_ascii_isspace (*end))
+    end += 1;
+
+  if ((*end == '+') || (*end == '-'))
+    {
+      double constant;
+      const char *operator;
+
+      operator = end;
+      end += 1;
+
+      while (g_ascii_isspace (*end))
+        end += 1;
+
+      if (g_ascii_isdigit (*end))
+        {
+          char *tmp;
+
+          constant = g_ascii_strtod (end, &tmp);
+          end = tmp;
+        }
+      else
+        {
+          parser->error_offset = end - parser->cursor;
+          parser->error_range = 0;
+          g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
+                       "Expected positive number as a constant");
+          return false;
+        }
+
+      if (*operator == '+')
+        predicate->constant += constant;
+      else
+        predicate->constant += -1.0 * constant;
+    }
+
   /* Parse priority */
   if (*end == '@')
     {
@@ -903,7 +991,7 @@ vfl_parser_get_constraints (VflParser *parser,
                 }
               c.relation = p->relation;
               c.constant = p->constant;
-              c.multiplier = 1.0;
+              c.multiplier = p->multiplier;
               c.strength = p->priority;
 
               g_array_append_val (constraints, c);
