@@ -531,7 +531,7 @@ parse_operators:
         }
       else
         {
-          char *range_end = strchr (end, ')');
+          char *range_end = get_offset_to (end, ",)]");
 
           g_free (predicate->object);
 
