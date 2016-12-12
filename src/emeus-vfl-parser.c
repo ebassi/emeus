@@ -213,6 +213,40 @@ has_view (VflParser *parser,
   return g_hash_table_lookup (parser->views_set, name) != NULL;
 }
 
+/* Valid attributes */
+static const struct {
+  int len;
+  const char *name;
+} valid_attributes[] = {
+  { 5, "width" },
+  { 6, "height" },
+  { 7, "centerX" },
+  { 7, "centerY" },
+  { 3, "top" },
+  { 6, "bottom" },
+  { 4, "left" },
+  { 5, "right" },
+  { 5, "start" },
+  { 3, "end" },
+  { 8, "baseline" }
+};
+
+static char *
+get_offset_to (const char *str,
+               const char *tokens)
+{
+  char *offset = NULL;
+  int n_tokens = strlen (tokens);
+
+  for (int i = 0; i < n_tokens; i++)
+    {
+      if ((offset = strchr (str, tokens[i])) != NULL)
+        break;
+    }
+
+  return offset;
+}
+
 static bool
 parse_predicate (VflParser *parser,
                  const char *cursor,
@@ -226,7 +260,7 @@ parse_predicate (VflParser *parser,
   predicate->object = NULL;
   predicate->multiplier = 1.0;
 
-  /*         <predicate> = (<relation>)? (<objectOfPredicate>) (<operator>)? ('@'<priority>)?
+  /*         <predicate> = (<relation>)? (<objectOfPredicate>) ('.'<attribute>)? (<operator>)? ('@'<priority>)?
    *          <relation> = '==' | '<=' | '>='
    * <objectOfPredicate> = <constant> | <viewName>
    *          <constant> = <number> | <metricName>
@@ -324,7 +358,7 @@ parse_predicate (VflParser *parser,
           predicate->attr = default_attribute[orientation];
           predicate->constant = 0;
 
-          goto parse_operators;
+          goto parse_attribute;
         }
 
       parser->error_offset = name_start - parser->cursor;
@@ -341,6 +375,39 @@ parse_predicate (VflParser *parser,
       g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
                    "Expected constant, view name, or metric");
       return false;
+    }
+
+parse_attribute:
+  if (*end == '.')
+    {
+      end += 1;
+      predicate->attr = NULL;
+
+      for (int i = 0; i < G_N_ELEMENTS (valid_attributes); i++)
+        {
+          if (g_ascii_strncasecmp (valid_attributes[i].name, end, valid_attributes[i].len) == 0)
+            {
+              predicate->attr = valid_attributes[i].name;
+              end += valid_attributes[i].len;
+            }
+        }
+
+      if (predicate->attr == NULL)
+        {
+          char *range_end = get_offset_to (end, "*/+-@,)]");
+
+          if (range_end != NULL)
+            parser->error_range = range_end - end - 1;
+          else
+            parser->error_range = 0;
+
+          parser->error_offset = end - parser->cursor;
+          g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_ATTRIBUTE,
+                       "Attribute must be on one of 'width', 'height', "
+                       "'centerX', 'centerY', 'top', 'bottom', "
+                       "'left', 'right', 'start', 'end', 'baseline'");
+          return false;
+        }
     }
 
 parse_operators:
