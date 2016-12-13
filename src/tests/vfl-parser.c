@@ -29,6 +29,9 @@ static struct {
   { "predicate-spacing-1", "|-(>=0)-[view]-(>=0)-|", { "view", NULL, }, { NULL, } },
   { "predicate-numeric-priority", "[view(==0@500)]", { "view", NULL, }, { NULL, }, },
   { "predicate-spacing-priority", "[view1]-(==0@500)-[view2]", { "view1", "view2", NULL, }, { NULL, }, },
+  { "predicate-view-operator", "[view1(view2 * 2.0 + 20)]", { "view1", "view2", NULL, }, { NULL, }, },
+  { "predicate-metric-operator", "|-(metric1/2-20.0)-", { NULL, }, { "metric1", NULL, }, },
+  { "predicate-attribute", "[view1(view1.height)]", { "view1", NULL, }, { NULL, }, },
 };
 
 static struct {
@@ -48,6 +51,8 @@ static struct {
   { "view-invalid-identifier-3", "[-a]", { NULL, }, VFL_ERROR_INVALID_VIEW, },
   { "predicate-wrong-relation", "[view(>30)]", { "view", NULL, }, VFL_ERROR_INVALID_RELATION, },
   { "predicate-wrong-priority", "[view(>=30@foo)]", { "view", NULL, }, VFL_ERROR_INVALID_PRIORITY, },
+  { "predicate-wrong-operator", "[view(view + wrong)]", { "view", NULL, }, VFL_ERROR_INVALID_SYMBOL, },
+  { "predicate-wrong-attribute", "[view(view.wrong)]", { "view", NULL, }, VFL_ERROR_INVALID_ATTRIBUTE, },
 };
 
 static void
