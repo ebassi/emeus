@@ -711,14 +711,18 @@ emeus_constraint_get_active (EmeusConstraint *constraint)
  *             <predicateList> = <simplePredicate> | <predicateListWithParens>
  *           <simplePredicate> = <metricName> | <positiveNumber>
  *   <predicateListWithParens> = '(' <predicate> (',' <predicate>)* ')'
- *                 <predicate> = (<relation>)? <objectOfPredicate> (<operator>)? ('@' <priority>)?
+ *                 <predicate> = (<relation>)? <objectOfPredicate> (<operatorList>)? ('@' <priority>)?
  *                  <relation> = '==' | '<=' | '>='
- *         <objectOfPredicate> = <constant> | <viewName> | <metricName>
+ *         <objectOfPredicate> = <constant> | <viewName> | <metricName> ('.' <attributeName>)?
  *                  <priority> = <positiveNumber> | 'required' | 'strong' | 'medium' | 'weak'
  *                  <constant> = <number>
- *                  <operator> = (['*'|'/']<positiveNumber>)? (['+'|'-']<positiveNumber>)?
+ *              <operatorList> = (<multiplyOperator>)? (<addOperator>)?
+ *          <multiplyOperator> = [ '*' | '/' ] <positiveNumber>
+ *               <addOperator> = [ '+' | '-' ] <positiveNumber>
  *                  <viewName> = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
  *                <metricName> = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
+ *             <attributeName> = 'top' | 'bottom' | 'left' | 'right' | 'width' | 'height' |
+ *                               'start' | 'end' | 'centerX' | 'centerY' | 'baseline'
  *            <positiveNumber> // A positive real number parseable by g_ascii_strtod()
  *                    <number> // A real number parseable by g_ascii_strtod()
  * ]|
@@ -759,6 +763,9 @@ emeus_constraint_get_active (EmeusConstraint *constraint)
  *
  *   // Operators
  *   [button1(button2 / 3 + 50)]
+ *
+ *   // Named attributes
+ *   [button1(==button2.height)]
  * ]|
  *
  * Returns: (transfer container) (element-type Emeus.Constraint): a list of #EmeusConstraint

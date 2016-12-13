@@ -119,13 +119,18 @@
           &lt;predicateList&gt; = &lt;simplePredicate&gt; | &lt;predicateListWithParens&gt;
         &lt;simplePredicate&gt; = &lt;metricName&gt; | &lt;positiveNumber&gt;
 &lt;predicateListWithParens&gt; = '(' &lt;predicate&gt; (',' &lt;predicate&gt;)* ')'
-              &lt;predicate&gt; = (&lt;relation&gt;)? &lt;objectOfPredicate&gt; ('@' &lt;priority&gt;)?
+              &lt;predicate&gt; = (&lt;relation&gt;)? &lt;objectOfPredicate&gt; (&lt;operatorList&gt;)? ('@' &lt;priority&gt;)?
                &lt;relation&gt; = '==' | '&lt;=' | '&gt;='
-      &lt;objectOfPredicate&gt; = &lt;constant&gt; | &lt;viewName&gt; | &lt;metricName&gt;
+      &lt;objectOfPredicate&gt; = &lt;constant&gt; | &lt;viewName&gt; ('.' &lt;attributeName&gt; )? | &lt;metricName&gt;
+           &lt;operatorList&gt; = (&lt;multiplyOperator&gt;)? (&lt;addOperator&gt;)?
+       &lt;multiplyOperator&gt; = [ '*' | '/' ] &lt;positiveNumber&gt;
+            &lt;addOperator&gt; = [ '+' | '-' ] &lt;positiveNumber&gt;
                &lt;priority&gt; = &lt;positiveNumber&gt; | 'required' | 'strong' | 'medium' | 'weak'
                &lt;constant&gt; = &lt;number&gt;
                &lt;viewName&gt; = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
              &lt;metricName&gt; = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
+          &lt;attributeName&gt; = 'top' | 'bottom' | 'left' | 'right' | 'width' | 'height'
+                                  'start' | 'end' | 'centerX' | 'centerY' | 'baseline'
          &lt;positiveNumber&gt; // A positive real number parseable by g_ascii_strtod()
                  &lt;number&gt; // A real number parseable by g_ascii_strtod()
 </literallayout>
@@ -163,6 +168,12 @@
  
  // A complete line of layout
  |-[find]-[findNext]-[findField(&gt;=20)]-|
+
+ // Operators
+ [button1(button2 / 3 + 50)]
+
+ // Named attributes
+ [button1(==button2.height)]
 </literallayout>
 </informalexample>
 </refsect1>
