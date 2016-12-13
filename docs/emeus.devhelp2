@@ -65,10 +65,10 @@
     <keyword type="property" name="The “target-attribute” property" link="EmeusConstraint.html#EmeusConstraint--target-attribute"/>
     <keyword type="property" name="The “target-object” property" link="EmeusConstraint.html#EmeusConstraint--target-object"/>
     <keyword type="macro" name="EMEUS_CHECK_VERSION()" link="emeus-Version-checking.html#EMEUS-CHECK-VERSION:CAPS" since="1.0"/>
+    <keyword type="constant" name="EMEUS_CONSTRAINT_STRENGTH_REQUIRED" link="EmeusConstraint.html#EMEUS-CONSTRAINT-STRENGTH-REQUIRED:CAPS"/>
     <keyword type="constant" name="EMEUS_CONSTRAINT_STRENGTH_WEAK" link="EmeusConstraint.html#EMEUS-CONSTRAINT-STRENGTH-WEAK:CAPS"/>
     <keyword type="constant" name="EMEUS_CONSTRAINT_STRENGTH_MEDIUM" link="EmeusConstraint.html#EMEUS-CONSTRAINT-STRENGTH-MEDIUM:CAPS"/>
     <keyword type="constant" name="EMEUS_CONSTRAINT_STRENGTH_STRONG" link="EmeusConstraint.html#EMEUS-CONSTRAINT-STRENGTH-STRONG:CAPS"/>
-    <keyword type="constant" name="EMEUS_CONSTRAINT_STRENGTH_REQUIRED" link="EmeusConstraint.html#EMEUS-CONSTRAINT-STRENGTH-REQUIRED:CAPS"/>
     <keyword type="constant" name="EMEUS_CONSTRAINT_RELATION_LE" link="EmeusConstraint.html#EMEUS-CONSTRAINT-RELATION-LE:CAPS"/>
     <keyword type="constant" name="EMEUS_CONSTRAINT_RELATION_EQ" link="EmeusConstraint.html#EMEUS-CONSTRAINT-RELATION-EQ:CAPS"/>
     <keyword type="constant" name="EMEUS_CONSTRAINT_RELATION_GE" link="EmeusConstraint.html#EMEUS-CONSTRAINT-RELATION-GE:CAPS"/>

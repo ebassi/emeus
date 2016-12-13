@@ -8,7 +8,7 @@
 <link rel="up" href="ch01.html" title="Emeus">
 <link rel="prev" href="ch01.html" title="Emeus">
 <link rel="next" href="EmeusConstraint.html" title="EmeusConstraint">
-<meta name="generator" content="GTK-Doc V1.25.1 (XML mode)">
+<meta name="generator" content="GTK-Doc V1.25 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
 <body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF">
@@ -44,7 +44,7 @@
 <tbody>
 <tr>
 <td class="function_type">
-<span class="returnvalue">GtkWidget</span> *
+<a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-struct"><span class="returnvalue">GtkWidget</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-new" title="emeus_constraint_layout_new ()">emeus_constraint_layout_new</a> <span class="c_punctuation">()</span>
@@ -76,7 +76,7 @@
 </tr>
 <tr>
 <td class="function_type">
-<span class="returnvalue">GList</span> *
+<a href="https://developer.gnome.org/glib/stable/glib-Doubly-Linked-Lists.html#GList"><span class="returnvalue">GList</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-get-constraints" title="emeus_constraint_layout_get_constraints ()">emeus_constraint_layout_get_constraints</a> <span class="c_punctuation">()</span>
@@ -84,7 +84,7 @@
 </tr>
 <tr>
 <td class="function_type">
-<span class="returnvalue">GList</span> *
+<a href="https://developer.gnome.org/glib/stable/glib-Doubly-Linked-Lists.html#GList"><span class="returnvalue">GList</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="EmeusConstraintLayout.html#emeus-create-constraints-from-description" title="emeus_create_constraints_from_description ()">emeus_create_constraints_from_description</a> <span class="c_punctuation">()</span>
@@ -92,7 +92,7 @@
 </tr>
 <tr>
 <td class="function_type">
-<span class="returnvalue">GtkWidget</span> *
+<a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-struct"><span class="returnvalue">GtkWidget</span></a> *
 </td>
 <td class="function_name">
 <a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-new" title="emeus_constraint_layout_child_new ()">emeus_constraint_layout_child_new</a> <span class="c_punctuation">()</span>
@@ -222,7 +222,7 @@
 </colgroup>
 <tbody><tr>
 <td class="property_type">
-<span class="type">gchar</span> *</td>
+<a href="https://developer.gnome.org/glib/stable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *</td>
 <td class="property_name"><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild--name" title="The “name” property">name</a></td>
 <td class="property_flags">Read / Write / Construct Only</td>
 </tr></tbody>
@@ -249,11 +249,11 @@
 </div>
 <div class="refsect1">
 <a name="EmeusConstraintLayout.object-hierarchy"></a><h2>Object Hierarchy</h2>
-<pre class="screen">    GObject
-    <span class="lineart">╰──</span> GInitiallyUnowned
-        <span class="lineart">╰──</span> GtkWidget
-            <span class="lineart">╰──</span> GtkContainer
-                <span class="lineart">├──</span> GtkBin
+<pre class="screen">    <a href="https://developer.gnome.org/gobject/stable/gobject-The-Base-Object-Type.html#GObject-struct">GObject</a>
+    <span class="lineart">╰──</span> <a href="https://developer.gnome.org/gobject/stable/gobject-The-Base-Object-Type.html#GInitiallyUnowned">GInitiallyUnowned</a>
+        <span class="lineart">╰──</span> <a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-struct">GtkWidget</a>
+            <span class="lineart">╰──</span> <a href="https://developer.gnome.org/gtk3/stable/GtkContainer.html#GtkContainer-struct">GtkContainer</a>
+                <span class="lineart">├──</span> <a href="https://developer.gnome.org/gtk3/stable/GtkBin.html#GtkBin-struct">GtkBin</a>
                 <span class="lineart">│</span>   <span class="lineart">╰──</span> EmeusConstraintLayoutChild
                 <span class="lineart">╰──</span> EmeusConstraintLayout
 </pre>
@@ -262,10 +262,10 @@
 <a name="EmeusConstraintLayout.implemented-interfaces"></a><h2>Implemented Interfaces</h2>
 <p>
 EmeusConstraintLayout implements
- AtkImplementorIface and  GtkBuildable.</p>
+ AtkImplementorIface and  <a href="https://developer.gnome.org/gtk3/stable/GtkBuildable.html#GtkBuildable-struct">GtkBuildable</a>.</p>
 <p>
 EmeusConstraintLayoutChild implements
- AtkImplementorIface and  GtkBuildable.</p>
+ AtkImplementorIface and  <a href="https://developer.gnome.org/gtk3/stable/GtkBuildable.html#GtkBuildable-struct">GtkBuildable</a>.</p>
 </div>
 <div class="refsect1">
 <a name="EmeusConstraintLayout.includes"></a><h2>Includes</h2>
@@ -276,12 +276,147 @@ EmeusConstraintLayoutChild implements
 <a name="EmeusConstraintLayout.description"></a><h2>Description</h2>
 <p><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> is a <span class="type">GtkContainter</span> that uses constraints
 associated to each of its children to decide their layout.</p>
+<div class="refsect2">
+<a name="id-1.2.3.10.3"></a><h3>How do constraints work</h3>
+<p>Constraints are objects defining the relationship between attributes
+of a widget; you can read the description of the <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a>
+class to have a more in depth definition.</p>
+<p>By taking multiple constraints and applying them to the children of
+an <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>, it's possible to describe complex layout
+policies; each constraint applied to a child or to the layout itself
+contributes to the full description of the layout, in terms of
+parameters for resolving the value of each attribute.</p>
+<p>It is important to note that a layout is defined by the totality of
+constraints; removing a child, or a constraint, from an existing layout
+without changing the remaining constraints may result in a layout that
+cannot be solved.</p>
+<p>Constraints have an implicit "reading order"; you should start describing
+each edge of each child, as well as their relationship with the parent
+container, from the top left (or top right, in RTL languages), horizontally
+first, and then vertically.</p>
+<p>A constraint-based layout with too few constraints can become "unstable",
+that is: have more than one solution. The behavior of an unstable layout
+is undefined.</p>
+<p>A constraint-based layout with conflicting constraints may be unsolvable,
+and lead to an unstable layout.</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="id-1.2.3.10.4"></a><h3>Adding and removing widgets</h3>
+<p><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> accepts only one type of widget as its direct
+child, <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a>. As a convenience for the developer,
+<a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> will automatically add an <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a>
+for any other widget type when calling <a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-pack" title="emeus_constraint_layout_pack ()"><code class="function">emeus_constraint_layout_pack()</code></a> or
+<a href="https://developer.gnome.org/gtk3/stable/GtkContainer.html#gtk-container-add"><code class="function">gtk_container_add()</code></a>.</p>
+<p>Similarly, when removing a <a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-struct"><span class="type">GtkWidget</span></a> from an <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>,
+the container will remove the intermediate <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a>
+that was added automatically.</p>
+<p>When iterating over the children of <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>, you will
+get only <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> instances; use <a href="https://developer.gnome.org/gtk3/stable/GtkBin.html#gtk-bin-get-child"><code class="function">gtk_bin_get_child()</code></a>
+to retrieve the grandchild of the layout.</p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="id-1.2.3.10.5"></a><h3>Describing constraints using GtkBuilder</h3>
+<p>When creating an <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> layout with GtkBuilder, it
+can be simpler to also load constraints directly from the UI definition
+file.</p>
+<p><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> implements the <a href="https://developer.gnome.org/gtk3/stable/GtkBuildable.html#GtkBuildable-struct"><span class="type">GtkBuildable</span></a> interface, and
+adds the <code class="literal">constraints</code> tag, which contains <code class="literal">constraint</code> elements.</p>
+<p>The <code class="literal">constraint</code> element has various attributes:</p>
+<div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; ">
+<li class="listitem"><p><code class="literal">target-object</code>, used to point to a widget using its builder id; this
+attribute is mandatory, and specifies the value of the
+<a class="link" href="EmeusConstraint.html#EmeusConstraint--target-object" title="The “target-object” property"><span class="type">“target-object”</span></a> property</p></li>
+<li class="listitem"><p><code class="literal">target-attr</code>, which contains an <a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><code class="literal">EmeusConstraintAttribute</code></a> value; this
+attribute is mandatory, and specifies the value of the
+<span class="type">“taregt-attribute”</span> property</p></li>
+<li class="listitem"><p><code class="literal">source-object</code>, used to point to a widget using its builder id; this
+attribute is optional, for constant constraints, and specifies the value
+of the <a class="link" href="EmeusConstraint.html#EmeusConstraint--source-object" title="The “source-object” property"><span class="type">“source-object”</span></a> property</p></li>
+<li class="listitem"><p><code class="literal">source-attr</code>, which contains an <a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><code class="literal">EmeusConstraintAttribute</code></a> value; this
+attribute is optional, for constant constraints, and specifies the value
+of the <a class="link" href="EmeusConstraint.html#EmeusConstraint--source-attribute" title="The “source-attribute” property"><span class="type">“source-attribute”</span></a> property</p></li>
+<li class="listitem"><p><code class="literal">relation</code>, which contains an <a class="link" href="EmeusConstraint.html#EmeusConstraintRelation" title="enum EmeusConstraintRelation"><code class="literal">EmeusConstraintRelation</code></a> value; this
+attribute is optional, and if not found the relation will be
+<a class="link" href="EmeusConstraint.html#EMEUS-CONSTRAINT-RELATION-EQ:CAPS"><code class="literal">EMEUS_CONSTRAINT_RELATION_EQ</code></a></p></li>
+<li class="listitem"><p><code class="literal">constant</code>, which contains the constant factor value as a floating point
+numer; this attribute is optional, and if not found the constant will
+be set to 0</p></li>
+<li class="listitem"><p><code class="literal">multiplier</code>, which contains the multiplication factor value as a
+floating point number; this attribute is option, and if not found the
+multiplier will be set to 1</p></li>
+<li class="listitem"><p><code class="literal">strength</code>, which contains an <a class="link" href="EmeusConstraint.html#EmeusConstraintStrength" title="enum EmeusConstraintStrength"><code class="literal">EmeusConstraintStrength</code></a> value, or a positive
+integer; this attribute is optional, and if not found the strength will
+be <a class="link" href="EmeusConstraint.html#EMEUS-CONSTRAINT-STRENGTH-REQUIRED:CAPS"><code class="literal">EMEUS_CONSTRAINT_STRENGTH_REQUIRED</code></a></p></li>
+</ul></div>
+<p>A simple layout definitions is:</p>
+<div class="informalexample"><pre class="screen">
+&lt;object class="EmeusConstraintLayout" id="layout"&gt;
+  &lt;property name="visible"&gt;True&lt;/property&gt;
+  &lt;child&gt;
+    &lt;object class="GtkButton" id="button1"&gt;
+    ...
+    &lt;/object&gt;
+  &lt;/child&gt;
+  &lt;child&gt;
+    &lt;object class="GtkButton" id="button2"&gt;
+    ...
+    &lt;/object&gt;
+  &lt;/child&gt;
+  &lt;constraints&gt;
+    &lt;constraint target-object="button1"
+                target-attr="width"
+                relation="EMEUS_CONSTRAINT_RELATION_GE"
+                constant="250"
+                strength="EMEUS_CONSTRAINT_STRENGTH_STRONG"/&gt;
+    &lt;constraint target-object="button2"
+                target-attr="width"
+                relation="EMEUS_CONSTRAINT_RELATION_EQ"
+                source-object="button1"
+                source-attr="width"/&gt;
+    ...
+  &lt;/constraints&gt;
+&lt;/object&gt;
+</pre></div>
+<p></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="id-1.2.3.10.6"></a><h3>Describing constraints using the Visual Format Language</h3>
+<p>While it's entirely possible to describe layouts by writing constraints
+by hand, it can be tedious to do so. Additionally, writing constraints
+by hand may lead to forgetting one or more of them, thus causing the
+layout to be unstable or incomplete; or to add conflicting constraints,
+thus causing the layout to be unsolvable.</p>
+<p>In order to quickly visualize, and generate, constraints for a layout,
+Emeus implements a Visual Format language. Each row and column of a
+layout can be described by the VFL, and translated into constraints to
+be applied on top of a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> and its children. Once
+the layout has been established, it's also possible to impose new
+constraints for additional layout rules.</p>
+<p>A simple VFL description of a layout is:</p>
+<div class="informalexample"><pre class="screen">
+  |-[view0]-[view1(view0)]-|
+  [view2(view1)]-|
+  V:|-[view0]-|
+  V:|-[view1]-[view2(view1)]-|
+</pre></div>
+<p></p>
+<p>The description will generate a layout composed by three widgets arrange
+in two columns: one with 'view0', and the other with 'view1' and 'view2'.
+The 'view1' and 'view2' widgets will have the same width and height, and
+all three widgets will grow to fill the available space if their parent
+grows.</p>
+<p>See <a class="link" href="EmeusConstraintLayout.html#emeus-create-constraints-from-description" title="emeus_create_constraints_from_description ()"><code class="function">emeus_create_constraints_from_description()</code></a> for the VFL grammar and
+additional examples of layouts.</p>
+</div>
 </div>
 <div class="refsect1">
 <a name="EmeusConstraintLayout.functions_details"></a><h2>Functions</h2>
 <div class="refsect2">
 <a name="emeus-constraint-layout-new"></a><h3>emeus_constraint_layout_new ()</h3>
-<pre class="programlisting"><span class="returnvalue">GtkWidget</span> *
+<pre class="programlisting"><a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-struct"><span class="returnvalue">GtkWidget</span></a> *
 emeus_constraint_layout_new (<em class="parameter"><code><span class="type">void</span></code></em>);</pre>
 <p>Creates a new constraint-based layout manager.</p>
 <div class="refsect3">
@@ -296,7 +431,7 @@ emeus_constraint_layout_new (<em class="parameter"><code><span class="type">void
 <a name="emeus-constraint-layout-pack"></a><h3>emeus_constraint_layout_pack ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 emeus_constraint_layout_pack (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> *layout</code></em>,
-                              <em class="parameter"><code><span class="type">GtkWidget</span> *child</code></em>,
+                              <em class="parameter"><code><a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-struct"><span class="type">GtkWidget</span></a> *child</code></em>,
                               <em class="parameter"><code>const <span class="type">char</span> *name</code></em>,
                               <em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *first_constraint</code></em>,
                               <em class="parameter"><code>...</code></em>);</pre>
@@ -304,7 +439,7 @@ emeus_constraint_layout_pack (<em class="parameter"><code><a class="link" href="
  to the <em class="parameter"><code>layout</code></em>
 , and applies a list of constraints to it.</p>
 <p>This convenience function is the equivalent of calling
-<code class="function">gtk_container_add()</code> and <a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-add-constraint" title="emeus_constraint_layout_child_add_constraint ()"><code class="function">emeus_constraint_layout_child_add_constraint()</code></a>
+<a href="https://developer.gnome.org/gtk3/stable/GtkContainer.html#gtk-container-add"><code class="function">gtk_container_add()</code></a> and <a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-child-add-constraint" title="emeus_constraint_layout_child_add_constraint ()"><code class="function">emeus_constraint_layout_child_add_constraint()</code></a>
 for each constraint instance.</p>
 <div class="refsect3">
 <a name="emeus-constraint-layout-pack.parameters"></a><h4>Parameters</h4>
@@ -322,7 +457,7 @@ for each constraint instance.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>child</p></td>
-<td class="parameter_description"><p>a <span class="type">GtkWidget</span></p></td>
+<td class="parameter_description"><p>a <a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-struct"><span class="type">GtkWidget</span></a></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
@@ -338,7 +473,7 @@ for each constraint instance.</p>
 </tr>
 <tr>
 <td class="parameter_name"><p>...</p></td>
-<td class="parameter_description"><p>a <code class="literal">NULL</code>-terminated list of <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> instances</p></td>
+<td class="parameter_description"><p>a <a href="https://developer.gnome.org/glib/stable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>-terminated list of <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> instances</p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -366,7 +501,7 @@ emeus_constraint_layout_add_constraints
 <hr>
 <div class="refsect2">
 <a name="emeus-constraint-layout-get-constraints"></a><h3>emeus_constraint_layout_get_constraints ()</h3>
-<pre class="programlisting"><span class="returnvalue">GList</span> *
+<pre class="programlisting"><a href="https://developer.gnome.org/glib/stable/glib-Doubly-Linked-Lists.html#GList"><span class="returnvalue">GList</span></a> *
 emeus_constraint_layout_get_constraints
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> *layout</code></em>);</pre>
 <p>Retrieves all the constraints used by the <em class="parameter"><code>layout</code></em>
@@ -397,14 +532,14 @@ emeus_constraint_layout_get_constraints
 <hr>
 <div class="refsect2">
 <a name="emeus-create-constraints-from-description"></a><h3>emeus_create_constraints_from_description ()</h3>
-<pre class="programlisting"><span class="returnvalue">GList</span> *
+<pre class="programlisting"><a href="https://developer.gnome.org/glib/stable/glib-Doubly-Linked-Lists.html#GList"><span class="returnvalue">GList</span></a> *
 emeus_create_constraints_from_description
                                (<em class="parameter"><code>const <span class="type">char</span> * const lines[]</code></em>,
-                                <em class="parameter"><code><span class="type">guint</span> n_lines</code></em>,
+                                <em class="parameter"><code><a href="https://developer.gnome.org/glib/stable/glib-Basic-Types.html#guint"><span class="type">guint</span></a> n_lines</code></em>,
                                 <em class="parameter"><code><span class="type">int</span> hspacing</code></em>,
                                 <em class="parameter"><code><span class="type">int</span> vspacing</code></em>,
-                                <em class="parameter"><code><span class="type">GHashTable</span> *views</code></em>,
-                                <em class="parameter"><code><span class="type">GHashTable</span> *metrics</code></em>);</pre>
+                                <em class="parameter"><code><a href="https://developer.gnome.org/glib/stable/glib-Hash-Tables.html#GHashTable"><span class="type">GHashTable</span></a> *views</code></em>,
+                                <em class="parameter"><code><a href="https://developer.gnome.org/glib/stable/glib-Hash-Tables.html#GHashTable"><span class="type">GHashTable</span></a> *metrics</code></em>);</pre>
 <p>Creates a list of constraints they formal description using the
 <a class="ulink" href="https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/AutolayoutPG/VisualFormatLanguage.html" target="_top">Visual Format Language</a>
 syntax.</p>
@@ -426,13 +561,18 @@ VFL strings.</p>
             &lt;predicateList&gt; = &lt;simplePredicate&gt; | &lt;predicateListWithParens&gt;
           &lt;simplePredicate&gt; = &lt;metricName&gt; | &lt;positiveNumber&gt;
   &lt;predicateListWithParens&gt; = '(' &lt;predicate&gt; (',' &lt;predicate&gt;)* ')'
-                &lt;predicate&gt; = (&lt;relation&gt;)? &lt;objectOfPredicate&gt; ('@' &lt;priority&gt;)?
+                &lt;predicate&gt; = (&lt;relation&gt;)? &lt;objectOfPredicate&gt; (&lt;operatorList&gt;)? ('@' &lt;priority&gt;)?
                  &lt;relation&gt; = '==' | '&lt;=' | '&gt;='
-        &lt;objectOfPredicate&gt; = &lt;constant&gt; | &lt;viewName&gt; | &lt;metricName&gt;
-                 &lt;priority&gt; = 'required' | 'strong' | 'medium' | 'weak'
+        &lt;objectOfPredicate&gt; = &lt;constant&gt; | &lt;viewName&gt; | &lt;metricName&gt; ('.' &lt;attributeName&gt;)?
+                 &lt;priority&gt; = &lt;positiveNumber&gt; | 'required' | 'strong' | 'medium' | 'weak'
                  &lt;constant&gt; = &lt;number&gt;
+             &lt;operatorList&gt; = (&lt;multiplyOperator&gt;)? (&lt;addOperator&gt;)?
+         &lt;multiplyOperator&gt; = [ '*' | '/' ] &lt;positiveNumber&gt;
+              &lt;addOperator&gt; = [ '+' | '-' ] &lt;positiveNumber&gt;
                  &lt;viewName&gt; = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
                &lt;metricName&gt; = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
+            &lt;attributeName&gt; = 'top' | 'bottom' | 'left' | 'right' | 'width' | 'height' |
+                              'start' | 'end' | 'centerX' | 'centerY' | 'baseline'
            &lt;positiveNumber&gt; // A positive real number parseable by g_ascii_strtod()
                    &lt;number&gt; // A real number parseable by g_ascii_strtod()
 </pre></div>
@@ -468,6 +608,12 @@ values.</p>
 
   // A complete line of layout
   |-[find]-[findNext]-[findField(&gt;=20)]-|
+
+  // Operators
+  [button1(button2 / 3 + 50)]
+
+  // Named attributes
+  [button1(==button2.height)]
 </pre></div>
 <p></p>
 <div class="refsect3">
@@ -528,7 +674,7 @@ instances, to be used with an <a class="link" href="EmeusConstraintLayout.html" 
 <hr>
 <div class="refsect2">
 <a name="emeus-constraint-layout-child-new"></a><h3>emeus_constraint_layout_child_new ()</h3>
-<pre class="programlisting"><span class="returnvalue">GtkWidget</span> *
+<pre class="programlisting"><a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-struct"><span class="returnvalue">GtkWidget</span></a> *
 emeus_constraint_layout_child_new (<em class="parameter"><code>const <span class="type">char</span> *name</code></em>);</pre>
 <p>Creates a new <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> widget.</p>
 <p><span class="annotation">[<acronym title="This symbol is a constructor, not a static method."><span class="acronym">constructor</span></acronym>]</span></p>
@@ -748,7 +894,7 @@ emeus_constraint_layout_child_set_intrinsic_width
 <a name="EmeusConstraintLayout.property-details"></a><h2>Property Details</h2>
 <div class="refsect2">
 <a name="EmeusConstraintLayoutChild--name"></a><h3>The <code class="literal">“name”</code> property</h3>
-<pre class="programlisting">  “name”                     <span class="type">gchar</span> *</pre>
+<pre class="programlisting">  “name”                     <a href="https://developer.gnome.org/glib/stable/glib-Basic-Types.html#gchar"><span class="type">gchar</span></a> *</pre>
 <p>The name of the child.</p>
 <p>Flags: Read / Write / Construct Only</p>
 <p>Default value: NULL</p>
@@ -756,6 +902,6 @@ emeus_constraint_layout_child_set_intrinsic_width
 </div>
 </div>
 <div class="footer">
-<hr>Generated by GTK-Doc V1.25.1</div>
+<hr>Generated by GTK-Doc V1.25</div>
 </body>
 </html>
