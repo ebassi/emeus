@@ -478,7 +478,7 @@ editor_application_window_init (EditorApplicationWindow *self)
   gtk_widget_init_template (GTK_WIDGET (self));
 
   self->views = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
-  self->vfl_parser = vfl_parser_new (-1, -1, self->views, NULL);
+  self->vfl_parser = vfl_parser_new (-1, -1, NULL, self->views);
 
   g_signal_connect_swapped (gtk_text_view_get_buffer (GTK_TEXT_VIEW (self->vfl_text_area)),
                             "changed", G_CALLBACK (vfl_text_area__changed),

@@ -711,11 +711,12 @@ emeus_constraint_get_active (EmeusConstraint *constraint)
  *             <predicateList> = <simplePredicate> | <predicateListWithParens>
  *           <simplePredicate> = <metricName> | <positiveNumber>
  *   <predicateListWithParens> = '(' <predicate> (',' <predicate>)* ')'
- *                 <predicate> = (<relation>)? <objectOfPredicate> ('@' <priority>)?
+ *                 <predicate> = (<relation>)? <objectOfPredicate> (<operator>)? ('@' <priority>)?
  *                  <relation> = '==' | '<=' | '>='
  *         <objectOfPredicate> = <constant> | <viewName> | <metricName>
  *                  <priority> = <positiveNumber> | 'required' | 'strong' | 'medium' | 'weak'
  *                  <constant> = <number>
+ *                  <operator> = (['*'|'/']<positiveNumber>)? (['+'|'-']<positiveNumber>)?
  *                  <viewName> = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
  *                <metricName> = [A-Za-z_]([A-Za-z0-9_]*) // A C identifier
  *            <positiveNumber> // A positive real number parseable by g_ascii_strtod()
@@ -755,6 +756,9 @@ emeus_constraint_get_active (EmeusConstraint *constraint)
  *
  *   // A complete line of layout
  *   |-[find]-[findNext]-[findField(>=20)]-|
+ *
+ *   // Operators
+ *   [button1(button2 / 3 + 50)]
  * ]|
  *
  * Returns: (transfer container) (element-type Emeus.Constraint): a list of #EmeusConstraint
