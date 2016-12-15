@@ -21,6 +21,7 @@ emeus_binary_age = emeus_minor_version * 100 + emeus_micro_version
 emeus_is_development = emeus_minor_version.is_odd()
 
 emeus_prefix = get_option('prefix')
+emeus_bindir = join_paths(emeus_prefix, get_option('bindir'))
 emeus_libdir = join_paths(emeus_prefix, get_option('libdir'))
 emeus_datadir = join_paths(emeus_prefix, get_option('datadir'))
 emeus_includedir = join_paths(emeus_prefix, get_option('includedir'))

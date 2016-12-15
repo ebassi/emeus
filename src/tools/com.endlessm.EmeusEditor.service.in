@@ -1,0 +1,3 @@
+[D-BUS Service]
+Name=com.endlessm.EmeusEditor
+Exec=@bindir@/emeus-edit-constraints --gapplication-service

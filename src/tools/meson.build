@@ -17,6 +17,16 @@ custom_target('desktop-file',
                 msgfmt, '--desktop', '--template', '@INPUT@', '-d', podir, '-o', '@OUTPUT@'
               ])
 
+# Service file
+serviceconf = configuration_data()
+serviceconf.set('bindir', emeus_bindir)
+
+configure_file(input: 'com.endlessm.EmeusEditor.service.in',
+               output: 'com.endlessm.EmeusEditor.service',
+               configuration: serviceconf,
+               install: true,
+               install_dir: join_paths(get_option('datadir'), 'dbus-1/services'))
+
 editor_sources = [
   'emeus-edit-constraints.c'
 ]

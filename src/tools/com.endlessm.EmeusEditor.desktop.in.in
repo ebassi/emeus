@@ -7,3 +7,4 @@ Terminal=false
 Type=Application
 Icon=view-fullscreen-symbolic
 Keywords=Build;Develop;Editor;
+DBusActivatable=true
