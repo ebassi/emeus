@@ -132,6 +132,53 @@ button3.height = button2.height
 <p>The <code>EmeusConstraintLayout</code> widget will attempt to resolve all the
 constraints, and lay out its children according to them.</p>
 
+<h3>
+<a id="visual-format-language" class="anchor" href="#visual-format-language" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Visual Format
+Language</h3>
+
+<p>Emeus constraints can be expressed both in code, using the <code>EmeusConstraint</code> object methods,
+and using a <a href="https://developer.apple.com/library/content/documentation/UserExperience/Conceptual/AutolayoutPG/VisualFormatLanguage.html">Visual Format language</a>.</p>
+
+<p>The <acronym title="Visual Format Language">VFL</acronym> is a compact syntax that describes how the
+layout should look like; for instance:
+
+<pre><code>
+|-[button1(&gt;=250)]-[button2(==button1)]-[button3(==button1)]-|
+V:|-[button1(==100)]
+V:|-[button2(==button1)]
+V:|-[button3(==button1)]
+</code></pre>
+
+Acts both as a visual description of a layout with three buttons, laid
+out horizontally next to each other; and as a description of the constraints
+on each button:
+
+<ul>
+  <li><code>button1</code> must be at least 250 pixels wide, and must be 100 pixel high</li>
+  <li><code>button2</code> must have the same width and height of <code>button1</code></li>
+  <li><code>button3</code> must have the same width and height of <code>button1</code></li>
+</ul>
+
+<p>Another example:</p>
+
+<pre><code>
+H:|-[view0(view2)]-[view2]-|
+H:|-[view1(view3)]-[view3]-|
+H:[view4(view3)]-|
+V:|-[view0(view1)]-[view1]-|
+V:|-[view2(view3,view4)]-[view3]-[view4]-|
+</code></pre>
+
+<p>Results in:</p>
+
+<img src="images/vfl-boxes-sidebar.png"/>
+
+<p>A layout can be described using <acronym title="Visual Format Language">VFL</acronym> by
+letting Emeus parse the description and generate the necessary constraints.</p>
+
+<p>Not all layouts or constraints can be described to the Visual Format language, but using
+it as a starting point for more complex layouts reduces the amount of code needed.</p>
+
 <h2>
 <a id="building" class="anchor" href="#building" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Building</h2>
 
