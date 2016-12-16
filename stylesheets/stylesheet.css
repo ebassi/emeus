@@ -173,7 +173,8 @@ pre, code {
 pre {
   width: 100%;
   padding: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,.1);
+  box-shadow: 0px 20px 22px -16px rgba(22, 22, 22, 0.45);
+  margin-bottom: 25px;
   overflow: auto;
 }
 
@@ -368,7 +369,15 @@ Full-Width Styles
   background: #212121;
 }
 
-
+img.logo {
+  background-color: rgba(148, 148, 148, 0.3);
+  border-width: 1px;
+  border-color: rgba(0, 0, 0, 0.1);
+  border-style: solid;
+  border-radius: 32px;
+  box-shadow: 0px 30px 27px -28px rgba(22, 22, 22, 0.65);
+  padding: 5px;
+}
 
 /*******************************************************************************
 Small Device Styles
