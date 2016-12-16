@@ -42,3 +42,6 @@ editor = executable('emeus-edit-constraints',
                     dependencies: [ glib_dep, gtk_dep, emeus_dep ],
                     link_with: libemeus_private,
                     install: true)
+
+install_data('com.endlessm.EmeusEditor.png',
+             install_dir: join_paths(get_option('datadir'), 'icons/hicolor/256x256/apps'))

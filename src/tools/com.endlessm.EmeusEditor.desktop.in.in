@@ -5,6 +5,6 @@ Exec=emeus-edit-constraints
 StartupNotify=true
 Terminal=false
 Type=Application
-Icon=view-fullscreen-symbolic
+Icon=com.endlessm.EmeusEditor
 Keywords=Build;Develop;Editor;
 DBusActivatable=true
