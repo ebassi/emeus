@@ -142,8 +142,9 @@ and using a <a href="https://developer.apple.com/library/content/documentation/U
 <p>The <acronym title="Visual Format Language">VFL</acronym> is a compact syntax that describes how the
 layout should look like; for instance:
 
-<pre><code>
-|-[button1(&gt;=250)]-[button2(==button1)]-[button3(==button1)]-|
+<img src="images/three-buttons.png"/>
+
+<pre><code>|-[button1(&gt;=250)]-[button2(==button1)]-[button3(==button1)]-|
 V:|-[button1(==100)]
 V:|-[button2(==button1)]
 V:|-[button3(==button1)]
@@ -159,19 +160,37 @@ on each button:
   <li><code>button3</code> must have the same width and height of <code>button1</code></li>
 </ul>
 
-<p>Another example:</p>
+<hr/>
 
-<pre><code>
-H:|-[view0(view2)]-[view2]-|
+<p>Some additional examples of layouts described via <acronym title="Visual Format Language">VFL</acronym>:</p>
+
+<h6>Side bar</h6>
+
+<img src="images/vfl-boxes-sidebar.png"/>
+
+<pre><code>H:|-[view0(view2)]-[view2]-|
 H:|-[view1(view3)]-[view3]-|
 H:[view4(view3)]-|
 V:|-[view0(view1)]-[view1]-|
 V:|-[view2(view3,view4)]-[view3]-[view4]-|
 </code></pre>
 
-<p>Results in:</p>
+<hr/>
 
-<img src="images/vfl-boxes-sidebar.png"/>
+<h6>Details</h6>
+
+<img src="images/vfl-icon-details.png"/>
+
+<pre><code>H:|-[view0(==128)]-[view1]-|
+H:|-[view4(==view0)]
+H:[view2(==view1)]-|
+H:[view3(==view1)]-|
+V:|-[view0(==128)]
+V:[view4(==48)]-|
+V:|-[view1]-[view2(view1)]-[view3(view1)]-|
+</code></pre>
+
+<hr/>
 
 <p>A layout can be described using <acronym title="Visual Format Language">VFL</acronym> by
 letting Emeus parse the description and generate the necessary constraints.</p>
