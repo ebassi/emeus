@@ -1810,6 +1810,7 @@ emeus_constraint_layout_child_get_property (GObject    *gobject,
 static void
 emeus_constraint_layout_child_get_preferred_size (EmeusConstraintLayoutChild *self,
                                                   GtkOrientation              orientation,
+                                                  int                         for_size,
                                                   int                        *minimum_p,
                                                   int                        *natural_p)
 {
@@ -1824,7 +1825,11 @@ emeus_constraint_layout_child_get_preferred_size (EmeusConstraintLayoutChild *se
       attr = get_child_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
       if (child != NULL && gtk_widget_get_visible (child))
         {
-          gtk_widget_get_preferred_width (child, &child_min, &child_nat);
+
+          if (for_size == -1.0)
+            gtk_widget_get_preferred_width (child, &child_min, &child_nat);
+          else
+            gtk_widget_get_preferred_width_for_height (child, for_size, &child_min, &child_nat);
 
           if (self->width_constraint == NULL)
             {
@@ -1850,7 +1855,10 @@ emeus_constraint_layout_child_get_preferred_size (EmeusConstraintLayoutChild *se
       attr = get_child_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
       if (child != NULL && gtk_widget_get_visible (child))
         {
-          gtk_widget_get_preferred_height (child, &child_min, &child_nat);
+          if (for_size == -1.0)
+            gtk_widget_get_preferred_height (child, &child_min, &child_nat);
+          else
+            gtk_widget_get_preferred_height_for_width (child, for_size, &child_min, &child_nat);
 
           if (self->height_constraint == NULL)
             {
@@ -1887,6 +1895,7 @@ emeus_constraint_layout_child_get_preferred_width (GtkWidget *widget,
 {
   emeus_constraint_layout_child_get_preferred_size (EMEUS_CONSTRAINT_LAYOUT_CHILD (widget),
                                                     GTK_ORIENTATION_HORIZONTAL,
+                                                    -1.0,
                                                     minimum_p,
                                                     natural_p);
 }
@@ -1898,6 +1907,33 @@ emeus_constraint_layout_child_get_preferred_height (GtkWidget *widget,
 {
   emeus_constraint_layout_child_get_preferred_size (EMEUS_CONSTRAINT_LAYOUT_CHILD (widget),
                                                     GTK_ORIENTATION_VERTICAL,
+                                                    -1.0,
+                                                    minimum_p,
+                                                    natural_p);
+}
+
+static void
+emeus_constraint_layout_child_get_preferred_width_for_height (GtkWidget *widget,
+                                                              int        height,
+                                                              int       *minimum_p,
+                                                              int       *natural_p)
+{
+  emeus_constraint_layout_child_get_preferred_size (EMEUS_CONSTRAINT_LAYOUT_CHILD (widget),
+                                                    GTK_ORIENTATION_HORIZONTAL,
+                                                    height,
+                                                    minimum_p,
+                                                    natural_p);
+}
+
+static void
+emeus_constraint_layout_child_get_preferred_height_for_width (GtkWidget *widget,
+                                                              int        width,
+                                                              int       *minimum_p,
+                                                              int       *natural_p)
+{
+  emeus_constraint_layout_child_get_preferred_size (EMEUS_CONSTRAINT_LAYOUT_CHILD (widget),
+                                                    GTK_ORIENTATION_VERTICAL,
+                                                    width,
                                                     minimum_p,
                                                     natural_p);
 }
@@ -1930,6 +1966,8 @@ emeus_constraint_layout_child_class_init (EmeusConstraintLayoutChildClass *klass
 
   widget_class->get_preferred_width = emeus_constraint_layout_child_get_preferred_width;
   widget_class->get_preferred_height = emeus_constraint_layout_child_get_preferred_height;
+  widget_class->get_preferred_width_for_height = emeus_constraint_layout_child_get_preferred_width_for_height;
+  widget_class->get_preferred_height_for_width = emeus_constraint_layout_child_get_preferred_height_for_width;
   widget_class->draw = emeus_constraint_layout_child_draw;
 
   gtk_container_class_handle_border_width (container_class);
