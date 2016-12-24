@@ -1,5 +1,5 @@
 project('emeus', 'c',
-        version: '1.0.0',
+        version: '0.99.1',
         default_options: [
           'buildtype=debug',
           'c_std=c99',
@@ -13,13 +13,23 @@ emeus_major_version = emeus_version[0].to_int()
 emeus_minor_version = emeus_version[1].to_int()
 emeus_micro_version = emeus_version[2].to_int()
 
-emeus_api_version = '@0@.0'.format(emeus_major_version)
-
-emeus_interface_age = 0
-emeus_binary_age = emeus_minor_version * 100 + emeus_micro_version
-
 emeus_is_development = emeus_minor_version.is_odd()
 
+if emeus_minor_version > 90
+  emeus_api_version = '@0@.0'.format(emeus_major_version + 1)
+else
+  emeus_api_version = '@0@.0'.format(emeus_major_version)
+endif
+
+if emeus_is_development
+  emeus_interface_age = 0
+else
+  emeus_interface_age = emeus_micro_version
+endif
+
+emeus_binary_age = emeus_minor_version * 100 + emeus_micro_version
+
+# Paths for the pkg-config file
 emeus_prefix = get_option('prefix')
 emeus_bindir = join_paths(emeus_prefix, get_option('bindir'))
 emeus_libdir = join_paths(emeus_prefix, get_option('libdir'))
