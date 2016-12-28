@@ -11,6 +11,7 @@ ignore_headers = [
   'emeus-types-private.h',
   'emeus-utils-private.h',
   'emeus-variable-private.h',
+  'emeus-version.h',
   'emeus-vfl-parser-private.h',
   'emeus-test-utils.h',
 ]
