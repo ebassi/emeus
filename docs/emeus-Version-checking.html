@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Version checking: Emeus 1.0 Reference Manual</title>
+<title>Version macros: Emeus 1.0 Reference Manual</title>
 <meta name="generator" content="DocBook XSL Stylesheets V1.79.1">
 <link rel="home" href="index.html" title="Emeus 1.0 Reference Manual">
 <link rel="up" href="ch01.html" title="Emeus">
@@ -26,8 +26,8 @@
 <a name="emeus-Version-checking"></a><div class="titlepage"></div>
 <div class="refnamediv"><table width="100%"><tr>
 <td valign="top">
-<h2><span class="refentrytitle"><a name="emeus-Version-checking.top_of_page"></a>Version checking</span></h2>
-<p>Version checking</p>
+<h2><span class="refentrytitle"><a name="emeus-Version-checking.top_of_page"></a>Version macros</span></h2>
+<p>Version macros — Check the version at compile time</p>
 </td>
 <td class="gallery_image" valign="top" align="right"></td>
 </tr></table></div>
@@ -47,12 +47,38 @@
 </table></div>
 </div>
 <div class="refsect1">
+<a name="emeus-Version-checking.other"></a><h2>Types and Values</h2>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="name">
+<col class="description">
+</colgroup>
+<tbody>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="emeus-Version-checking.html#EMEUS-VERSION-MIN-REQUIRED:CAPS" title="EMEUS_VERSION_MIN_REQUIRED">EMEUS_VERSION_MIN_REQUIRED</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="emeus-Version-checking.html#EMEUS-VERSION-MAX-ALLOWED:CAPS" title="EMEUS_VERSION_MAX_ALLOWED">EMEUS_VERSION_MAX_ALLOWED</a></td>
+</tr>
+<tr>
+<td class="define_keyword">#define</td>
+<td class="function_name"><a class="link" href="emeus-Version-checking.html#EMEUS-VERSION-1-0:CAPS" title="EMEUS_VERSION_1_0">EMEUS_VERSION_1_0</a></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<div class="refsect1">
 <a name="emeus-Version-checking.includes"></a><h2>Includes</h2>
 <pre class="synopsis">#include &lt;emeus.h&gt;
 </pre>
 </div>
 <div class="refsect1">
 <a name="emeus-Version-checking.description"></a><h2>Description</h2>
+<p>Emeus allows checking the version of the API at compile time; this can be
+used to write code that can be used when built against a specific version
+of the library.</p>
 </div>
 <div class="refsect1">
 <a name="emeus-Version-checking.functions_details"></a><h2>Functions</h2>
@@ -60,6 +86,11 @@
 <a name="EMEUS-CHECK-VERSION:CAPS"></a><h3>EMEUS_CHECK_VERSION()</h3>
 <pre class="programlisting">#define             EMEUS_CHECK_VERSION(major,minor,micro)</pre>
 <p>Compile time check for a specific version of Emeus.</p>
+<p>This macro evaluates to <a href="https://developer.gnome.org/glib/stable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if the version of Emeus is greater than
+or equal to <em class="parameter"><code>major</code></em>
+.<em class="parameter"><code>minor</code></em>
+.<em class="parameter"><code>micro</code></em>
+.</p>
 <div class="refsect3">
 <a name="EMEUS-CHECK-VERSION.parameters"></a><h4>Parameters</h4>
 <div class="informaltable"><table class="informaltable" width="100%" border="0">
@@ -71,17 +102,17 @@
 <tbody>
 <tr>
 <td class="parameter_name"><p>major</p></td>
-<td class="parameter_description"><p>the major version, or 1 in 1.2.3</p></td>
+<td class="parameter_description"><p>the major version, or 1 in <code class="literal">1.2.3</code></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
 <td class="parameter_name"><p>minor</p></td>
-<td class="parameter_description"><p>the minor version, or 2 in 1.2.3</p></td>
+<td class="parameter_description"><p>the minor version, or 2 in <code class="literal">1.2.3</code></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 <tr>
 <td class="parameter_name"><p>micro</p></td>
-<td class="parameter_description"><p>the micro version, or 3 in 1.2.3</p></td>
+<td class="parameter_description"><p>the micro version, or 3 in <code class="literal">1.2.3</code></p></td>
 <td class="parameter_annotations"> </td>
 </tr>
 </tbody>
@@ -92,6 +123,51 @@
 </div>
 <div class="refsect1">
 <a name="emeus-Version-checking.other_details"></a><h2>Types and Values</h2>
+<div class="refsect2">
+<a name="EMEUS-VERSION-MIN-REQUIRED:CAPS"></a><h3>EMEUS_VERSION_MIN_REQUIRED</h3>
+<pre class="programlisting"># define EMEUS_VERSION_MIN_REQUIRED     (EMEUS_VERSION_CUR_STABLE)
+</pre>
+<p>Defines the lower bound of the API of Emeus that can be used.</p>
+<p>This macro can only be defined prior to including <code class="literal">emeus.h</code>.</p>
+<p>The allowed values for this macro are one of the encoded Emeus version symbols,
+like <a class="link" href="emeus-Version-checking.html#EMEUS-VERSION-1-0:CAPS" title="EMEUS_VERSION_1_0"><code class="literal">EMEUS_VERSION_1_0</code></a>.</p>
+<p>If this pre-processor symbol is defined, Emeus will only emit compiler warnings
+when attempting to use functions that have been deprecated in newer versions
+of the library; for instance, if <a class="link" href="emeus-Version-checking.html#EMEUS-VERSION-MIN-REQUIRED:CAPS" title="EMEUS_VERSION_MIN_REQUIRED"><code class="literal">EMEUS_VERSION_MIN_REQUIRED</code></a> is defined to be
+<code class="literal">EMEUS_VERSION_1_4</code>, you'll be able to use API that has been deprecated in version
+1.0 and 1.2 without any warning; any API deprecated in 1.4 and above will emit a
+compiler warning.</p>
+<p>See also: <a class="link" href="emeus-Version-checking.html#EMEUS-VERSION-MAX-ALLOWED:CAPS" title="EMEUS_VERSION_MAX_ALLOWED"><code class="literal">EMEUS_VERSION_MAX_ALLOWED</code></a></p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EMEUS-VERSION-MAX-ALLOWED:CAPS"></a><h3>EMEUS_VERSION_MAX_ALLOWED</h3>
+<pre class="programlisting">#  define EMEUS_VERSION_MAX_ALLOWED     EMEUS_VERSION_MIN_REQUIRED
+</pre>
+<p>Defines the upper bound of the API of Emeus that can be used.</p>
+<p>This macro can only be defined prior to including <code class="literal">emeus.h</code>.</p>
+<p>The allowed values for this macro are one of the encoded Emeus version symbols,
+like <a class="link" href="emeus-Version-checking.html#EMEUS-VERSION-1-0:CAPS" title="EMEUS_VERSION_1_0"><code class="literal">EMEUS_VERSION_1_0</code></a>.</p>
+<p>If this pre-processor symbol is define, Emeus will emit a compiler warning when
+attempting to use functions that have been introduced in newer versions of the
+library; for instance, if <a class="link" href="emeus-Version-checking.html#EMEUS-VERSION-MAX-ALLOWED:CAPS" title="EMEUS_VERSION_MAX_ALLOWED"><code class="literal">EMEUS_VERSION_MAX_ALLOWED</code></a> is defined to be
+<code class="literal">EMEUS_VERSION_1_2</code>, you'll be able to use API that has been introduced in version
+1.0 and 1.2 without any warning; any API introduced in 1.4 and above will emit
+a compiler warning.</p>
+<p>See also: <a class="link" href="emeus-Version-checking.html#EMEUS-VERSION-MIN-REQUIRED:CAPS" title="EMEUS_VERSION_MIN_REQUIRED"><code class="literal">EMEUS_VERSION_MIN_REQUIRED</code></a></p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="EMEUS-VERSION-1-0:CAPS"></a><h3>EMEUS_VERSION_1_0</h3>
+<pre class="programlisting">#define EMEUS_VERSION_1_0       (G_ENCODE_VERSION (1, 0))
+</pre>
+<p>A pre-processor symbol that expands to the 1.0 version of Emeus.</p>
+<p>You should use this macro with <a class="link" href="emeus-Version-checking.html#EMEUS-VERSION-MIN-REQUIRED:CAPS" title="EMEUS_VERSION_MIN_REQUIRED"><code class="literal">EMEUS_VERSION_MIN_REQUIRED</code></a> and
+<a class="link" href="emeus-Version-checking.html#EMEUS-VERSION-MAX-ALLOWED:CAPS" title="EMEUS_VERSION_MAX_ALLOWED"><code class="literal">EMEUS_VERSION_MAX_ALLOWED</code></a>.</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
 </div>
 </div>
 <div class="footer">

@@ -30,7 +30,7 @@
 <div class="refnamediv"><table width="100%"><tr>
 <td valign="top">
 <h2><span class="refentrytitle"><a name="EmeusConstraintLayout.top_of_page"></a>EmeusConstraintLayout</span></h2>
-<p>EmeusConstraintLayout</p>
+<p>EmeusConstraintLayout — A widget container using layout constraints</p>
 </td>
 <td class="gallery_image" valign="top" align="right"></td>
 </tr></table></div>
@@ -80,6 +80,14 @@
 </td>
 <td class="function_name">
 <a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-get-constraints" title="emeus_constraint_layout_get_constraints ()">emeus_constraint_layout_get_constraints</a> <span class="c_punctuation">()</span>
+</td>
+</tr>
+<tr>
+<td class="function_type">
+<span class="returnvalue">void</span>
+</td>
+<td class="function_name">
+<a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-clear-constraints" title="emeus_constraint_layout_clear_constraints ()">emeus_constraint_layout_clear_constraints</a> <span class="c_punctuation">()</span>
 </td>
 </tr>
 <tr>
@@ -488,6 +496,32 @@ for each constraint instance.</p>
 emeus_constraint_layout_add_constraint
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> *layout</code></em>,
                                 <em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Adds <em class="parameter"><code>constraint</code></em>
+ to the <em class="parameter"><code>layout</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-add-constraint.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>layout</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -497,6 +531,37 @@ emeus_constraint_layout_add_constraints
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> *layout</code></em>,
                                 <em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *first_constraint</code></em>,
                                 <em class="parameter"><code>...</code></em>);</pre>
+<p>Adds multiple <a href="EmeusConstraint.html#EmeusConstraint-struct"><span class="type">EmeusConstraints</span></a> at once to the <em class="parameter"><code>layout</code></em>
+.</p>
+<p>See also: <a class="link" href="EmeusConstraintLayout.html#emeus-constraint-layout-add-constraints" title="emeus_constraint_layout_add_constraints ()"><code class="function">emeus_constraint_layout_add_constraints()</code></a></p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-add-constraints.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>layout</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>first_constraint</p></td>
+<td class="parameter_description"><p>the first <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>...</p></td>
+<td class="parameter_description"><p>a <a href="https://developer.gnome.org/glib/stable/glib-Standard-Macros.html#NULL:CAPS"><code class="literal">NULL</code></a>-terminated list of <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> instances</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -526,6 +591,30 @@ emeus_constraint_layout_get_constraints
 <p> a list of
 <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> instances, owned by the <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>. </p>
 <p><span class="annotation">[<acronym title="Free data container after the code is done."><span class="acronym">transfer container</span></acronym>][<acronym title="Generics and defining elements of containers and arrays."><span class="acronym">element-type</span></acronym> EmeusConstraint]</span></p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
+</div>
+<hr>
+<div class="refsect2">
+<a name="emeus-constraint-layout-clear-constraints"></a><h3>emeus_constraint_layout_clear_constraints ()</h3>
+<pre class="programlisting"><span class="returnvalue">void</span>
+emeus_constraint_layout_clear_constraints
+                               (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> *layout</code></em>);</pre>
+<p>Removes all constraints from a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-clear-constraints.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>layout</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
 </div>
 <p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
@@ -805,12 +894,57 @@ emeus_constraint_layout_child_clear_constraints
 <pre class="programlisting">const <span class="returnvalue">char</span> *
 emeus_constraint_layout_child_get_name
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+<p>Retrieves the name of the <em class="parameter"><code>child</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-name.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-name.returns"></a><h4>Returns</h4>
+<p> the name of the child. </p>
+<p><span class="annotation">[<acronym title="NULL may be passed as the value in, out, in-out; or as a return value."><span class="acronym">nullable</span></acronym>][<acronym title="Don't free data after the code is done."><span class="acronym">transfer none</span></acronym>]</span></p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="emeus-constraint-layout-child-get-top"></a><h3>emeus_constraint_layout_child_get_top ()</h3>
 <pre class="programlisting"><span class="returnvalue">int</span>
 emeus_constraint_layout_child_get_top (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+<p>Retrieves the value of the <a class="link" href="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-TOP:CAPS"><code class="literal">EMEUS_CONSTRAINT_ATTRIBUTE_TOP</code></a> for the <em class="parameter"><code>child</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-top.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-top.returns"></a><h4>Returns</h4>
+<p> the value of the attribute</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -818,6 +952,28 @@ emeus_constraint_layout_child_get_top (<em class="parameter"><code><a class="lin
 <pre class="programlisting"><span class="returnvalue">int</span>
 emeus_constraint_layout_child_get_bottom
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+<p>Retrieves the value of the <a class="link" href="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-BOTTOM:CAPS"><code class="literal">EMEUS_CONSTRAINT_ATTRIBUTE_BOTTOM</code></a> for the <em class="parameter"><code>child</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-bottom.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-bottom.returns"></a><h4>Returns</h4>
+<p> the value of the attribute</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -825,6 +981,28 @@ emeus_constraint_layout_child_get_bottom
 <pre class="programlisting"><span class="returnvalue">int</span>
 emeus_constraint_layout_child_get_left
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+<p>Retrieves the value of the <a class="link" href="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-LEFT:CAPS"><code class="literal">EMEUS_CONSTRAINT_ATTRIBUTE_LEFT</code></a> for the <em class="parameter"><code>child</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-left.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-left.returns"></a><h4>Returns</h4>
+<p> the value of the attribute</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -832,6 +1010,28 @@ emeus_constraint_layout_child_get_left
 <pre class="programlisting"><span class="returnvalue">int</span>
 emeus_constraint_layout_child_get_right
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+<p>Retrieves the value of the <a class="link" href="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-RIGHT:CAPS"><code class="literal">EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT</code></a> for the <em class="parameter"><code>child</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-right.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-right.returns"></a><h4>Returns</h4>
+<p> the value of the attribute</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -839,6 +1039,28 @@ emeus_constraint_layout_child_get_right
 <pre class="programlisting"><span class="returnvalue">int</span>
 emeus_constraint_layout_child_get_width
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+<p>Retrieves the value of the <a class="link" href="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-WIDTH:CAPS"><code class="literal">EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH</code></a> for the <em class="parameter"><code>child</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-width.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-width.returns"></a><h4>Returns</h4>
+<p> the value of the attribute</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -846,6 +1068,28 @@ emeus_constraint_layout_child_get_width
 <pre class="programlisting"><span class="returnvalue">int</span>
 emeus_constraint_layout_child_get_height
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+<p>Retrieves the value of the <a class="link" href="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-HEIGHT:CAPS"><code class="literal">EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT</code></a> for the <em class="parameter"><code>child</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-height.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-height.returns"></a><h4>Returns</h4>
+<p> the value of the attribute</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -853,6 +1097,28 @@ emeus_constraint_layout_child_get_height
 <pre class="programlisting"><span class="returnvalue">int</span>
 emeus_constraint_layout_child_get_center_x
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+<p>Retrieves the value of the <a class="link" href="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-CENTER-X:CAPS"><code class="literal">EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X</code></a> for the <em class="parameter"><code>child</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-center-x.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-center-x.returns"></a><h4>Returns</h4>
+<p> the value of the attribute</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -860,6 +1126,28 @@ emeus_constraint_layout_child_get_center_x
 <pre class="programlisting"><span class="returnvalue">int</span>
 emeus_constraint_layout_child_get_center_y
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>);</pre>
+<p>Retrieves the value of the <a class="link" href="EmeusConstraint.html#EMEUS-CONSTRAINT-ATTRIBUTE-CENTER-Y:CAPS"><code class="literal">EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y</code></a> for the <em class="parameter"><code>child</code></em>
+.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-center-y.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-get-center-y.returns"></a><h4>Returns</h4>
+<p> the value of the attribute</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -868,6 +1156,33 @@ emeus_constraint_layout_child_get_center_y
 emeus_constraint_layout_child_set_intrinsic_height
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>,
                                 <em class="parameter"><code><span class="type">int</span> height</code></em>);</pre>
+<p>Creates a new constraint on the height of the <em class="parameter"><code>child</code></em>
+.</p>
+<p>If <em class="parameter"><code>height</code></em>
+ is a negative value, the constraint is removed.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-set-intrinsic-height.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>height</p></td>
+<td class="parameter_description"><p>the intrinsic width</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -876,6 +1191,33 @@ emeus_constraint_layout_child_set_intrinsic_height
 emeus_constraint_layout_child_set_intrinsic_width
                                (<em class="parameter"><code><a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a> *child</code></em>,
                                 <em class="parameter"><code><span class="type">int</span> width</code></em>);</pre>
+<p>Creates a new constraint on the width of the <em class="parameter"><code>child</code></em>
+.</p>
+<p>If <em class="parameter"><code>width</code></em>
+ is a negative value, the constraint is removed.</p>
+<div class="refsect3">
+<a name="emeus-constraint-layout-child-set-intrinsic-width.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>child</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraintLayout.html#EmeusConstraintLayoutChild"><span class="type">EmeusConstraintLayoutChild</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>width</p></td>
+<td class="parameter_description"><p>the intrinsic width</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 </div>
 <div class="refsect1">
@@ -883,11 +1225,19 @@ emeus_constraint_layout_child_set_intrinsic_width
 <div class="refsect2">
 <a name="EmeusConstraintLayout-struct"></a><h3>EmeusConstraintLayout</h3>
 <pre class="programlisting">typedef struct _EmeusConstraintLayout EmeusConstraintLayout;</pre>
+<p>A container that uses constraints to determine the layout policy.</p>
+<p>The contents of the <code class="literal">EmeusConstraintLayout</code> are private and should never be
+accessed directly.</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="EmeusConstraintLayoutChild-struct"></a><h3>EmeusConstraintLayoutChild</h3>
 <pre class="programlisting">typedef struct _EmeusConstraintLayoutChild EmeusConstraintLayoutChild;</pre>
+<p>A child in a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>.</p>
+<p>The contents of the <code class="literal">EmeusConstraintLayoutChild</code> structure are private and
+should never be accessed directly.</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 </div>
 <div class="refsect1">
@@ -898,6 +1248,7 @@ emeus_constraint_layout_child_set_intrinsic_width
 <p>The name of the child.</p>
 <p>Flags: Read / Write / Construct Only</p>
 <p>Default value: NULL</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 </div>
 </div>

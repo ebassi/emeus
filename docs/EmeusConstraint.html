@@ -7,7 +7,7 @@
 <link rel="home" href="index.html" title="Emeus 1.0 Reference Manual">
 <link rel="up" href="ch01.html" title="Emeus">
 <link rel="prev" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout">
-<link rel="next" href="emeus-Version-checking.html" title="Version checking">
+<link rel="next" href="emeus-Version-checking.html" title="Version macros">
 <meta name="generator" content="GTK-Doc V1.25 (XML mode)">
 <link rel="stylesheet" href="style.css" type="text/css">
 </head>
@@ -29,7 +29,7 @@
 <div class="refnamediv"><table width="100%"><tr>
 <td valign="top">
 <h2><span class="refentrytitle"><a name="EmeusConstraint.top_of_page"></a>EmeusConstraint</span></h2>
-<p>EmeusConstraint</p>
+<p>EmeusConstraint — The representation of a single constraint</p>
 </td>
 <td class="gallery_image" valign="top" align="right"></td>
 </tr></table></div>
@@ -244,7 +244,7 @@
 </div>
 <div class="refsect1">
 <a name="EmeusConstraint.object-hierarchy"></a><h2>Object Hierarchy</h2>
-<pre class="screen">    <a href="https://developer.gnome.org/gobject/stable//gobject-Enumeration-and-Flag-Types.html">GEnum</a>
+<pre class="screen">    <a href="https://developer.gnome.org/gobject/stable/gobject-Enumeration-and-Flag-Types.html">GEnum</a>
     <span class="lineart">├──</span> EmeusConstraintAttribute
     <span class="lineart">├──</span> EmeusConstraintRelation
     <span class="lineart">╰──</span> EmeusConstraintStrength
@@ -688,13 +688,62 @@ emeus_constraint_get_strength (<em class="parameter"><code><a class="link" href=
 <a name="emeus-constraint-set-active"></a><h3>emeus_constraint_set_active ()</h3>
 <pre class="programlisting"><span class="returnvalue">void</span>
 emeus_constraint_set_active (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>,
-                             <em class="parameter"><code><a href="https://developer.gnome.org/glib/stable/glib-Basic-Types.html#gboolean"><span class="type">gboolean</span></a> is_active</code></em>);</pre>
+                             <em class="parameter"><code><a href="https://developer.gnome.org/glib/stable/glib-Basic-Types.html#gboolean"><span class="type">gboolean</span></a> active</code></em>);</pre>
+<p>Sets whether a <em class="parameter"><code>constraint</code></em>
+ should be actively used by
+a <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a> or not.</p>
+<div class="refsect3">
+<a name="emeus-constraint-set-active.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody>
+<tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+<tr>
+<td class="parameter_name"><p>active</p></td>
+<td class="parameter_description"><p>whether the <em class="parameter"><code>constraint</code></em>
+should be active</p></td>
+<td class="parameter_annotations"> </td>
+</tr>
+</tbody>
+</table></div>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="emeus-constraint-get-active"></a><h3>emeus_constraint_get_active ()</h3>
 <pre class="programlisting"><a href="https://developer.gnome.org/glib/stable/glib-Basic-Types.html#gboolean"><span class="returnvalue">gboolean</span></a>
 emeus_constraint_get_active (<em class="parameter"><code><a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> *constraint</code></em>);</pre>
+<p>Checks whether a <em class="parameter"><code>constraint</code></em>
+ is active.</p>
+<div class="refsect3">
+<a name="emeus-constraint-get-active.parameters"></a><h4>Parameters</h4>
+<div class="informaltable"><table class="informaltable" width="100%" border="0">
+<colgroup>
+<col width="150px" class="parameters_name">
+<col class="parameters_description">
+<col width="200px" class="parameters_annotations">
+</colgroup>
+<tbody><tr>
+<td class="parameter_name"><p>constraint</p></td>
+<td class="parameter_description"><p>a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a></p></td>
+<td class="parameter_annotations"> </td>
+</tr></tbody>
+</table></div>
+</div>
+<div class="refsect3">
+<a name="emeus-constraint-get-active.returns"></a><h4>Returns</h4>
+<p> <a href="https://developer.gnome.org/glib/stable/glib-Standard-Macros.html#TRUE:CAPS"><code class="literal">TRUE</code></a> if the constraint is active</p>
+</div>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -759,6 +808,10 @@ emeus_constraint_is_required (<em class="parameter"><code><a class="link" href="
 <div class="refsect2">
 <a name="EmeusConstraint-struct"></a><h3>EmeusConstraint</h3>
 <pre class="programlisting">typedef struct _EmeusConstraint EmeusConstraint;</pre>
+<p>The representation of a constraint inside an <a class="link" href="EmeusConstraintLayout.html" title="EmeusConstraintLayout"><span class="type">EmeusConstraintLayout</span></a>.</p>
+<p>The contents of the <code class="literal">EmeusConstraint</code> structure are private and should
+never be accessed directly.</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
@@ -962,62 +1015,88 @@ emeus_constraint_is_required (<em class="parameter"><code><a class="link" href="
 <div class="refsect2">
 <a name="EmeusConstraint--active"></a><h3>The <code class="literal">“active”</code> property</h3>
 <pre class="programlisting">  “active”                   <a href="https://developer.gnome.org/glib/stable/glib-Basic-Types.html#gboolean"><span class="type">gboolean</span></a></pre>
+<p>Whether a <a class="link" href="EmeusConstraint.html" title="EmeusConstraint"><span class="type">EmeusConstraint</span></a> participates in the layout.</p>
 <p>Flags: Read / Write</p>
 <p>Default value: TRUE</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="EmeusConstraint--constant"></a><h3>The <code class="literal">“constant”</code> property</h3>
 <pre class="programlisting">  “constant”                 <a href="https://developer.gnome.org/glib/stable/glib-Basic-Types.html#gdouble"><span class="type">gdouble</span></a></pre>
+<p>The constant factor to be applied to the value of
+the <a class="link" href="EmeusConstraint.html#EmeusConstraint--source-attribute" title="The “source-attribute” property"><span class="type">“source-attribute”</span></a> in the constraint.</p>
 <p>Flags: Read / Write / Construct Only</p>
 <p>Default value: 0</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="EmeusConstraint--multiplier"></a><h3>The <code class="literal">“multiplier”</code> property</h3>
 <pre class="programlisting">  “multiplier”               <a href="https://developer.gnome.org/glib/stable/glib-Basic-Types.html#gdouble"><span class="type">gdouble</span></a></pre>
+<p>The multiplication factor to be applied to the value of
+the <a class="link" href="EmeusConstraint.html#EmeusConstraint--source-attribute" title="The “source-attribute” property"><span class="type">“source-attribute”</span></a> in the constraint.</p>
 <p>Flags: Read / Write / Construct Only</p>
 <p>Default value: 1</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="EmeusConstraint--relation"></a><h3>The <code class="literal">“relation”</code> property</h3>
 <pre class="programlisting">  “relation”                 <a class="link" href="EmeusConstraint.html#EmeusConstraintRelation" title="enum EmeusConstraintRelation"><span class="type">EmeusConstraintRelation</span></a></pre>
+<p>The relation between target and source attributes in
+the constraint.</p>
 <p>Flags: Read / Write / Construct Only</p>
 <p>Default value: EMEUS_CONSTRAINT_RELATION_EQ</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="EmeusConstraint--source-attribute"></a><h3>The <code class="literal">“source-attribute”</code> property</h3>
 <pre class="programlisting">  “source-attribute”         <a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="type">EmeusConstraintAttribute</span></a></pre>
+<p>The attribute on the <a class="link" href="EmeusConstraint.html#EmeusConstraint--source-object" title="The “source-object” property"><span class="type">“source-object”</span></a> in the
+constraint.</p>
 <p>Flags: Read / Write / Construct Only</p>
 <p>Default value: EMEUS_CONSTRAINT_ATTRIBUTE_INVALID</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="EmeusConstraint--source-object"></a><h3>The <code class="literal">“source-object”</code> property</h3>
 <pre class="programlisting">  “source-object”            <a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-struct"><span class="type">GtkWidget</span></a> *</pre>
+<p>The source object in the constraint.</p>
 <p>Flags: Read / Write / Construct Only</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="EmeusConstraint--strength"></a><h3>The <code class="literal">“strength”</code> property</h3>
 <pre class="programlisting">  “strength”                 <a href="https://developer.gnome.org/glib/stable/glib-Basic-Types.html#gint"><span class="type">gint</span></a></pre>
+<p>The strength, or priority of the constraint.</p>
+<p>You can use any positive integer for custom priorities, or use
+the values of the <a class="link" href="EmeusConstraint.html#EmeusConstraintStrength" title="enum EmeusConstraintStrength"><span class="type">EmeusConstraintStrength</span></a> enumeration for common
+strength values.</p>
 <p>Flags: Read / Write / Construct Only</p>
 <p>Default value: 0</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="EmeusConstraint--target-attribute"></a><h3>The <code class="literal">“target-attribute”</code> property</h3>
 <pre class="programlisting">  “target-attribute”         <a class="link" href="EmeusConstraint.html#EmeusConstraintAttribute" title="enum EmeusConstraintAttribute"><span class="type">EmeusConstraintAttribute</span></a></pre>
+<p>The attribute on the <a class="link" href="EmeusConstraint.html#EmeusConstraint--target-object" title="The “target-object” property"><span class="type">“target-object”</span></a> in
+the constraint.</p>
 <p>Flags: Read / Write / Construct Only</p>
 <p>Default value: EMEUS_CONSTRAINT_ATTRIBUTE_INVALID</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 <hr>
 <div class="refsect2">
 <a name="EmeusConstraint--target-object"></a><h3>The <code class="literal">“target-object”</code> property</h3>
 <pre class="programlisting">  “target-object”            <a href="https://developer.gnome.org/gtk3/stable/GtkWidget.html#GtkWidget-struct"><span class="type">GtkWidget</span></a> *</pre>
+<p>The target object in the constraint.</p>
 <p>Flags: Read / Write / Construct Only</p>
+<p class="since">Since: <a class="link" href="ix03.html#api-index-1.0">1.0</a></p>
 </div>
 </div>
 </div>
