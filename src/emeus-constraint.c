@@ -211,6 +211,13 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
   gobject_class->get_property = emeus_constraint_get_property;
   gobject_class->finalize = emeus_constraint_finalize;
 
+  /**
+   * EmeusConstraint:target-object:
+   *
+   * The target object in the constraint.
+   *
+   * Since: 1.0
+   */
   emeus_constraint_properties[PROP_TARGET_OBJECT] =
     g_param_spec_object ("target-object", "Target Object", NULL,
                          GTK_TYPE_WIDGET,
@@ -218,6 +225,14 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
                          G_PARAM_READWRITE |
                          G_PARAM_STATIC_STRINGS);
 
+  /**
+   * EmeusConstraint:target-attribute:
+   *
+   * The attribute on the #EmeusConstraint:target-object in
+   * the constraint.
+   *
+   * Since: 1.0
+   */
   emeus_constraint_properties[PROP_TARGET_ATTRIBUTE] =
     g_param_spec_enum ("target-attribute", "Target Attribute", NULL,
                        EMEUS_TYPE_CONSTRAINT_ATTRIBUTE,
@@ -226,6 +241,14 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
                        G_PARAM_READWRITE |
                        G_PARAM_STATIC_STRINGS);
 
+  /**
+   * EmeusConstraint:relation:
+   *
+   * The relation between target and source attributes in
+   * the constraint.
+   *
+   * Since: 1.0
+   */
   emeus_constraint_properties[PROP_RELATION] =
     g_param_spec_enum ("relation", "Relation", NULL,
                        EMEUS_TYPE_CONSTRAINT_RELATION,
@@ -234,6 +257,13 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
                        G_PARAM_READWRITE |
                        G_PARAM_STATIC_STRINGS);
 
+  /**
+   * EmeusConstraint:source-object:
+   *
+   * The source object in the constraint.
+   *
+   * Since: 1.0
+   */
   emeus_constraint_properties[PROP_SOURCE_OBJECT] =
     g_param_spec_object ("source-object", "Source Object", NULL,
                          GTK_TYPE_WIDGET,
@@ -241,6 +271,14 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
                          G_PARAM_READWRITE |
                          G_PARAM_STATIC_STRINGS);
 
+  /**
+   * EmeusConstraint:source-attribute:
+   *
+   * The attribute on the #EmeusConstraint:source-object in the
+   * constraint.
+   *
+   * Since: 1.0
+   */
   emeus_constraint_properties[PROP_SOURCE_ATTRIBUTE] =
     g_param_spec_enum ("source-attribute", "Source Attribute", NULL,
                        EMEUS_TYPE_CONSTRAINT_ATTRIBUTE,
@@ -249,6 +287,14 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
                        G_PARAM_READWRITE |
                        G_PARAM_STATIC_STRINGS);
 
+  /**
+   * EmeusConstraint:multiplier:
+   *
+   * The multiplication factor to be applied to the value of
+   * the #EmeusConstraint:source-attribute in the constraint.
+   *
+   * Since: 1.0
+   */
   emeus_constraint_properties[PROP_MULTIPLIER] =
     g_param_spec_double ("multiplier", "Multiplier", NULL,
                          -G_MAXDOUBLE, G_MAXDOUBLE,
@@ -257,6 +303,14 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
                          G_PARAM_READWRITE |
                          G_PARAM_STATIC_STRINGS);
 
+  /**
+   * EmeusConstraint:constant:
+   *
+   * The constant factor to be applied to the value of
+   * the #EmeusConstraint:source-attribute in the constraint.
+   *
+   * Since: 1.0
+   */
   emeus_constraint_properties[PROP_CONSTANT] =
     g_param_spec_double ("constant", "Constant", NULL,
                          -G_MAXDOUBLE, G_MAXDOUBLE,
@@ -265,6 +319,17 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
                          G_PARAM_READWRITE |
                          G_PARAM_STATIC_STRINGS);
 
+  /**
+   * EmeusConstraint:strength:
+   *
+   * The strength, or priority of the constraint.
+   *
+   * You can use any positive integer for custom priorities, or use
+   * the values of the #EmeusConstraintStrength enumeration for common
+   * strength values.
+   *
+   * Since: 1.0
+   */
   emeus_constraint_properties[PROP_STRENGTH] =
     g_param_spec_int ("strength", "Strength", NULL,
                       G_MININT, G_MAXINT,
@@ -273,6 +338,13 @@ emeus_constraint_class_init (EmeusConstraintClass *klass)
                       G_PARAM_READWRITE |
                       G_PARAM_STATIC_STRINGS);
 
+  /**
+   * EmeusConstraint:active:
+   *
+   * Whether a #EmeusConstraint participates in the layout.
+   *
+   * Since: 1.0
+   */
   emeus_constraint_properties[PROP_ACTIVE] =
     g_param_spec_boolean ("active", "Active", NULL,
                           TRUE,
@@ -643,6 +715,16 @@ emeus_constraint_is_attached (EmeusConstraint *constraint)
   return constraint->solver != NULL;
 }
 
+/**
+ * emeus_constraint_set_active:
+ * @constraint: a #EmeusConstraint
+ * @active: whether the @constraint should be active
+ *
+ * Sets whether a @constraint should be actively used by
+ * a #EmeusConstraintLayout or not.
+ *
+ * Since: 1.0
+ */
 void
 emeus_constraint_set_active (EmeusConstraint *constraint,
                              gboolean         active)
@@ -667,6 +749,16 @@ emeus_constraint_set_active (EmeusConstraint *constraint,
   g_object_notify_by_pspec (G_OBJECT (constraint), emeus_constraint_properties[PROP_ACTIVE]);
 }
 
+/**
+ * emeus_constraint_get_active:
+ * @constraint: a #EmeusConstraint
+ *
+ * Checks whether a @constraint is active.
+ *
+ * Returns: %TRUE if the constraint is active
+ *
+ * Since: 1.0
+ */
 gboolean
 emeus_constraint_get_active (EmeusConstraint *constraint)
 {

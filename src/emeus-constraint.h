@@ -24,6 +24,16 @@ G_BEGIN_DECLS
 
 #define EMEUS_TYPE_CONSTRAINT (emeus_constraint_get_type())
 
+/**
+ * EmeusConstraint:
+ *
+ * The representation of a constraint inside an #EmeusConstraintLayout.
+ *
+ * The contents of the `EmeusConstraint` structure are private and should
+ * never be accessed directly.
+ *
+ * Since: 1.0
+ */
 EMEUS_AVAILABLE_IN_1_0
 G_DECLARE_FINAL_TYPE (EmeusConstraint, emeus_constraint, EMEUS, CONSTRAINT, GInitiallyUnowned)
 
@@ -67,7 +77,7 @@ gboolean                        emeus_constraint_is_attached            (EmeusCo
 
 EMEUS_AVAILABLE_IN_1_0
 void                            emeus_constraint_set_active             (EmeusConstraint         *constraint,
-                                                                         gboolean                 is_active);
+                                                                         gboolean                 active);
 EMEUS_AVAILABLE_IN_1_0
 gboolean                        emeus_constraint_get_active             (EmeusConstraint         *constraint);
 
