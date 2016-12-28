@@ -1559,6 +1559,15 @@ layout_add_constraint (EmeusConstraintLayout *layout,
   add_child_constraint (layout, child, constraint);
 }
 
+/**
+ * emeus_constraint_layout_add_constraint:
+ * @layout: a #EmeusConstraintLayout
+ * @constraint: a #EmeusConstraint
+ *
+ * Adds @constraint to the @layout.
+ *
+ * Since: 1.0
+ */
 void
 emeus_constraint_layout_add_constraint (EmeusConstraintLayout *layout,
                                         EmeusConstraint       *constraint)
@@ -1569,6 +1578,18 @@ emeus_constraint_layout_add_constraint (EmeusConstraintLayout *layout,
   layout_add_constraint (layout, constraint);
 }
 
+/**
+ * emeus_constraint_layout_add_constraints:
+ * @layout: a #EmeusConstraintLayout
+ * @first_constraint: the first #EmeusConstraint
+ * @...: a %NULL-terminated list of #EmeusConstraint instances
+ *
+ * Adds multiple #EmeusConstraints at once to the @layout.
+ *
+ * See also: emeus_constraint_layout_add_constraints()
+ *
+ * Since: 1.0
+ */
 void
 emeus_constraint_layout_add_constraints (EmeusConstraintLayout *layout,
                                          EmeusConstraint       *first_constraint,
@@ -1692,6 +1713,14 @@ emeus_constraint_layout_get_constraints (EmeusConstraintLayout *layout)
   return res;
 }
 
+/**
+ * emeus_constraint_layout_clear_constraints:
+ * @layout: a #EmeusConstraintLayout
+ *
+ * Removes all constraints from a #EmeusConstraintLayout.
+ *
+ * Since: 1.0
+ */
 void
 emeus_constraint_layout_clear_constraints (EmeusConstraintLayout *layout)
 {
@@ -1972,6 +2001,13 @@ emeus_constraint_layout_child_class_init (EmeusConstraintLayoutChildClass *klass
 
   gtk_container_class_handle_border_width (container_class);
 
+  /**
+   * EmeusConstraintLayoutChild:name:
+   *
+   * The name of the child.
+   *
+   * Since: 1.0
+   */
   emeus_constraint_layout_child_properties[CHILD_PROP_NAME] =
     g_param_spec_string ("name", "Name", "The name of the child",
                          NULL,
@@ -2103,6 +2139,16 @@ emeus_constraint_layout_child_clear_constraints (EmeusConstraintLayoutChild *chi
   gtk_widget_queue_resize (GTK_WIDGET (child));
 }
 
+/**
+ * emeus_constraint_layout_child_get_top:
+ * @child: a #EmeusConstraintLayoutChild
+ *
+ * Retrieves the value of the %EMEUS_CONSTRAINT_ATTRIBUTE_TOP for the @child.
+ *
+ * Returns: the value of the attribute
+ *
+ * Since: 1.0
+ */
 int
 emeus_constraint_layout_child_get_top (EmeusConstraintLayoutChild *child)
 {
@@ -2115,6 +2161,16 @@ emeus_constraint_layout_child_get_top (EmeusConstraintLayoutChild *child)
   return floor (variable_get_value (res));
 }
 
+/**
+ * emeus_constraint_layout_child_get_right:
+ * @child: a #EmeusConstraintLayoutChild
+ *
+ * Retrieves the value of the %EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT for the @child.
+ *
+ * Returns: the value of the attribute
+ *
+ * Since: 1.0
+ */
 int
 emeus_constraint_layout_child_get_right (EmeusConstraintLayoutChild *child)
 {
@@ -2127,6 +2183,16 @@ emeus_constraint_layout_child_get_right (EmeusConstraintLayoutChild *child)
   return ceil (variable_get_value (res));
 }
 
+/**
+ * emeus_constraint_layout_child_get_bottom:
+ * @child: a #EmeusConstraintLayoutChild
+ *
+ * Retrieves the value of the %EMEUS_CONSTRAINT_ATTRIBUTE_BOTTOM for the @child.
+ *
+ * Returns: the value of the attribute
+ *
+ * Since: 1.0
+ */
 int
 emeus_constraint_layout_child_get_bottom (EmeusConstraintLayoutChild *child)
 {
@@ -2139,6 +2205,16 @@ emeus_constraint_layout_child_get_bottom (EmeusConstraintLayoutChild *child)
   return ceil (variable_get_value (res));
 }
 
+/**
+ * emeus_constraint_layout_child_get_left:
+ * @child: a #EmeusConstraintLayoutChild
+ *
+ * Retrieves the value of the %EMEUS_CONSTRAINT_ATTRIBUTE_LEFT for the @child.
+ *
+ * Returns: the value of the attribute
+ *
+ * Since: 1.0
+ */
 int
 emeus_constraint_layout_child_get_left (EmeusConstraintLayoutChild *child)
 {
@@ -2151,6 +2227,16 @@ emeus_constraint_layout_child_get_left (EmeusConstraintLayoutChild *child)
   return floor (variable_get_value (res));
 }
 
+/**
+ * emeus_constraint_layout_child_get_width:
+ * @child: a #EmeusConstraintLayoutChild
+ *
+ * Retrieves the value of the %EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH for the @child.
+ *
+ * Returns: the value of the attribute
+ *
+ * Since: 1.0
+ */
 int
 emeus_constraint_layout_child_get_width (EmeusConstraintLayoutChild *child)
 {
@@ -2163,6 +2249,16 @@ emeus_constraint_layout_child_get_width (EmeusConstraintLayoutChild *child)
   return ceil (variable_get_value (res));
 }
 
+/**
+ * emeus_constraint_layout_child_get_height:
+ * @child: a #EmeusConstraintLayoutChild
+ *
+ * Retrieves the value of the %EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT for the @child.
+ *
+ * Returns: the value of the attribute
+ *
+ * Since: 1.0
+ */
 int
 emeus_constraint_layout_child_get_height (EmeusConstraintLayoutChild *child)
 {
@@ -2175,6 +2271,16 @@ emeus_constraint_layout_child_get_height (EmeusConstraintLayoutChild *child)
   return ceil (variable_get_value (res));
 }
 
+/**
+ * emeus_constraint_layout_child_get_center_x:
+ * @child: a #EmeusConstraintLayoutChild
+ *
+ * Retrieves the value of the %EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_X for the @child.
+ *
+ * Returns: the value of the attribute
+ *
+ * Since: 1.0
+ */
 int
 emeus_constraint_layout_child_get_center_x (EmeusConstraintLayoutChild *child)
 {
@@ -2187,6 +2293,16 @@ emeus_constraint_layout_child_get_center_x (EmeusConstraintLayoutChild *child)
   return ceil (variable_get_value (res));
 }
 
+/**
+ * emeus_constraint_layout_child_get_center_y:
+ * @child: a #EmeusConstraintLayoutChild
+ *
+ * Retrieves the value of the %EMEUS_CONSTRAINT_ATTRIBUTE_CENTER_Y for the @child.
+ *
+ * Returns: the value of the attribute
+ *
+ * Since: 1.0
+ */
 int
 emeus_constraint_layout_child_get_center_y (EmeusConstraintLayoutChild *child)
 {
@@ -2199,6 +2315,17 @@ emeus_constraint_layout_child_get_center_y (EmeusConstraintLayoutChild *child)
   return ceil (variable_get_value (res));
 }
 
+/**
+ * emeus_constraint_layout_child_set_intrinsic_width:
+ * @child: a #EmeusConstraintLayoutChild
+ * @width: the intrinsic width
+ *
+ * Creates a new constraint on the width of the @child.
+ *
+ * If @width is a negative value, the constraint is removed.
+ *
+ * Since: 1.0
+ */
 void
 emeus_constraint_layout_child_set_intrinsic_width (EmeusConstraintLayoutChild *child,
                                                    int                         width)
@@ -2236,6 +2363,17 @@ emeus_constraint_layout_child_set_intrinsic_width (EmeusConstraintLayoutChild *c
     gtk_widget_queue_resize (GTK_WIDGET (child));
 }
 
+/**
+ * emeus_constraint_layout_child_set_intrinsic_height:
+ * @child: a #EmeusConstraintLayoutChild
+ * @height: the intrinsic width
+ *
+ * Creates a new constraint on the height of the @child.
+ *
+ * If @height is a negative value, the constraint is removed.
+ *
+ * Since: 1.0
+ */
 void
 emeus_constraint_layout_child_set_intrinsic_height (EmeusConstraintLayoutChild *child,
                                                     int                         height)
@@ -2271,4 +2409,22 @@ emeus_constraint_layout_child_set_intrinsic_height (EmeusConstraintLayoutChild *
 
   if (gtk_widget_get_visible (GTK_WIDGET (child)))
     gtk_widget_queue_resize (GTK_WIDGET (child));
+}
+
+/**
+ * emeus_constraint_layout_child_get_name:
+ * @child: a #EmeusConstraintLayoutChild
+ *
+ * Retrieves the name of the @child.
+ *
+ * Returns: (nullable) (transfer none): the name of the child
+ *
+ * Since: 1.0
+ */
+const char *
+emeus_constraint_layout_child_get_name (EmeusConstraintLayoutChild *child)
+{
+  g_return_val_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child), NULL);
+
+  return child->name;
 }
