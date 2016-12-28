@@ -26,6 +26,16 @@ G_BEGIN_DECLS
 
 #define EMEUS_TYPE_CONSTRAINT_LAYOUT (emeus_constraint_layout_get_type())
 
+/**
+ * EmeusConstraintLayout:
+ *
+ * A container that uses constraints to determine the layout policy.
+ *
+ * The contents of the `EmeusConstraintLayout` are private and should never be
+ * accessed directly.
+ *
+ * Since: 1.0
+ */
 EMEUS_AVAILABLE_IN_1_0
 G_DECLARE_FINAL_TYPE (EmeusConstraintLayout, emeus_constraint_layout, EMEUS, CONSTRAINT_LAYOUT, GtkContainer)
 
@@ -53,6 +63,16 @@ void            emeus_constraint_layout_clear_constraints       (EmeusConstraint
 
 #define EMEUS_TYPE_CONSTRAINT_LAYOUT_CHILD (emeus_constraint_layout_child_get_type())
 
+/**
+ * EmeusConstraintLayoutChild:
+ *
+ * A child in a #EmeusConstraintLayout.
+ *
+ * The contents of the `EmeusConstraintLayoutChild` structure are private and
+ * should never be accessed directly.
+ *
+ * Since: 1.0
+ */
 EMEUS_AVAILABLE_IN_1_0
 G_DECLARE_FINAL_TYPE (EmeusConstraintLayoutChild, emeus_constraint_layout_child, EMEUS, CONSTRAINT_LAYOUT_CHILD, GtkBin)
 
