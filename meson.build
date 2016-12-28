@@ -29,6 +29,11 @@ endif
 
 emeus_binary_age = emeus_minor_version * 100 + emeus_micro_version
 
+# Shared library versioning
+current = emeus_binary_age - emeus_interface_age
+revision = emeus_interface_age
+libversion = '0.@0@.@1@'.format(current, revision)
+
 # Paths for the pkg-config file
 emeus_prefix = get_option('prefix')
 emeus_bindir = join_paths(emeus_prefix, get_option('bindir'))

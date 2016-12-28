@@ -63,7 +63,8 @@ libemeus_private = static_library('emeus-private',
 
 libemeus = shared_library('emeus-@0@'.format(emeus_api_version),
                           sources: sources + solver_sources + private_headers,
-                          version: meson.project_version(),
+                          soversion: 0,
+                          version: libversion,
                           install: true,
                           dependencies: [ gtk_dep, mathlib_dep ],
                           c_args: common_cflags + debug_cflags + gtk_version_cflags + [
