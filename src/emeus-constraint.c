@@ -19,7 +19,7 @@
 /**
  * SECTION:emeus-constraint
  * @Title: EmeusConstraint
- * @Short_desc: The representation of a single constraint
+ * @Short_Description: The representation of a single constraint
  *
  * #EmeusConstraint is a type that describes a constraint between two widget
  * attributes which must be satisfied by a #GtkConstraintLayout.

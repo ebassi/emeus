@@ -19,7 +19,7 @@
 /**
  * SECTION:emeus-constraint-layout
  * @Title: EmeusConstraintLayout
- * @Short_desc: A widget container using layout constraints
+ * @Short_Description: A widget container using layout constraints
  *
  * #EmeusConstraintLayout is a #GtkContainter that uses constraints
  * associated to each of its children to decide their layout.
