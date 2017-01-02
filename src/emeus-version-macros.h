@@ -162,7 +162,7 @@
  * The allowed values for this macro are one of the encoded Emeus version symbols,
  * like %EMEUS_VERSION_1_0.
  *
- * If this pre-processor symbol is define, Emeus will emit a compiler warning when
+ * If this pre-processor symbol is defined, Emeus will emit a compiler warning when
  * attempting to use functions that have been introduced in newer versions of the
  * library; for instance, if %EMEUS_VERSION_MAX_ALLOWED is defined to be
  * %EMEUS_VERSION_1_2, you'll be able to use API that has been introduced in version
