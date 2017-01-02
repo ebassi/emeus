@@ -674,11 +674,9 @@ emeus_constraint_to_string (EmeusConstraint *constraint)
 
 gboolean
 emeus_constraint_attach (EmeusConstraint       *constraint,
-                         EmeusConstraintLayout *layout,
-                         gpointer               target_object)
+                         EmeusConstraintLayout *layout)
 {
   constraint->layout = layout;
-  constraint->target_object = target_object;
   constraint->solver = emeus_constraint_layout_get_solver (layout);
 
   return TRUE;
@@ -691,7 +689,6 @@ emeus_constraint_detach (EmeusConstraint *constraint)
     simplex_solver_remove_constraint (constraint->solver, constraint->constraint);
 
   constraint->constraint = NULL;
-  constraint->target_object = NULL;
   constraint->layout = NULL;
   constraint->solver = NULL;
 }

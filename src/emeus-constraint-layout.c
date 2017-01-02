@@ -741,8 +741,11 @@ remove_constraints_from_widget (GHashTable *constraints,
       EmeusConstraint *constraint = key;
       GtkWidget *real_target = constraint->target_object;
 
+      if (real_target == NULL)
+        continue;
+
       if (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (real_target))
-          real_target = gtk_bin_get_child (GTK_BIN (real_target));
+        real_target = gtk_bin_get_child (GTK_BIN (real_target));
 
       if (constraint->source_object == widget || real_target == widget)
         {
@@ -1333,7 +1336,7 @@ static void
 add_layout_constraint (EmeusConstraintLayout *layout,
                        EmeusConstraint       *constraint)
 {
-  if (!emeus_constraint_attach (constraint, layout, layout))
+  if (!emeus_constraint_attach (constraint, layout))
     return;
 
   g_hash_table_add (layout->constraints, g_object_ref_sink (constraint));
@@ -1351,8 +1354,7 @@ create_child_constraint (EmeusConstraintLayout      *layout,
   Expression *expr;
 
   /* attr1 is the LHS of the linear equation */
-  attr1 = get_child_attribute (constraint->target_object,
-                               constraint->target_attribute);
+  attr1 = get_child_attribute (child, constraint->target_attribute);
 
   /* attr2 is the RHS of the linear equation; if it's a constant value
    * we create a stay constraint for it. Stay constraints ensure that a
@@ -1429,7 +1431,7 @@ add_child_constraint (EmeusConstraintLayout      *layout,
       return;
     }
 
-  if (!emeus_constraint_attach (constraint, layout, child))
+  if (!emeus_constraint_attach (constraint, layout))
     return;
 
   g_hash_table_add (child->constraints, g_object_ref_sink (constraint));
@@ -1445,8 +1447,13 @@ remove_child_constraint (EmeusConstraintLayout      *layout,
 {
   if (constraint->target_object != child)
     {
-      g_critical ("Attempting to remove unknown constraint %p", constraint);
-      return FALSE;
+      GtkWidget *bin_child = gtk_bin_get_child (GTK_BIN (child));
+
+      if (constraint->target_object != bin_child)
+        {
+          g_critical ("Attempting to remove unknown constraint %p", constraint);
+          return FALSE;
+        }
     }
 
   emeus_constraint_detach (constraint);
@@ -1465,10 +1472,30 @@ emeus_constraint_layout_activate_constraint (EmeusConstraintLayout *layout,
   if (constraint->constraint != NULL)
     return;
 
-  if (constraint->target_object == layout)
+  if (constraint->target_object == NULL)
     create_layout_constraint (layout, constraint);
   else
-    create_child_constraint (layout, constraint->target_object, constraint);
+    {
+      EmeusConstraintLayoutChild *child = NULL;
+
+      if (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (constraint->target_object))
+        child = constraint->target_object;
+      else
+        {
+          GtkWidget *parent = gtk_widget_get_parent (constraint->target_object);
+
+          if (parent == NULL || !EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (parent))
+            {
+              g_critical ("Invalid target object for constraint");
+              return;
+            }
+
+          child = EMEUS_CONSTRAINT_LAYOUT_CHILD (parent);
+        }
+
+      g_assert (child != NULL);
+      create_child_constraint (layout, child, constraint);
+    }
 }
 
 void
