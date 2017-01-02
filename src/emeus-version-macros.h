@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <emeus-version.h>
+#include "emeus-version.h"
 
 /**
  * SECTION: emeus-version
