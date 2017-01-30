@@ -20,9 +20,8 @@
 
 #include "emeus-simplex-solver-private.h"
 
-#include "emeus-types-private.h"
-#include "emeus-variable-private.h"
 #include "emeus-expression-private.h"
+#include "emeus-types-private.h"
 #include "emeus-utils-private.h"
 
 #include <glib.h>

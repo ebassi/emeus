@@ -1,7 +1,6 @@
 #include "emeus-expression-private.h"
 #include "emeus-simplex-solver-private.h"
 #include "emeus-types-private.h"
-#include "emeus-variable-private.h"
 
 #include "emeus-test-utils.h"
 

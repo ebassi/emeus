@@ -35,7 +35,7 @@ typedef enum {
 typedef struct {
   int ref_count;
 
-  int id_;
+  unsigned long id_;
 
   VariableType type;
 

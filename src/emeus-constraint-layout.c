@@ -179,7 +179,6 @@
 #include "emeus-expression-private.h"
 #include "emeus-simplex-solver-private.h"
 #include "emeus-utils-private.h"
-#include "emeus-variable-private.h"
 
 #include <errno.h>
 #include <math.h>

@@ -15,7 +15,6 @@ private_headers = [
   'emeus-simplex-solver-private.h',
   'emeus-types-private.h',
   'emeus-utils-private.h',
-  'emeus-variable-private.h',
   'emeus-vfl-parser-private.h',
 ]
 
@@ -23,7 +22,6 @@ solver_sources = [
   'emeus-expression.c',
   'emeus-simplex-solver.c',
   'emeus-utils.c',
-  'emeus-variable.c',
   'emeus-vfl-parser.c',
 ]
 

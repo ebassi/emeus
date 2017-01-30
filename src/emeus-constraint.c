@@ -65,7 +65,6 @@
 #include "emeus-simplex-solver-private.h"
 #include "emeus-utils-private.h"
 #include "emeus-utils.h"
-#include "emeus-variable-private.h"
 #include "emeus-vfl-parser-private.h"
 
 #include <math.h>
