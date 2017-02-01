@@ -401,6 +401,8 @@ parse_attribute:
           else
             parser->error_range = 0;
 
+          g_free (predicate->object);
+
           parser->error_offset = end - parser->cursor;
           g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_ATTRIBUTE,
                        "Attribute must be on one of 'width', 'height', "
@@ -435,6 +437,8 @@ parse_operators:
         }
       else
         {
+          g_free (predicate->object);
+
           parser->error_offset = end - parser->cursor;
           parser->error_range = 0;
           g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
@@ -483,6 +487,8 @@ parse_operators:
         }
       else
         {
+          g_free (predicate->object);
+
           parser->error_offset = end - parser->cursor;
           parser->error_range = 0;
           g_set_error (error, VFL_ERROR, VFL_ERROR_INVALID_SYMBOL,
@@ -641,6 +647,8 @@ parse_view (VflParser *parser,
                    "A predicate on a view must end with ')'");
           return false;
         }
+
+      memset (&cur_predicate, 0, sizeof (VflPredicate));
 
       cur_predicate.subject = view->name;
       if (!parse_predicate (parser, end, &cur_predicate, &tmp, error))
