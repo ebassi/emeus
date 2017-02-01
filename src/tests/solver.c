@@ -53,6 +53,9 @@ emeus_solver_stay (void)
   emeus_assert_almost_equals (x_value,  5.0);
   emeus_assert_almost_equals (y_value, 10.0);
 
+  variable_unref (x);
+  variable_unref (y);
+
   simplex_solver_clear (&solver);
 }
 
@@ -162,18 +165,31 @@ emeus_solver_cassowary (void)
   Variable *x = simplex_solver_create_variable (&solver, "x", 0.0);
   Variable *y = simplex_solver_create_variable (&solver, "y", 0.0);
 
+  Expression *e;
+
+  e = expression_new_from_variable (y);
   simplex_solver_add_constraint (&solver,
-                                 x, OPERATOR_TYPE_LE, expression_new_from_variable (y),
+                                 x, OPERATOR_TYPE_LE, e,
                                  STRENGTH_REQUIRED);
+  expression_unref (e);
+
+  e = expression_plus (expression_new_from_variable (x), 3.0);
   simplex_solver_add_constraint (&solver,
-                                 y, OPERATOR_TYPE_EQ, expression_plus (expression_new_from_variable (x), 3.0),
+                                 y, OPERATOR_TYPE_EQ, e,
                                  STRENGTH_REQUIRED);
+  expression_unref (e);
+
+  e = expression_new_from_constant (10.0);
   simplex_solver_add_constraint (&solver,
-                                 x, OPERATOR_TYPE_EQ, expression_new_from_constant (10.0),
+                                 x, OPERATOR_TYPE_EQ, e,
                                  STRENGTH_WEAK);
+  expression_unref (e);
+
+  e = expression_new_from_constant (10.0);
   simplex_solver_add_constraint (&solver,
-                                 y, OPERATOR_TYPE_EQ, expression_new_from_constant (10.0),
+                                 y, OPERATOR_TYPE_EQ, e,
                                  STRENGTH_WEAK);
+  expression_unref (e);
 
   double x_val = variable_get_value (x);
   double y_val = variable_get_value (y);
@@ -183,6 +199,9 @@ emeus_solver_cassowary (void)
 
   g_assert_true ((emeus_fuzzy_equals (x_val, 10, 1e-8) && emeus_fuzzy_equals (y_val, 13, 1e-8)) ||
                  (emeus_fuzzy_equals (x_val,  7, 1e-8) && emeus_fuzzy_equals (y_val, 10, 1e-9)));
+
+  variable_unref (x);
+  variable_unref (y);
 
   simplex_solver_clear (&solver);
 }
@@ -206,6 +225,8 @@ emeus_solver_edit_var_required (void)
 
   emeus_assert_almost_equals (variable_get_value (a), 2.0);
 
+  variable_unref (a);
+
   simplex_solver_clear (&solver);
 }
 
@@ -220,7 +241,11 @@ emeus_solver_edit_var_suggest (void)
   Variable *b = simplex_solver_create_variable (&solver, "b", 0.0);
 
   simplex_solver_add_stay_variable (&solver, a, STRENGTH_STRONG);
-  simplex_solver_add_constraint (&solver, a, OPERATOR_TYPE_EQ, expression_new_from_variable (b), STRENGTH_REQUIRED);
+
+  Expression *e = expression_new_from_variable (b);
+  simplex_solver_add_constraint (&solver, a, OPERATOR_TYPE_EQ, e, STRENGTH_REQUIRED);
+  expression_unref (e);
+
   simplex_solver_resolve (&solver);
 
   emeus_assert_almost_equals (variable_get_value (a), 0.0);
@@ -240,6 +265,9 @@ emeus_solver_edit_var_suggest (void)
   emeus_assert_almost_equals (variable_get_value (a), 10.0);
   emeus_assert_almost_equals (variable_get_value (b), 10.0);
 
+  variable_unref (a);
+  variable_unref (b);
+
   simplex_solver_clear (&solver);
 }
 
@@ -258,15 +286,19 @@ emeus_solver_paper (void)
 
   expr = expression_divide (expression_plus_variable (expression_new_from_variable (left), right), 2.0);
   simplex_solver_add_constraint (&solver, middle, OPERATOR_TYPE_EQ, expr, STRENGTH_REQUIRED);
+  expression_unref (expr);
 
   expr = expression_plus (expression_new_from_variable (left), 10.0);
   simplex_solver_add_constraint (&solver, right, OPERATOR_TYPE_EQ, expr, STRENGTH_REQUIRED);
+  expression_unref (expr);
 
   expr = expression_new_from_constant (100.0);
   simplex_solver_add_constraint (&solver, right, OPERATOR_TYPE_LE, expr, STRENGTH_REQUIRED);
+  expression_unref (expr);
 
   expr = expression_new_from_constant (0.0);
   simplex_solver_add_constraint (&solver, left, OPERATOR_TYPE_GE, expr, STRENGTH_REQUIRED);
+  expression_unref (expr);
 
   if (g_test_verbose ())
     g_test_message ("Check constraints hold");
@@ -298,6 +330,10 @@ emeus_solver_paper (void)
   emeus_assert_almost_equals (variable_get_value (middle), 45.0);
   emeus_assert_almost_equals (variable_get_value (right), 50.0);
 
+  variable_unref (left);
+  variable_unref (middle);
+  variable_unref (right);
+
   simplex_solver_clear (&solver);
 }
 
@@ -305,6 +341,13 @@ typedef struct {
   Variable *left;
   Variable *width;
 } Button;
+
+static void
+button_clear (Button *b)
+{
+  variable_unref (b->left);
+  variable_unref (b->width);
+}
 
 static char *
 button_to_string (const Button *button)
@@ -351,32 +394,47 @@ emeus_solver_buttons (void)
   simplex_solver_add_stay_variable (&solver, left_limit, STRENGTH_REQUIRED);
   simplex_solver_add_stay_variable (&solver, right_limit, STRENGTH_WEAK);
 
-  simplex_solver_add_constraint (&solver,
-                                 b1.width, OPERATOR_TYPE_EQ, expression_new_from_variable (b2.width),
-                                 STRENGTH_REQUIRED);
-  simplex_solver_add_constraint (&solver,
-                                 b1.left, OPERATOR_TYPE_EQ, expression_plus (expression_new_from_variable (left_limit), 50),
-                                 STRENGTH_REQUIRED);
-  simplex_solver_add_constraint (&solver,
-                                 right_limit, OPERATOR_TYPE_EQ,
-                                 expression_plus (expression_plus_variable (expression_new_from_variable (b2.left), b2.width), 50),
-                                 STRENGTH_REQUIRED);
-  simplex_solver_add_constraint (&solver,
-                                 b2.left, OPERATOR_TYPE_GE,
-                                 expression_plus (expression_plus_variable (expression_new_from_variable (b1.left), b1.width), 100),
-                                 STRENGTH_REQUIRED);
-  simplex_solver_add_constraint (&solver,
-                                 b1.width, OPERATOR_TYPE_GE, expression_new_from_constant (87.0),
-                                 STRENGTH_REQUIRED);
-  simplex_solver_add_constraint (&solver,
-                                 b1.width, OPERATOR_TYPE_EQ, expression_new_from_constant (87.0),
-                                 STRENGTH_STRONG);
-  simplex_solver_add_constraint (&solver,
-                                 b2.width, OPERATOR_TYPE_GE, expression_new_from_constant (113.0),
-                                 STRENGTH_REQUIRED);
-  simplex_solver_add_constraint (&solver,
-                                 b2.width, OPERATOR_TYPE_EQ, expression_new_from_constant (113.0),
-                                 STRENGTH_STRONG);
+  Expression *e;
+
+  /* b1.width = b2.width */
+  e = expression_new_from_variable (b2.width);
+  simplex_solver_add_constraint (&solver, b1.width, OPERATOR_TYPE_EQ, e, STRENGTH_REQUIRED);
+  expression_unref (e);
+
+  /* b1.left = super.left + 50 */
+  e = expression_plus (expression_new_from_variable (left_limit), 50);
+  simplex_solver_add_constraint (&solver, b1.left, OPERATOR_TYPE_EQ, e, STRENGTH_REQUIRED);
+  expression_unref (e);
+
+  /* super.right = b2.left + b2.width + 50 */
+  e = expression_plus (expression_plus_variable (expression_new_from_variable (b2.left), b2.width), 50);
+  simplex_solver_add_constraint (&solver, right_limit, OPERATOR_TYPE_EQ, e, STRENGTH_REQUIRED);
+  expression_unref (e);
+
+  /* b2.left >= b1.left + b1.width + 100 */
+  e = expression_plus (expression_plus_variable (expression_new_from_variable (b1.left), b1.width), 100);
+  simplex_solver_add_constraint (&solver, b2.left, OPERATOR_TYPE_GE, e, STRENGTH_REQUIRED);
+  expression_unref (e);
+
+  /* b1.width >= 87 */
+  e = expression_new_from_constant (87.0);
+  simplex_solver_add_constraint (&solver, b1.width, OPERATOR_TYPE_GE, e, STRENGTH_REQUIRED);
+  expression_unref (e);
+
+  /* b1.width == 87 */
+  e = expression_new_from_constant (87.0);
+  simplex_solver_add_constraint (&solver, b1.width, OPERATOR_TYPE_EQ, e, STRENGTH_STRONG);
+  expression_unref (e);
+
+  /* b2.width >= 113 */
+  e = expression_new_from_constant (113.0);
+  simplex_solver_add_constraint (&solver, b2.width, OPERATOR_TYPE_GE, e, STRENGTH_REQUIRED);
+  expression_unref (e);
+
+  /* b2.width == 113 */
+  e = expression_new_from_constant (113.0);
+  simplex_solver_add_constraint (&solver, b2.width, OPERATOR_TYPE_EQ, e, STRENGTH_STRONG);
+  expression_unref (e);
 
   g_test_message ("right_limit := 0 (preferred size)");
 
@@ -506,6 +564,12 @@ emeus_solver_buttons (void)
   emeus_assert_almost_equals (variable_get_value (b2.left), 263.0);
   emeus_assert_almost_equals (variable_get_value (b2.width), 113.0);
   emeus_assert_almost_equals (variable_get_value (right_limit), 426.0);
+
+  variable_unref (left_limit);
+  variable_unref (right_limit);
+
+  button_clear (&b1);
+  button_clear (&b2);
 
   simplex_solver_clear (&solver);
 }
