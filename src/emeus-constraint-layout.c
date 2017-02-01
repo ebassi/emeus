@@ -219,6 +219,11 @@ emeus_constraint_layout_finalize (GObject *gobject)
   g_clear_pointer (&self->bound_attributes, g_hash_table_unref);
   g_clear_pointer (&self->constraints, g_hash_table_unref);
 
+  simplex_solver_remove_constraint (&self->solver, self->stays.top);
+  simplex_solver_remove_constraint (&self->solver, self->stays.left);
+  simplex_solver_remove_constraint (&self->solver, self->stays.width);
+  simplex_solver_remove_constraint (&self->solver, self->stays.height);
+
   simplex_solver_clear (&self->solver);
 
   G_OBJECT_CLASS (emeus_constraint_layout_parent_class)->finalize (gobject);
@@ -239,8 +244,6 @@ get_layout_attribute (EmeusConstraintLayout   *layout,
                       EmeusConstraintAttribute attr)
 {
   GtkTextDirection text_dir;
-  const char *attr_name;
-  Variable *res;
 
   /* Resolve the start/end attributes depending on the layout's text direction */
   if (attr == EMEUS_CONSTRAINT_ATTRIBUTE_START)
@@ -260,8 +263,8 @@ get_layout_attribute (EmeusConstraintLayout   *layout,
         attr = EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT;
     }
 
-  attr_name = get_attribute_name (attr);
-  res = g_hash_table_lookup (layout->bound_attributes, attr_name);
+  const char *attr_name = get_attribute_name (attr);
+  Variable *res = g_hash_table_lookup (layout->bound_attributes, attr_name);
   if (res != NULL)
     return res;
 
@@ -287,6 +290,8 @@ get_layout_attribute (EmeusConstraintLayout   *layout,
         simplex_solver_add_constraint (&layout->solver,
                                        res, OPERATOR_TYPE_EQ, expr,
                                        STRENGTH_MEDIUM);
+
+        expression_unref (expr);
       }
       break;
 
@@ -301,6 +306,8 @@ get_layout_attribute (EmeusConstraintLayout   *layout,
         simplex_solver_add_constraint (&layout->solver,
                                        res, OPERATOR_TYPE_EQ, expr,
                                        STRENGTH_MEDIUM);
+
+        expression_unref (expr);
       }
       break;
 
@@ -315,6 +322,8 @@ get_layout_attribute (EmeusConstraintLayout   *layout,
         simplex_solver_add_constraint (&layout->solver,
                                        res, OPERATOR_TYPE_EQ, expr,
                                        STRENGTH_REQUIRED);
+
+        expression_unref (expr);
       }
       break;
 
@@ -329,6 +338,8 @@ get_layout_attribute (EmeusConstraintLayout   *layout,
         simplex_solver_add_constraint (&layout->solver,
                                        res, OPERATOR_TYPE_EQ, expr,
                                        STRENGTH_REQUIRED);
+
+        expression_unref (expr);
       }
       break;
 
@@ -344,8 +355,6 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
                      EmeusConstraintAttribute    attr)
 {
   GtkTextDirection text_dir;
-  const char *attr_name;
-  Variable *res;
 
   /* Resolve the start/end attributes depending on the child's text direction */
   if (attr == EMEUS_CONSTRAINT_ATTRIBUTE_START)
@@ -365,8 +374,8 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
         attr = EMEUS_CONSTRAINT_ATTRIBUTE_RIGHT;
     }
 
-  attr_name = get_attribute_name (attr);
-  res = g_hash_table_lookup (child->bound_attributes, attr_name);
+  const char *attr_name = get_attribute_name (attr);
+  Variable *res = g_hash_table_lookup (child->bound_attributes, attr_name);
   if (res != NULL)
     return res;
 
@@ -393,6 +402,8 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
           simplex_solver_add_constraint (child->solver,
                                          res, OPERATOR_TYPE_EQ, expr,
                                          STRENGTH_MEDIUM);
+
+        expression_unref (expr);
       }
       break;
 
@@ -408,6 +419,8 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
           simplex_solver_add_constraint (child->solver,
                                          res, OPERATOR_TYPE_EQ, expr,
                                          STRENGTH_MEDIUM);
+
+        expression_unref (expr);
       }
       break;
 
@@ -423,6 +436,8 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
           simplex_solver_add_constraint (child->solver,
                                          res, OPERATOR_TYPE_EQ, expr,
                                          STRENGTH_REQUIRED);
+
+        expression_unref (expr);
       }
       break;
 
@@ -438,6 +453,8 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
           simplex_solver_add_constraint (child->solver,
                                          res, OPERATOR_TYPE_EQ, expr,
                                          STRENGTH_REQUIRED);
+
+        expression_unref (expr);
       }
       break;
 
@@ -459,28 +476,32 @@ add_layout_stays (EmeusConstraintLayout *self)
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_TOP),
                        var);
-  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
+  self->stays.top =
+    simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
 
   var = simplex_solver_create_variable (&self->solver, "left", 0.0);
   variable_set_prefix (var, "super");
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_LEFT),
                        var);
-  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
+  self->stays.left =
+    simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
 
   var = simplex_solver_create_variable (&self->solver, "width", 0.0);
   variable_set_prefix (var, "super");
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH),
                        var);
-  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
+  self->stays.width =
+    simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
 
   var = simplex_solver_create_variable (&self->solver, "height", 0.0);
   variable_set_prefix (var, "super");
   g_hash_table_insert (self->bound_attributes,
                        (gpointer) get_attribute_name (EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT),
                        var);
-  simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
+  self->stays.height =
+    simplex_solver_add_stay_variable (&self->solver, var, STRENGTH_WEAK);
 }
 
 static void
@@ -608,10 +629,6 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
                                        GtkAllocation *allocation)
 {
   EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (widget);
-  EmeusConstraintLayoutChild *child;
-  Variable *layout_top, *layout_left;
-  Variable *layout_width, *layout_height;
-  GSequenceIter *iter;
   Constraint *stay_x, *stay_y;
   Constraint *stay_w, *stay_h;
 
@@ -620,10 +637,10 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
   if (g_sequence_is_empty (self->children))
     return;
 
-  layout_top = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_TOP);
-  layout_left = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_LEFT);
-  layout_width = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
-  layout_height = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
+  Variable *layout_top = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_TOP);
+  Variable *layout_left = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_LEFT);
+  Variable *layout_width = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH);
+  Variable *layout_height = get_layout_attribute (self, EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT);
 
   variable_set_value (layout_left, allocation->x);
   stay_x = simplex_solver_add_stay_variable (&self->solver, layout_left, STRENGTH_REQUIRED);
@@ -646,7 +663,9 @@ emeus_constraint_layout_size_allocate (GtkWidget     *widget,
                   variable_get_value (layout_height)));
 #endif
 
-  iter = g_sequence_get_begin_iter (self->children);
+  EmeusConstraintLayoutChild *child = NULL;
+  GSequenceIter *iter = g_sequence_get_begin_iter (self->children);
+
   while (!g_sequence_iter_is_end (iter))
     {
       Variable *top, *left, *width, *height;
@@ -762,7 +781,6 @@ emeus_constraint_layout_remove (GtkContainer *container,
   EmeusConstraintLayoutChild *layout_child;
   GtkWidget *child;
   GSequenceIter *iter;
-  gboolean was_visible;
 
   if (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (widget))
     {
@@ -805,7 +823,7 @@ emeus_constraint_layout_remove (GtkContainer *container,
       iter = g_sequence_iter_next (iter);
     }
 
-  was_visible = gtk_widget_get_visible (GTK_WIDGET (layout_child));
+  gboolean was_visible = gtk_widget_get_visible (GTK_WIDGET (layout_child));
 
   gtk_widget_unparent (GTK_WIDGET (layout_child));
   g_sequence_remove (layout_child->iter);
@@ -821,13 +839,13 @@ emeus_constraint_layout_forall (GtkContainer *container,
                                 gpointer      data)
 {
   EmeusConstraintLayout *self = EMEUS_CONSTRAINT_LAYOUT (container);
-  GSequenceIter *iter;
-  GtkWidget *child;
 
   if (g_sequence_is_empty (self->children))
     return;
 
-  iter = g_sequence_get_begin_iter (self->children);
+  GtkWidget *child;
+  GSequenceIter *iter = g_sequence_get_begin_iter (self->children);
+
   while (!g_sequence_iter_is_end (iter))
     {
       child = g_sequence_get (iter);
@@ -1291,12 +1309,15 @@ create_layout_constraint (EmeusConstraintLayout *layout,
 
       simplex_solver_add_stay_variable (constraint->solver, attr2, STRENGTH_REQUIRED);
 
+      expr = expression_new_from_variable (attr2);
+
       constraint->constraint =
         simplex_solver_add_constraint (constraint->solver,
                                        attr1,
                                        relation_to_operator (constraint->relation),
-                                       expression_new_from_variable (attr2),
+                                       expr,
                                        strength_to_value (constraint->strength));
+      expression_unref (expr);
       variable_unref (attr2);
 
       return;
@@ -1329,6 +1350,8 @@ create_layout_constraint (EmeusConstraintLayout *layout,
                                    relation_to_operator (constraint->relation),
                                    expr,
                                    strength_to_value (constraint->strength));
+
+  expression_unref (expr);
 }
 
 static void
@@ -1366,13 +1389,16 @@ create_child_constraint (EmeusConstraintLayout      *layout,
 
       simplex_solver_add_stay_variable (child->solver, attr2, STRENGTH_REQUIRED);
 
+      expr = expression_new_from_variable (attr2);
+
       constraint->constraint =
         simplex_solver_add_constraint (constraint->solver,
                                        attr1,
                                        relation_to_operator (constraint->relation),
-                                       expression_new_from_variable (attr2),
+                                       expr,
                                        strength_to_value (constraint->strength));
 
+      expression_unref (expr);
       variable_unref (attr2);
 
       return;
@@ -1412,6 +1438,8 @@ create_child_constraint (EmeusConstraintLayout      *layout,
                                    relation_to_operator (constraint->relation),
                                    expr,
                                    strength_to_value (constraint->strength));
+
+  expression_unref (expr);
 }
 
 static void
@@ -1766,7 +1794,6 @@ emeus_constraint_layout_clear_constraints (EmeusConstraintLayout *layout)
     }
 
   g_hash_table_remove_all (layout->bound_attributes);
-  add_layout_stays (layout);
 
   GSequenceIter *child_iter = g_sequence_get_begin_iter (layout->children);
   while (!g_sequence_iter_is_end (child_iter))
@@ -1784,6 +1811,28 @@ emeus_constraint_layout_child_finalize (GObject *gobject)
 {
   EmeusConstraintLayoutChild *self = EMEUS_CONSTRAINT_LAYOUT_CHILD (gobject);
 
+  simplex_solver_freeze (self->solver);
+
+  if (self->width_constraint != NULL)
+    simplex_solver_remove_constraint (self->solver, self->width_constraint);
+
+  if (self->height_constraint != NULL)
+    simplex_solver_remove_constraint (self->solver, self->height_constraint);
+
+  if (self->right_constraint != NULL)
+    simplex_solver_remove_constraint (self->solver, self->right_constraint);
+
+  if (self->bottom_constraint != NULL)
+    simplex_solver_remove_constraint (self->solver, self->bottom_constraint);
+
+  if (self->center_x_constraint != NULL)
+    simplex_solver_remove_constraint (self->solver, self->center_x_constraint);
+
+  if (self->center_y_constraint != NULL)
+    simplex_solver_remove_constraint (self->solver, self->center_y_constraint);
+
+  simplex_solver_thaw (self->solver);
+
   g_free (self->name);
 
   G_OBJECT_CLASS (emeus_constraint_layout_child_parent_class)->finalize (gobject);
@@ -1793,30 +1842,6 @@ static void
 emeus_constraint_layout_child_dispose (GObject *gobject)
 {
   EmeusConstraintLayoutChild *self = EMEUS_CONSTRAINT_LAYOUT_CHILD (gobject);
-
-  if (self->right_constraint != NULL)
-    {
-      simplex_solver_remove_constraint (self->solver, self->right_constraint);
-      self->right_constraint = NULL;
-    }
-
-  if (self->bottom_constraint != NULL)
-    {
-      simplex_solver_remove_constraint (self->solver, self->bottom_constraint);
-      self->bottom_constraint = NULL;
-    }
-
-  if (self->center_x_constraint != NULL)
-    {
-      simplex_solver_remove_constraint (self->solver, self->center_x_constraint);
-      self->center_x_constraint = NULL;
-    }
-
-  if (self->center_y_constraint != NULL)
-    {
-      simplex_solver_remove_constraint (self->solver, self->center_y_constraint);
-      self->center_y_constraint = NULL;
-    }
 
   g_clear_pointer (&self->constraints, g_hash_table_unref);
   g_clear_pointer (&self->bound_attributes, g_hash_table_unref);
@@ -1894,6 +1919,8 @@ emeus_constraint_layout_child_get_preferred_size (EmeusConstraintLayoutChild *se
                 simplex_solver_add_constraint (self->solver,
                                                attr, OPERATOR_TYPE_GE, e,
                                                STRENGTH_MEDIUM);
+
+              expression_unref (e);
             }
         }
       else
@@ -1923,6 +1950,8 @@ emeus_constraint_layout_child_get_preferred_size (EmeusConstraintLayoutChild *se
                 simplex_solver_add_constraint (self->solver,
                                                attr, OPERATOR_TYPE_GE, e,
                                                STRENGTH_MEDIUM);
+
+              expression_unref (e);
             }
         }
       else

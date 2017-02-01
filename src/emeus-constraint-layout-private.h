@@ -80,10 +80,12 @@ struct _EmeusConstraintLayout
   GHashTable *constraints;
 
   /* Internal constraints */
-  Constraint *top_constraint;
-  Constraint *left_constraint;
-  Constraint *width_constraint;
-  Constraint *height_constraint;
+  struct {
+    Constraint *top;
+    Constraint *left;
+    Constraint *width;
+    Constraint *height;
+  } stays;
 };
 
 SimplexSolver * emeus_constraint_layout_get_solver      (EmeusConstraintLayout *layout);
