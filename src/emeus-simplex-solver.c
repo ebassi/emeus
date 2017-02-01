@@ -834,7 +834,7 @@ simplex_solver_optimize (SimplexSolver *solver,
       double min_ratio;
       double r;
 
-      for (l = z_row->ordered_terms; l != NULL; l = l->next)
+      for (l = g_list_last (z_row->ordered_terms); l != NULL; l = l->prev)
         {
           const Term *t = l->data;
 
@@ -1101,7 +1101,7 @@ simplex_solver_dual_optimize (SimplexSolver *solver)
 
       ratio = DBL_MAX;
       entry_var = NULL;
-      for (l = expr->ordered_terms; l != NULL; l = l->next)
+      for (l = g_list_last (expr->ordered_terms); l != NULL; l = l->prev)
         {
           Term *term = l->data;
           Variable *v = term_get_variable (term);
@@ -1209,14 +1209,14 @@ simplex_solver_choose_subject (SimplexSolver *solver,
   double coeff = 0.0;
   GList *iter;
 
-  iter = expression->ordered_terms;
+  iter = g_list_last (expression->ordered_terms);
   while (iter != NULL)
     {
       Term *t = iter->data;
       Variable *v = term_get_variable (t);
       double c = term_get_coefficient (t);
 
-      iter = iter->next;
+      iter = iter->prev;
 
       if (found_unrestricted)
         {
@@ -1260,14 +1260,14 @@ simplex_solver_choose_subject (SimplexSolver *solver,
   if (subject != NULL)
     return subject;
 
-  iter = expression->ordered_terms;
+  iter = g_list_last (expression->ordered_terms);
   while (iter != NULL)
     {
       Term *t = iter->data;
       Variable *v = term_get_variable (t);
       double c = term_get_coefficient (t);
 
-      iter = iter->next;
+      iter = iter->prev;
 
       if (!variable_is_dummy (v))
         {

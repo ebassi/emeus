@@ -222,7 +222,7 @@ expression_add_term (Expression *expression,
   if (expression->terms == NULL)
     expression->terms = g_hash_table_new_full (NULL, NULL, NULL, (GDestroyNotify) term_free);
 
-  expression->ordered_terms = g_list_append (expression->ordered_terms, term);
+  expression->ordered_terms = g_list_prepend (expression->ordered_terms, term);
   g_hash_table_insert (expression->terms, term->variable, term);
 }
 
@@ -280,7 +280,7 @@ expression_clone (Expression *expression)
   g_hash_table_iter_init (&iter, expression->terms);
   while (g_hash_table_iter_next (&iter, NULL, &value_p))
     {
-      Term *t = value_p;
+      const Term *t = value_p;
 
       expression_add_term (clone, term_new (t->variable, t->coefficient));
     }
@@ -427,7 +427,7 @@ expression_add_expression (Expression *a,
 
   a->constant += (n * b->constant);
 
-  for (l = b->ordered_terms; l != NULL; l = l->next)
+  for (l = g_list_last (b->ordered_terms); l != NULL; l = l->prev)
     {
       Term *t = l->data;
 
@@ -457,7 +457,7 @@ expression_get_value (const Expression *expression)
   double res = expression->constant;
   const GList *l;
 
-  for (l = expression->ordered_terms; l != NULL; l = l->next)
+  for (l = g_list_last (expression->ordered_terms); l != NULL; l = l->prev)
     {
       const Term *t = l->data;
 
@@ -473,7 +473,7 @@ expression_get_terms (Expression *expression)
   if (expression->terms == NULL)
     return NULL;
 
-  return g_list_copy (expression->ordered_terms);
+  return g_list_reverse (g_list_copy (expression->ordered_terms));
 }
 
 void
@@ -486,7 +486,7 @@ expression_terms_foreach (Expression *expression,
   if (expression->terms == NULL)
     return;
 
-  for (l = expression->ordered_terms; l != NULL; l = l->next)
+  for (l = g_list_last (expression->ordered_terms); l != NULL; l = l->prev)
     {
       Term *t = l->data;
 
