@@ -310,7 +310,10 @@ expression_unref (Expression *expression)
   if (expression->ref_count == 0)
     {
       if (expression->terms != NULL)
-        g_hash_table_unref (expression->terms);
+        {
+          g_list_free (expression->ordered_terms);
+          g_hash_table_unref (expression->terms);
+        }
 
       g_slice_free (Expression, expression);
     }
