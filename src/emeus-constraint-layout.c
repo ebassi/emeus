@@ -1911,17 +1911,18 @@ emeus_constraint_layout_child_get_preferred_size (EmeusConstraintLayoutChild *se
           else
             gtk_widget_get_preferred_width_for_height (child, for_size, &child_min, &child_nat);
 
-          if (self->width_constraint == NULL)
-            {
-              Expression *e = expression_new_from_constant (child_min);
+          /* Update the constraint because the min width can change */
+          if (self->width_constraint != NULL)
+            simplex_solver_remove_constraint (self->solver, self->width_constraint);
 
-              self->width_constraint =
-                simplex_solver_add_constraint (self->solver,
-                                               attr, OPERATOR_TYPE_GE, e,
-                                               STRENGTH_MEDIUM);
+          Expression *e = expression_new_from_constant (child_min);
 
-              expression_unref (e);
-            }
+          self->width_constraint =
+            simplex_solver_add_constraint (self->solver,
+                                           attr, OPERATOR_TYPE_GE, e,
+                                           STRENGTH_MEDIUM);
+
+          expression_unref (e);
         }
       else
         {
@@ -1942,17 +1943,18 @@ emeus_constraint_layout_child_get_preferred_size (EmeusConstraintLayoutChild *se
           else
             gtk_widget_get_preferred_height_for_width (child, for_size, &child_min, &child_nat);
 
-          if (self->height_constraint == NULL)
-            {
-              Expression *e = expression_new_from_constant (child_min);
+          /* Update the constraint because the min height can change */
+          if (self->height_constraint != NULL)
+            simplex_solver_remove_constraint (self->solver, self->height_constraint);
 
-              self->height_constraint =
-                simplex_solver_add_constraint (self->solver,
-                                               attr, OPERATOR_TYPE_GE, e,
-                                               STRENGTH_MEDIUM);
+          Expression *e = expression_new_from_constant (child_min);
 
-              expression_unref (e);
-            }
+          self->height_constraint =
+            simplex_solver_add_constraint (self->solver,
+                                           attr, OPERATOR_TYPE_GE, e,
+                                           STRENGTH_MEDIUM);
+
+          expression_unref (e);
         }
       else
         {
