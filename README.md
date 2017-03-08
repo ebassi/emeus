@@ -27,7 +27,7 @@ recalculations of the relative position and size of each UI element.
 Emeus provides a third layout management policy, based on *constraints*;
 each UI element binds one of more of its attributes — like its width, or its
 position — to other UI elements, in a way that is more natural to describe
-from a UI building perspective, and hopefully more efficient that stacking
+from a UI building perspective, and hopefully more efficient than stacking
 piles of boxes one inside another.
 
 ### Constraints
