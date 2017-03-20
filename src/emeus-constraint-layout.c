@@ -1407,7 +1407,11 @@ create_child_constraint (EmeusConstraintLayout      *layout,
   /* Alternatively, if it's not a constant value, we find the variable
    * associated with it
    */
-  if (constraint->source_object != NULL)
+  if (constraint->source_object == NULL || constraint->source_object == layout)
+    {
+      attr2 = get_layout_attribute (layout, constraint->source_attribute);
+    }
+  else
     {
       EmeusConstraintLayoutChild *source_child;
 
@@ -1416,11 +1420,16 @@ create_child_constraint (EmeusConstraintLayout      *layout,
       else
         source_child = (EmeusConstraintLayoutChild *) gtk_widget_get_parent (constraint->source_object);
 
+      if (gtk_widget_get_parent ((GtkWidget *) source_child) != (GtkWidget *) layout)
+        {
+          g_critical ("Source object %p of type %s does not belong to EmeusConstraintLayout %p",
+                      constraint->source_object,
+                      G_OBJECT_TYPE_NAME (constraint->source_object),
+                      layout);
+          return;
+        }
+
       attr2 = get_child_attribute (source_child, constraint->source_attribute);
-    }
-  else
-    {
-      attr2 = get_layout_attribute (layout, constraint->source_attribute);
     }
 
   /* Turn attr2 into an expression in the form:
