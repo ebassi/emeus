@@ -21,4 +21,4 @@ before_script:
   - docker build -t emeusci:withgit .
 
 script:
-  - docker run withgit /bin/sh -c "cd /root && TRAVIS=1 CC=$CC ./emeus-run-tests.sh"
+  - docker run emeusci:withgit /bin/sh -c "cd /root && TRAVIS=1 CC=$CC ./emeus-run-tests.sh"
