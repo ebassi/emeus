@@ -1,5 +1,7 @@
 ## Emeus - Constraint-based layout manager for GTK+
 
+[![Build Status](https://travis-ci.org/ebassi/emeus.svg?branch=master)](https://travis-ci.org/ebassi/emeus)
+
 ### What is Emeus?
 
 Emeus is a constraint-based layout manager widget for [GTK+][gtk-web],
