@@ -1721,6 +1721,7 @@ emeus_constraint_layout_pack (EmeusConstraintLayout *layout,
 
   layout_child->iter = g_sequence_append (layout->children, layout_child);
   layout_child->solver = &layout->solver;
+  g_object_add_weak_pointer (G_OBJECT (layout), (gpointer*) &layout_child->solver);
 
   gtk_widget_set_parent (GTK_WIDGET (layout_child), GTK_WIDGET (layout));
 
@@ -1820,27 +1821,35 @@ emeus_constraint_layout_child_finalize (GObject *gobject)
 {
   EmeusConstraintLayoutChild *self = EMEUS_CONSTRAINT_LAYOUT_CHILD (gobject);
 
-  simplex_solver_freeze (self->solver);
+  if (self->solver)
+    {
+      simplex_solver_freeze (self->solver);
 
-  if (self->width_constraint != NULL)
-    simplex_solver_remove_constraint (self->solver, self->width_constraint);
+      if (self->width_constraint != NULL)
+        simplex_solver_remove_constraint (self->solver, self->width_constraint);
 
-  if (self->height_constraint != NULL)
-    simplex_solver_remove_constraint (self->solver, self->height_constraint);
+      if (self->height_constraint != NULL)
+        simplex_solver_remove_constraint (self->solver, self->height_constraint);
 
-  if (self->right_constraint != NULL)
-    simplex_solver_remove_constraint (self->solver, self->right_constraint);
+      if (self->right_constraint != NULL)
+        simplex_solver_remove_constraint (self->solver, self->right_constraint);
 
-  if (self->bottom_constraint != NULL)
-    simplex_solver_remove_constraint (self->solver, self->bottom_constraint);
+      if (self->bottom_constraint != NULL)
+        simplex_solver_remove_constraint (self->solver, self->bottom_constraint);
 
-  if (self->center_x_constraint != NULL)
-    simplex_solver_remove_constraint (self->solver, self->center_x_constraint);
+      if (self->center_x_constraint != NULL)
+        simplex_solver_remove_constraint (self->solver, self->center_x_constraint);
 
-  if (self->center_y_constraint != NULL)
-    simplex_solver_remove_constraint (self->solver, self->center_y_constraint);
+      if (self->center_y_constraint != NULL)
+        simplex_solver_remove_constraint (self->solver, self->center_y_constraint);
 
-  simplex_solver_thaw (self->solver);
+      simplex_solver_thaw (self->solver);
+
+      GtkWidget *layout;
+      if ((layout = gtk_widget_get_parent (GTK_WIDGET (gobject))))
+        g_object_remove_weak_pointer (G_OBJECT (layout), (gpointer*) &self->solver);
+      self->solver = NULL;
+    }
 
   g_free (self->name);
 
@@ -1907,6 +1916,9 @@ emeus_constraint_layout_child_get_preferred_size (EmeusConstraintLayoutChild *se
   int child_min = 0;
   int child_nat = 0;
   Variable *attr = NULL;
+
+  if (self->solver == NULL)
+    return;
 
   switch (orientation)
     {
@@ -2400,6 +2412,9 @@ emeus_constraint_layout_child_set_intrinsic_width (EmeusConstraintLayoutChild *c
 
   g_return_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child));
 
+  if (child->solver == NULL)
+    return;
+
   if (child->intrinsic_width == width)
     return;
 
@@ -2447,6 +2462,9 @@ emeus_constraint_layout_child_set_intrinsic_height (EmeusConstraintLayoutChild *
   Variable *attr;
 
   g_return_if_fail (EMEUS_IS_CONSTRAINT_LAYOUT_CHILD (child));
+
+  if (child->solver == NULL)
+    return;
 
   if (child->intrinsic_height == height)
     return;
