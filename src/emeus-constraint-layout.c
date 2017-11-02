@@ -85,7 +85,7 @@
  *    #EmeusConstraint:target-object property
  *  - `target-attr`, which contains an %EmeusConstraintAttribute value; this
  *    attribute is mandatory, and specifies the value of the
- *    #EmeusConstraint:taregt-attribute property
+ *    #EmeusConstraint:target-attribute property
  *  - `source-object`, used to point to a widget using its builder id; this
  *    attribute is optional, for constant constraints, and specifies the value
  *    of the #EmeusConstraint:source-object property
