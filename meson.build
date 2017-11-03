@@ -1,12 +1,12 @@
 project('emeus', 'c',
         version: '0.99.1',
         default_options: [
-          'buildtype=debug',
+          'buildtype=debugoptimized',
           'c_std=c99',
           'warning_level=1'
         ],
         license: 'LGPLv2.1+',
-        meson_version: '>= 0.36.0')
+        meson_version: '>= 0.43.0')
 
 emeus_version = meson.project_version().split('.')
 emeus_major_version = emeus_version[0].to_int()
@@ -27,12 +27,11 @@ else
   emeus_interface_age = emeus_micro_version
 endif
 
-emeus_binary_age = emeus_minor_version * 100 + emeus_micro_version
+emeus_binary_age = 100* emeus_minor_version + emeus_micro_version
 
 # Shared library versioning
-current = emeus_binary_age - emeus_interface_age
-revision = emeus_interface_age
-libversion = '0.@0@.@1@'.format(current, revision)
+soversion = 0
+libversion = '@0@.@0@.@1@'.format(soversion, emeus_binary_age - emeus_interface_age, emeus_interface_age)
 
 # Paths for the pkg-config file
 emeus_prefix = get_option('prefix')
@@ -40,6 +39,10 @@ emeus_bindir = join_paths(emeus_prefix, get_option('bindir'))
 emeus_libdir = join_paths(emeus_prefix, get_option('libdir'))
 emeus_datadir = join_paths(emeus_prefix, get_option('datadir'))
 emeus_includedir = join_paths(emeus_prefix, get_option('includedir'))
+emeus_libexecdir = join_paths(emeus_prefix, get_option('libexecdir'))
+emeus_localedir = join_paths(emeus_datadir, 'locale')
+
+emeus_api_path = '@0@-@1@'.format(meson.project_name(), emeus_api_version)
 
 cc = meson.get_compiler('c')
 host_system = host_machine.system()
@@ -48,10 +51,10 @@ conf = configuration_data()
 conf.set_quoted('PACKAGE_NAME', meson.project_name())
 conf.set_quoted('PACKAGE_VERSION', meson.project_version())
 conf.set_quoted('PACKAGE_STRING', '@0@-@1@'.format(meson.project_name(), meson.project_version()))
-conf.set_quoted('PACKAGE_DATADIR', join_paths(get_option('prefix'), get_option('datadir')))
-conf.set_quoted('PACKAGE_LIBDIR', join_paths(get_option('prefix'), get_option('datadir')))
-conf.set_quoted('PACKAGE_LOCALE_DIR', join_paths(get_option('prefix'), get_option('datadir'), 'locale'))
-conf.set_quoted('PACKAGE_LIBEXECDIR', join_paths(get_option('prefix'), get_option('libexecdir')))
+conf.set_quoted('PACKAGE_DATADIR', emeus_datadir)
+conf.set_quoted('PACKAGE_LIBDIR', emeus_libdir)
+conf.set_quoted('PACKAGE_LOCALE_DIR', emeus_localedir)
+conf.set_quoted('PACKAGE_LIBEXECDIR', emeus_libexecdir)
 conf.set('GETTEXT_PACKAGE', 'PACKAGE_NAME')
 conf.set('LOCALEDIR', 'PACKAGE_LOCALE_DIR')
 conf.set10('ENABLE_NLS', true) # Always enabled
@@ -61,16 +64,16 @@ test_cflags = [
   '-fstrict-aliasing',
   '-Wpointer-arith',
   '-Wmissing-declarations',
+  '-Wmissing-noreturn',
+  '-Wmissing-format-attribute',
+  '-Wmissing-prototypes',
   '-Wformat=2',
   '-Wstrict-prototypes',
-  '-Wmissing-prototypes',
   '-Wnested-externs',
   '-Wold-style-definition',
   '-Wunused',
   '-Wuninitialized',
   '-Wshadow',
-  '-Wmissing-noreturn',
-  '-Wmissing-format-attribute',
   '-Wredundant-decls',
   '-Wlogical-op',
   '-Wcast-align',
@@ -86,9 +89,16 @@ test_cflags = [
 common_cflags = []
 foreach cflag: test_cflags
   if cc.has_argument(cflag)
-    common_cflags += [ cflag ]
+    common_cflags += cflag
   endif
 endforeach
+
+common_ldflags = []
+if host_system == 'linux'
+  foreach ldflag: [ '-Wl,-Bsymbolic-functions', '-Wl,-z,relro', '-Wl,-z,now', ]
+    common_ldflags += ldflag
+  endforeach
+endif
 
 # Check for headers
 conf.set('HAVE_STDLIB_H', cc.has_header('stdlib.h'))
@@ -97,33 +107,14 @@ conf.set('HAVE_STDBOOL_H', cc.has_header('stdbool.h'))
 
 # Debugging
 debug_cflags = []
-enable_debug = get_option('enable-debug')
-if enable_debug == 'auto'
-  if emeus_is_development
-    enable_debug = 'yes'
-  else
-    enable_debug = 'minimum'
-  endif
-endif
-
-if enable_debug == 'yes'
-  debug_cflags += [
-    '-DEMEUS_ENABLE_DEBUG'
-  ]
-endif
-
-if enable_debug == 'minimum'
-  debug_cflags += [
-    '-DEMEUS_ENABLE_DEBUG',
-    '-DG_DISABLE_CAST_CHECKS'
-  ]
-endif
-
-if enable_debug == 'no'
+buildtype = get_option('buildtype')
+if buildtype.startswith('debug')
+  debug_cflags += '-DEMEUS_ENABLE_DEBUG'
+elif buildtype == 'release'
   debug_cflags += [
     '-DG_DISABLE_CAST_CHECKS',
     '-DG_DISABLE_CHECKS',
-    '-DG_DISABLE_ASSERT'
+    '-DG_DISABLE_ASSERT',
   ]
 endif
 
@@ -135,11 +126,11 @@ if get_option('default_library') != 'static'
       conf.set('_EMEUS_PUBLIC', '__declspec(dllexport) extern')
     else
       conf.set('_EMEUS_PUBLIC', '__attribute__((visibility("default"))) __declspec(dllexport) extern')
-      add_global_arguments('-fvisibility=hidden', language: 'c')
+      common_ldflags += '-fvisibility=hidden'
     endif
   else
     conf.set('_EMEUS_PUBLIC', '__attribute__((visibility("default")))')
-    add_global_arguments('-fvisibility=hidden', language: 'c')
+    common_ldflags += '-fvisibility=hidden'
   endif
 endif
 
@@ -166,8 +157,7 @@ endif
 
 gtk_dep = dependency('gtk+-3.0', version: '>= ' + gtk_version_required)
 
-find_program('msgmerge')
-
+i18n = import('i18n')
 gnome = import('gnome')
 
 subdir('src')
@@ -175,6 +165,8 @@ subdir('examples')
 
 subdir('po')
 
-if get_option('enable-gtk-doc')
+if get_option('docs')
   subdir('doc')
 endif
+
+meson.add_install_script('build-aux/post-install.sh')

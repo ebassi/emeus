@@ -21,4 +21,4 @@ trim_trailing_whitespace = false
 
 [meson.build]
 indent_style = space
-indent_size = 8
+indent_size = 2

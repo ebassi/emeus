@@ -71,5 +71,5 @@ if xsltproc.found()
                                '@INPUT@',
                              ],
                              install: true,
-                             install_dir: join_paths(get_option('mandir'), 'man1'))
+                             install_dir: join_paths(emeus_prefix, get_option('mandir'), 'man1'))
 endif

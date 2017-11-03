@@ -1,10 +1,6 @@
-option('enable-gtk-doc', type: 'boolean',
+option('docs', type: 'boolean',
        value: true,
-       description: 'Enable generating the API reference (depends on GTK-Doc)')
-option('enable-introspection', type: 'boolean',
+       description: 'Build the API reference (depends on gtk-doc)')
+option('introspection', type: 'boolean',
        value: true,
-       description: 'Enable GObject Introspection (depends on GObject)')
-option('enable-debug', type: 'combo',
-       choices: [ 'auto', 'yes', 'minimum', 'no' ],
-       value: 'auto',
-       description: 'Enable debugging level')
+       description: 'Generate GObject introspection data (depends on gobject-introspection)')

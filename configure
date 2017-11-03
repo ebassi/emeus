@@ -52,7 +52,8 @@ sanitycheck() {
 sanitycheck MESON 'meson'
 sanitycheck NINJA 'ninja' 'ninja-build'
 
-enable_docs='-Denable-gtk-doc=false'
+enable_docs='-Ddocs=false'
+enable_introspection='-Dintrospection=true'
 
 while (($# > 0)); do
     case "${1%%=*}" in
@@ -66,8 +67,10 @@ while (($# > 0)); do
 	--libdir) read_arg libdir "$@" || shift;;
 	--mandir) read_arg mandir "$@" || shift;;
 	--includedir) read_arg includedir "$@" || shift;;
-	--enable-gtk-doc) enable_docs='-Denable-gtk-doc=true';;
-	--disable-gtk-doc) enable_docs='-Denable-gtk-doc=false';;
+	--enable-gtk-doc) enable_docs='-Ddocs=true';;
+	--disable-gtk-doc) enable_docs='-Ddocs=false';;
+	--enable-introspection) enable_introspection='-Dintrospection=true';;
+	--disable-introspection) disable_introspection='-Dintrospection=false';;
 	*) echo "Ignoring unknown option '$1'";;
     esac
     shift
@@ -124,6 +127,7 @@ exec ${MESON} \
 	--mandir=${mandir} \
 	--default-library shared \
 	${enable_docs} \
+	${enable_introspection} \
 	${srcdir}
 
 # vim: ai ts=8 noet sts=2 ft=sh
