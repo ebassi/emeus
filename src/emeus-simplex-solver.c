@@ -645,10 +645,11 @@ simplex_solver_remove_column (SimplexSolver *solver,
                               Variable *variable)
 {
   VariableSet *set = g_hash_table_lookup (solver->columns, variable);
-  if (set == NULL)
-    goto out;
 
   variable_ref (variable);
+
+  if (set == NULL)
+    goto out;
 
   VariableSetIter iter;
   Variable *v;
