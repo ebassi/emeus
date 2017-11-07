@@ -343,6 +343,18 @@ get_layout_attribute (EmeusConstraintLayout   *layout,
       }
       break;
 
+    case EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH:
+    case EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT:
+      {
+        Expression *expr = expression_new_from_constant (0.0);
+        simplex_solver_add_constraint (&layout->solver,
+                                       res, OPERATOR_TYPE_GE, expr,
+                                       STRENGTH_REQUIRED);
+
+        expression_unref (expr);
+      }
+      break;
+
     default:
       break;
     }
@@ -453,6 +465,18 @@ get_child_attribute (EmeusConstraintLayoutChild *child,
           simplex_solver_add_constraint (child->solver,
                                          res, OPERATOR_TYPE_EQ, expr,
                                          STRENGTH_REQUIRED);
+
+        expression_unref (expr);
+      }
+      break;
+
+    case EMEUS_CONSTRAINT_ATTRIBUTE_WIDTH:
+    case EMEUS_CONSTRAINT_ATTRIBUTE_HEIGHT:
+      {
+        Expression *expr = expression_new_from_constant (0.0);
+        simplex_solver_add_constraint (child->solver,
+                                       res, OPERATOR_TYPE_GE, expr,
+                                       STRENGTH_REQUIRED);
 
         expression_unref (expr);
       }
