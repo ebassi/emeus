@@ -1,0 +1,69 @@
+# Polish translation for emeus.
+# Copyright © 2017 the emeus authors.
+# This file is distributed under the same license as the emeus package.
+# Piotr Drąg <piotrdrag@gmail.com>, 2017.
+# Aviary.pl <community-poland@mozilla.org>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: emeus\n"
+"Report-Msgid-Bugs-To: https://github.com/ebassi/emeus/issues/new\n"
+"POT-Creation-Date: 2017-12-22 17:30+0100\n"
+"PO-Revision-Date: 2017-12-22 17:32+0100\n"
+"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>\n"
+"Language-Team: Polish <community-poland@mozilla.org>\n"
+"Language: pl\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 "
+"|| n%100>=20) ? 1 : 2);\n"
+
+#: src/tools/com.endlessm.EmeusEditor.desktop.in:3
+msgid "Emeus Editor"
+msgstr "Edytor Emeus"
+
+#: src/tools/com.endlessm.EmeusEditor.desktop.in:4
+msgid "Editor for Emeus constraints"
+msgstr "Edytor ograniczeń Emeus"
+
+#: src/tools/com.endlessm.EmeusEditor.desktop.in:9
+msgid "com.endlessm.EmeusEditor"
+msgstr "com.endlessm.EmeusEditor"
+
+#: src/tools/com.endlessm.EmeusEditor.desktop.in:10
+msgid "Build;Develop;Editor;"
+msgstr ""
+"Budowanie;Buduj;Zbuduj;Programowanie;Programuj;Developer;Edytor;Edytowanie;"
+
+#: src/tools/editor-menu.ui:7
+msgid "_Quit"
+msgstr "Za_kończ"
+
+#: src/tools/editor-window.ui:11
+msgid "Constraints Editor"
+msgstr "Edytor ograniczeń"
+
+#: src/tools/editor-window.ui:41
+msgid "Views"
+msgstr "Widoki"
+
+#: src/tools/editor-window.ui:51
+msgid "Metrics"
+msgstr "Parametry"
+
+#: src/tools/editor-window.ui:161
+msgid "Visual Format"
+msgstr "Format wizualny"
+
+#: src/tools/editor-window.ui:178
+msgid "Log"
+msgstr "Dziennik"
+
+#: src/tools/emeus-edit-constraints.c:413
+msgid "Visual format parsed successfully\n"
+msgstr "Pomyślnie przetworzono format wizualny\n"
+
+#: src/tools/view-list-row.ui:28
+msgid "Enter the view name…"
+msgstr "Nazwa widoku…"
