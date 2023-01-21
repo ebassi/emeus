@@ -6,7 +6,7 @@ project('emeus', 'c',
           'warning_level=1'
         ],
         license: 'LGPLv2.1+',
-        meson_version: '>= 0.43.0')
+        meson_version: '>= 0.59')
 
 emeus_version = meson.project_version().split('.')
 emeus_major_version = emeus_version[0].to_int()
@@ -169,4 +169,10 @@ if get_option('docs')
   subdir('doc')
 endif
 
-meson.add_install_script('build-aux/post-install.sh')
+gnome = import('gnome')
+update_desktop_database = find_program('update-desktop-database', required: false)
+gnome.post_install(
+  glib_compile_schemas: true,
+  gtk_update_icon_cache: true,
+  update_desktop_database: update_desktop_database.found(),
+)
