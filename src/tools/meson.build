@@ -5,8 +5,7 @@ gen_constraints = executable('emeus-gen-constraints', 'emeus-gen-constraints.c',
                              install: true)
 
 # Desktop launcher and description file.
-i18n.merge_file('desktop',
-                input: 'com.endlessm.EmeusEditor.desktop.in',
+i18n.merge_file(input: 'com.endlessm.EmeusEditor.desktop.in',
                 output: 'com.endlessm.EmeusEditor.desktop',
                 install: true,
                 install_dir: join_paths(emeus_datadir, 'applications'),
