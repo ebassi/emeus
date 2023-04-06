@@ -129,10 +129,10 @@ additional Cassowary implementations in various languages.
 [gtk-web]: https://www.gtk.org
 [cassowary-web]: http://constraints.cs.washington.edu/cassowary/
 [overconstrained-web]: http://overconstrained.io/
-[gtk-container-api]: https://developer.gnome.org/gtk3/stable/GtkContainer.html
-[gtk-fixed-api]: https://developer.gnome.org/gtk3/stable/GtkFixed.html
-[gtk-layout-api]: https://developer.gnome.org/gtk3/stable/GtkLayout.html
-[gtk-box-api]: https://developer.gnome.org/gtk3/stable/GtkBox.html
+[gtk-container-api]: https://docs.gtk.org/gtk3/class.Container.html
+[gtk-fixed-api]: https://docs.gtk.org/gtk3/class.Fixed.html
+[gtk-layout-api]: https://docs.gtk.org/gtk3/class.Layout.html
+[gtk-box-api]: https://docs.gtk.org/gtk3/class.Box.html
 [cassowary-cpp-web]: https://sourceforge.net/projects/cassowary/
 [cassowary-js-web]: https://github.com/slightlyoff/cassowary.js
 [cassowary-py-web]: https://github.com/pybee/cassowary
